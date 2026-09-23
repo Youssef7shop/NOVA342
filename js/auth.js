@@ -3,20 +3,22 @@
 /* =========================================================
    NOVA MARKET
    SUPABASE AUTH
+   Uses the ONE client created in supabase-config.js
    ========================================================= */
 
 document.addEventListener("DOMContentLoaded", async () => {
 
     /* =====================================================
-       CHECK SUPABASE
+       GET EXISTING SUPABASE CLIENT
        ===================================================== */
 
-    if (
-        typeof supabase === "undefined" ||
-        typeof SUPABASE_URL === "undefined" ||
-        typeof SUPABASE_ANON_KEY === "undefined"
-    ) {
-        console.error("Supabase is not configured.");
+    const supabaseClient = window.supabaseClient;
+
+    if (!supabaseClient) {
+
+        console.error(
+            "Supabase client is missing. Check js/supabase-config.js."
+        );
 
         showMessage(
             "Supabase is not configured. Check supabase-config.js.",
@@ -25,19 +27,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         return;
     }
-
-
-    /* =====================================================
-       CREATE CLIENT
-       ===================================================== */
-
-    const supabaseClient = supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_ANON_KEY
-    );
-
-    // Make client available globally
-    window.supabaseClient = supabaseClient;
 
 
     /* =====================================================
@@ -85,33 +74,61 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
     /* =====================================================
-       CURRENT USER
+       CURRENT SESSION
        ===================================================== */
 
-    const {
-        data: {
-            session
+    try {
+
+        const {
+            data,
+            error
+        } = await supabaseClient.auth.getSession();
+
+
+        if (error) {
+            console.error(
+                "Session error:",
+                error
+            );
         }
-    } = await supabaseClient.auth.getSession();
 
 
-    if (session) {
+        const session = data?.session;
 
-        const currentPage =
-            window.location.pathname;
 
-        /*
-         * If user is already logged in and opens
-         * login/register, send them to dashboard.
-         */
+        if (session) {
 
-        if (
-            currentPage.endsWith("login.html") ||
-            currentPage.endsWith("register.html")
-        ) {
-            window.location.href =
-                "dashboard.html";
+            const currentPage =
+                window.location.pathname;
+
+
+            /*
+             * Only redirect if the user is on
+             * login/register pages.
+             *
+             * Do NOT redirect from service.html,
+             * services.html, dashboard.html, etc.
+             */
+
+            if (
+                currentPage.endsWith("login.html") ||
+                currentPage.endsWith("register.html")
+            ) {
+
+                const redirect =
+                    getSafeRedirect();
+
+                window.location.href =
+                    redirect || "dashboard.html";
+            }
         }
+
+    } catch (error) {
+
+        console.error(
+            "Session check failed:",
+            error
+        );
     }
 
 
@@ -120,7 +137,7 @@ document.addEventListener("DOMContentLoaded", async () => {
        ===================================================== */
 
     supabaseClient.auth.onAuthStateChange(
-        async (event, session) => {
+        (event, session) => {
 
             console.log(
                 "NOVA Auth:",
@@ -138,23 +155,22 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
                 /*
-                 * Never send authenticated users
-                 * back to index.html.
+                 * Only redirect from auth pages.
                  */
 
                 if (
                     currentPage.endsWith("login.html") ||
-                    currentPage.endsWith("register.html") ||
-                    currentPage.endsWith("index.html") ||
-                    currentPage === "/" ||
-                    currentPage.endsWith("/")
+                    currentPage.endsWith("register.html")
                 ) {
 
+                    const redirect =
+                        getSafeRedirect();
+
+
                     window.location.href =
-                        "dashboard.html";
+                        redirect || "dashboard.html";
                 }
             }
-
         }
     );
 
@@ -186,6 +202,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                         ?.value;
 
 
+                /* ------------------------------
+                   VALIDATION
+                   ------------------------------ */
+
                 if (!email || !passwordValue) {
 
                     showMessage(
@@ -215,6 +235,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                 );
 
 
+                /* ------------------------------
+                   LOGIN
+                   ------------------------------ */
+
                 try {
 
                     const {
@@ -224,7 +248,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                         await supabaseClient.auth
                             .signInWithPassword({
                                 email,
-                                password: passwordValue
+                                password:
+                                    passwordValue
                             });
 
 
@@ -233,7 +258,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     }
 
 
-                    if (!data.session) {
+                    if (!data?.session) {
 
                         showMessage(
                             "Login ماكملش. حاول مرة أخرى.",
@@ -256,15 +281,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                     );
 
 
-                    /*
-                     * IMPORTANT:
-                     * Go directly to dashboard.
-                     */
-
                     setTimeout(() => {
 
+                        const redirect =
+                            getSafeRedirect();
+
+
                         window.location.href =
-                            "dashboard.html";
+                            redirect || "dashboard.html";
 
                     }, 500);
 
@@ -289,7 +313,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                         "Login to NOVA"
                     );
                 }
-
             }
         );
     }
@@ -344,9 +367,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                         ?.checked;
 
 
-                /* -----------------------------------------
+                /* ------------------------------
                    VALIDATION
-                   ----------------------------------------- */
+                   ------------------------------ */
 
                 if (
                     !firstName ||
@@ -423,10 +446,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
 
 
-                /* -----------------------------------------
-                   LOADING
-                   ----------------------------------------- */
-
                 setButtonLoading(
                     registerButton,
                     true,
@@ -434,11 +453,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                 );
 
 
-                try {
+                /* ------------------------------
+                   SUPABASE SIGN UP
+                   ------------------------------ */
 
-                    /* -------------------------------------
-                       SUPABASE SIGN UP
-                       ------------------------------------- */
+                try {
 
                     const {
                         data,
@@ -449,7 +468,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                                 email,
 
-                                password: passwordValue,
+                                password:
+                                    passwordValue,
 
                                 options: {
 
@@ -463,18 +483,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                                         full_name:
                                             `${firstName} ${lastName}`
-
                                     },
-
-                                    /*
-                                     * After email confirmation,
-                                     * return to login page.
-                                     */
 
                                     emailRedirectTo:
                                         `${window.location.origin}/login.html`
                                 }
-
                             });
 
 
@@ -483,13 +496,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                     }
 
 
-                    /* -------------------------------------
+                    /* ------------------------------
                        EMAIL CONFIRMATION
-                       ------------------------------------- */
+                       ------------------------------ */
 
                     if (
-                        data.user &&
-                        !data.session
+                        data?.user &&
+                        !data?.session
                     ) {
 
                         showMessage(
@@ -512,11 +525,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                     }
 
 
-                    /* -------------------------------------
+                    /* ------------------------------
                        DIRECT LOGIN
-                       ------------------------------------- */
+                       ------------------------------ */
 
-                    if (data.session) {
+                    if (data?.session) {
 
                         showMessage(
                             "Account created successfully!",
@@ -556,7 +569,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                         "Create account"
                     );
                 }
-
             }
         );
     }
@@ -584,6 +596,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 try {
 
+                    const redirect =
+                        getSafeRedirect();
+
+
                     const {
                         error
                     } =
@@ -594,16 +610,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                                 options: {
 
-                                    /*
-                                     * IMPORTANT:
-                                     * Google → Supabase → Dashboard
-                                     */
-
                                     redirectTo:
-                                        `${window.location.origin}/dashboard.html`
-
+                                        redirect
+                                            ? `${window.location.origin}/${redirect.replace(/^\//, "")}`
+                                            : `${window.location.origin}/dashboard.html`
                                 }
-
                             });
 
 
@@ -632,7 +643,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                         "Continue with Google"
                     );
                 }
-
             }
         );
     }
@@ -660,6 +670,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 try {
 
+                    const redirect =
+                        getSafeRedirect();
+
+
                     const {
                         error
                     } =
@@ -670,16 +684,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                                 options: {
 
-                                    /*
-                                     * IMPORTANT:
-                                     * Google Register → Dashboard
-                                     */
-
                                     redirectTo:
-                                        `${window.location.origin}/dashboard.html`
-
+                                        redirect
+                                            ? `${window.location.origin}/${redirect.replace(/^\//, "")}`
+                                            : `${window.location.origin}/dashboard.html`
                                 }
-
                             });
 
 
@@ -708,7 +717,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                         "Continue with Google"
                     );
                 }
-
             }
         );
     }
@@ -797,7 +805,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                         "error"
                     );
                 }
-
             }
         );
     }
@@ -834,7 +841,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                     passwordStrength,
                     strengthText
                 );
-
             }
         );
     }
@@ -859,12 +865,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 if (!confirmation) {
 
-                    confirmPassword
-                        .classList
-                        .remove(
-                            "valid",
-                            "invalid"
-                        );
+                    confirmPassword.classList.remove(
+                        "valid",
+                        "invalid"
+                    );
 
                     return;
                 }
@@ -874,32 +878,31 @@ document.addEventListener("DOMContentLoaded", async () => {
                     original === confirmation
                 ) {
 
-                    confirmPassword
-                        .classList
-                        .add("valid");
+                    confirmPassword.classList.add(
+                        "valid"
+                    );
 
-                    confirmPassword
-                        .classList
-                        .remove("invalid");
+                    confirmPassword.classList.remove(
+                        "invalid"
+                    );
 
                 } else {
 
-                    confirmPassword
-                        .classList
-                        .add("invalid");
+                    confirmPassword.classList.add(
+                        "invalid"
+                    );
 
-                    confirmPassword
-                        .classList
-                        .remove("valid");
+                    confirmPassword.classList.remove(
+                        "valid"
+                    );
                 }
-
             }
         );
     }
 
 
     /* =====================================================
-       GLOBAL FUNCTIONS
+       GLOBAL NOVA AUTH API
        ===================================================== */
 
     window.novaAuth = {
@@ -916,13 +919,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             if (error) {
 
-                console.error(error);
+                console.error(
+                    "Get user error:",
+                    error
+                );
 
                 return null;
             }
 
 
-            return data.user;
+            return data?.user || null;
         },
 
 
@@ -938,13 +944,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             if (error) {
 
-                console.error(error);
+                console.error(
+                    "Get session error:",
+                    error
+                );
 
                 return null;
             }
 
 
-            return data.session;
+            return data?.session || null;
         },
 
 
@@ -965,14 +974,77 @@ document.addEventListener("DOMContentLoaded", async () => {
             window.location.href =
                 "login.html";
         }
-
     };
 
 });
 
 
 /* =========================================================
-   PASSWORD TOGGLE FUNCTION
+   SAFE REDIRECT
+   ========================================================= */
+
+function getSafeRedirect() {
+
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+
+    const redirect =
+        params.get("redirect");
+
+
+    if (!redirect) {
+        return null;
+    }
+
+
+    /*
+     * Security:
+     * Only allow local relative pages.
+     * Prevent external redirects.
+     */
+
+    try {
+
+        const decoded =
+            decodeURIComponent(redirect);
+
+
+        if (
+            decoded.startsWith("/") &&
+            !decoded.startsWith("//")
+        ) {
+
+            return decoded;
+        }
+
+
+        if (
+            !decoded.includes("://") &&
+            !decoded.startsWith("javascript:")
+        ) {
+
+            return decoded;
+        }
+
+
+    } catch (error) {
+
+        console.warn(
+            "Invalid redirect:",
+            error
+        );
+    }
+
+
+    return null;
+}
+
+
+/* =========================================================
+   PASSWORD TOGGLE
    ========================================================= */
 
 function setupPasswordToggle(
@@ -1011,7 +1083,6 @@ function setupPasswordToggle(
                     ? "Hide password"
                     : "Show password"
             );
-
         }
     );
 }
@@ -1034,15 +1105,20 @@ function updatePasswordStrength(
 
     if (!password) {
 
-        container.classList.remove("show");
+        container.classList.remove(
+            "show"
+        );
 
-        textElement.textContent = "";
+        textElement.textContent =
+            "";
 
         return;
     }
 
 
-    container.classList.add("show");
+    container.classList.add(
+        "show"
+    );
 
 
     const bars =
@@ -1079,20 +1155,21 @@ function updatePasswordStrength(
     }
 
 
-    bars.forEach((bar, index) => {
+    bars.forEach(
+        (bar, index) => {
 
-        if (index < score) {
+            if (index < score) {
 
-            bar.style.background =
-                "rgba(34,197,94,.85)";
+                bar.style.background =
+                    "rgba(34,197,94,.85)";
 
-        } else {
+            } else {
 
-            bar.style.background =
-                "rgba(255,255,255,.08)";
+                bar.style.background =
+                    "rgba(255,255,255,.08)";
+            }
         }
-
-    });
+    );
 
 
     if (score <= 1) {
@@ -1171,7 +1248,8 @@ function clearMessage() {
     }
 
 
-    element.textContent = "";
+    element.textContent =
+        "";
 
     element.className =
         "auth-message";
@@ -1193,11 +1271,14 @@ function setButtonLoading(
     }
 
 
-    button.disabled = loading;
+    button.disabled =
+        loading;
 
 
     const span =
-        button.querySelector("span");
+        button.querySelector(
+            "span"
+        );
 
 
     if (span) {
@@ -1209,9 +1290,10 @@ function setButtonLoading(
         }
 
 
-        span.textContent = loading
-            ? text
-            : button.dataset.originalText;
+        span.textContent =
+            loading
+                ? text
+                : button.dataset.originalText;
 
     } else {
 
@@ -1222,9 +1304,10 @@ function setButtonLoading(
         }
 
 
-        button.textContent = loading
-            ? text
-            : button.dataset.originalText;
+        button.textContent =
+            loading
+                ? text
+                : button.dataset.originalText;
     }
 }
 
@@ -1236,6 +1319,7 @@ function setButtonLoading(
 function getAuthErrorMessage(error) {
 
     if (!error) {
+
         return "وقع خطأ غير معروف.";
     }
 
@@ -1316,6 +1400,28 @@ function getAuthErrorMessage(error) {
     }
 
 
-    return error.message ||
-        "وقع خطأ. حاول مرة أخرى.";
+    if (
+        message.includes(
+            "user not found"
+        )
+    ) {
+
+        return "ما لقيناش هاد الحساب.";
+    }
+
+
+    if (
+        message.includes(
+            "too many requests"
+        )
+    ) {
+
+        return "طلبات كثيرة دابا. حاول من بعد.";
+    }
+
+
+    return (
+        error.message ||
+        "وقع خطأ. حاول مرة أخرى."
+    );
 }
