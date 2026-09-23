@@ -26,6 +26,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
     }
 
+
     /* =====================================================
        CREATE CLIENT
        ===================================================== */
@@ -34,6 +35,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         SUPABASE_URL,
         SUPABASE_ANON_KEY
     );
+
+    // Make client available globally
+    window.supabaseClient = supabaseClient;
 
 
     /* =====================================================
@@ -65,27 +69,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById("togglePassword");
 
     const toggleConfirmPassword =
-        document.getElementById(
-            "toggleConfirmPassword"
-        );
+        document.getElementById("toggleConfirmPassword");
 
     const password =
         document.getElementById("password");
 
     const confirmPassword =
-        document.getElementById(
-            "confirmPassword"
-        );
+        document.getElementById("confirmPassword");
 
     const passwordStrength =
-        document.getElementById(
-            "passwordStrength"
-        );
+        document.getElementById("passwordStrength");
 
     const strengthText =
-        document.getElementById(
-            "strengthText"
-        );
+        document.getElementById("strengthText");
 
 
     /* =====================================================
@@ -98,17 +94,23 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     } = await supabaseClient.auth.getSession();
 
+
     if (session) {
 
         const currentPage =
             window.location.pathname;
+
+        /*
+         * If user is already logged in and opens
+         * login/register, send them to dashboard.
+         */
 
         if (
             currentPage.endsWith("login.html") ||
             currentPage.endsWith("register.html")
         ) {
             window.location.href =
-                "index.html";
+                "dashboard.html";
         }
     }
 
@@ -125,6 +127,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 event
             );
 
+
             if (
                 event === "SIGNED_IN" &&
                 session
@@ -133,12 +136,22 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const currentPage =
                     window.location.pathname;
 
+
+                /*
+                 * Never send authenticated users
+                 * back to index.html.
+                 */
+
                 if (
                     currentPage.endsWith("login.html") ||
-                    currentPage.endsWith("register.html")
+                    currentPage.endsWith("register.html") ||
+                    currentPage.endsWith("index.html") ||
+                    currentPage === "/" ||
+                    currentPage.endsWith("/")
                 ) {
+
                     window.location.href =
-                        "index.html";
+                        "dashboard.html";
                 }
             }
 
@@ -160,18 +173,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 clearMessage();
 
+
                 const email =
                     document
                         .getElementById("email")
                         ?.value
                         .trim();
 
-                const password =
+                const passwordValue =
                     document
                         .getElementById("password")
                         ?.value;
 
-                if (!email || !password) {
+
+                if (!email || !passwordValue) {
 
                     showMessage(
                         "دخل Email و Password.",
@@ -180,6 +195,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                     return;
                 }
+
 
                 if (!isValidEmail(email)) {
 
@@ -191,11 +207,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                     return;
                 }
 
+
                 setButtonLoading(
                     loginButton,
                     true,
                     "Logging in..."
                 );
+
 
                 try {
 
@@ -206,12 +224,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                         await supabaseClient.auth
                             .signInWithPassword({
                                 email,
-                                password
+                                password: passwordValue
                             });
+
 
                     if (error) {
                         throw error;
                     }
+
 
                     if (!data.session) {
 
@@ -229,17 +249,25 @@ document.addEventListener("DOMContentLoaded", async () => {
                         return;
                     }
 
+
                     showMessage(
                         "Login successful. Welcome back!",
                         "success"
                     );
 
+
+                    /*
+                     * IMPORTANT:
+                     * Go directly to dashboard.
+                     */
+
                     setTimeout(() => {
 
                         window.location.href =
-                            "index.html";
+                            "dashboard.html";
 
-                    }, 700);
+                    }, 500);
+
 
                 } catch (error) {
 
@@ -248,10 +276,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                         error
                     );
 
+
                     showMessage(
                         getAuthErrorMessage(error),
                         "error"
                     );
+
 
                     setButtonLoading(
                         loginButton,
@@ -279,6 +309,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 clearMessage();
 
+
                 const firstName =
                     document
                         .getElementById("firstName")
@@ -297,16 +328,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                         ?.value
                         .trim();
 
-                const password =
+                const passwordValue =
                     document
                         .getElementById("password")
                         ?.value;
 
                 const confirm =
                     document
-                        .getElementById(
-                            "confirmPassword"
-                        )
+                        .getElementById("confirmPassword")
                         ?.value;
 
                 const terms =
@@ -323,7 +352,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     !firstName ||
                     !lastName ||
                     !email ||
-                    !password ||
+                    !passwordValue ||
                     !confirm
                 ) {
 
@@ -361,7 +390,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
 
 
-                if (password.length < 8) {
+                if (passwordValue.length < 8) {
 
                     showMessage(
                         "Password خاصو يكون فيه 8 حروف على الأقل.",
@@ -372,7 +401,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
 
 
-                if (password !== confirm) {
+                if (passwordValue !== confirm) {
 
                     showMessage(
                         "Password و Confirm Password ما متطابقينش.",
@@ -420,7 +449,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                                 email,
 
-                                password,
+                                password: passwordValue,
 
                                 options: {
 
@@ -435,8 +464,15 @@ document.addEventListener("DOMContentLoaded", async () => {
                                         full_name:
                                             `${firstName} ${lastName}`
 
-                                    }
+                                    },
 
+                                    /*
+                                     * After email confirmation,
+                                     * return to login page.
+                                     */
+
+                                    emailRedirectTo:
+                                        `${window.location.origin}/login.html`
                                 }
 
                             });
@@ -461,13 +497,16 @@ document.addEventListener("DOMContentLoaded", async () => {
                             "success"
                         );
 
+
                         registerForm.reset();
+
 
                         setButtonLoading(
                             registerButton,
                             false,
                             "Create account"
                         );
+
 
                         return;
                     }
@@ -484,12 +523,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                             "success"
                         );
 
+
                         setTimeout(() => {
 
                             window.location.href =
-                                "index.html";
+                                "dashboard.html";
 
-                        }, 700);
+                        }, 500);
+
 
                         return;
                     }
@@ -502,10 +543,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                         error
                     );
 
+
                     showMessage(
                         getAuthErrorMessage(error),
                         "error"
                     );
+
 
                     setButtonLoading(
                         registerButton,
@@ -531,11 +574,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 clearMessage();
 
+
                 setButtonLoading(
                     googleLogin,
                     true,
                     "Connecting..."
                 );
+
 
                 try {
 
@@ -549,16 +594,23 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                                 options: {
 
+                                    /*
+                                     * IMPORTANT:
+                                     * Google → Supabase → Dashboard
+                                     */
+
                                     redirectTo:
-                                        `${window.location.origin}/index.html`
+                                        `${window.location.origin}/dashboard.html`
 
                                 }
 
                             });
 
+
                     if (error) {
                         throw error;
                     }
+
 
                 } catch (error) {
 
@@ -567,10 +619,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                         error
                     );
 
+
                     showMessage(
                         getAuthErrorMessage(error),
                         "error"
                     );
+
 
                     setButtonLoading(
                         googleLogin,
@@ -596,11 +650,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 clearMessage();
 
+
                 setButtonLoading(
                     googleRegister,
                     true,
                     "Connecting..."
                 );
+
 
                 try {
 
@@ -614,16 +670,23 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                                 options: {
 
+                                    /*
+                                     * IMPORTANT:
+                                     * Google Register → Dashboard
+                                     */
+
                                     redirectTo:
-                                        `${window.location.origin}/index.html`
+                                        `${window.location.origin}/dashboard.html`
 
                                 }
 
                             });
 
+
                     if (error) {
                         throw error;
                     }
+
 
                 } catch (error) {
 
@@ -632,10 +695,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                         error
                     );
 
+
                     showMessage(
                         getAuthErrorMessage(error),
                         "error"
                     );
+
 
                     setButtonLoading(
                         googleRegister,
@@ -663,11 +728,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 clearMessage();
 
+
                 const email =
                     document
                         .getElementById("email")
                         ?.value
                         .trim();
+
 
                 if (!email) {
 
@@ -679,6 +746,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     return;
                 }
 
+
                 if (!isValidEmail(email)) {
 
                     showMessage(
@@ -688,6 +756,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                     return;
                 }
+
 
                 try {
 
@@ -703,14 +772,17 @@ document.addEventListener("DOMContentLoaded", async () => {
                                 }
                             );
 
+
                     if (error) {
                         throw error;
                     }
+
 
                     showMessage(
                         "إلا كان الحساب موجود، غادي توصلك رسالة باش تبدل Password.",
                         "success"
                     );
+
 
                 } catch (error) {
 
@@ -718,6 +790,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         "Reset password error:",
                         error
                     );
+
 
                     showMessage(
                         getAuthErrorMessage(error),
@@ -738,6 +811,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         togglePassword,
         password
     );
+
 
     setupPasswordToggle(
         toggleConfirmPassword,
@@ -782,6 +856,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const confirmation =
                     confirmPassword.value;
 
+
                 if (!confirmation) {
 
                     confirmPassword
@@ -793,6 +868,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                     return;
                 }
+
 
                 if (
                     original === confirmation
@@ -837,10 +913,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                 await supabaseClient.auth
                     .getUser();
 
+
             if (error) {
+
                 console.error(error);
+
                 return null;
             }
+
 
             return data.user;
         },
@@ -855,10 +935,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                 await supabaseClient.auth
                     .getSession();
 
+
             if (error) {
+
                 console.error(error);
+
                 return null;
             }
+
 
             return data.session;
         },
@@ -872,16 +956,17 @@ document.addEventListener("DOMContentLoaded", async () => {
                 await supabaseClient.auth
                     .signOut();
 
+
             if (error) {
                 throw error;
             }
+
 
             window.location.href =
                 "login.html";
         }
 
     };
-
 
 });
 
@@ -890,11 +975,15 @@ document.addEventListener("DOMContentLoaded", async () => {
    PASSWORD TOGGLE FUNCTION
    ========================================================= */
 
-function setupPasswordToggle(button, input) {
+function setupPasswordToggle(
+    button,
+    input
+) {
 
     if (!button || !input) {
         return;
     }
+
 
     button.addEventListener(
         "click",
@@ -903,15 +992,18 @@ function setupPasswordToggle(button, input) {
             const isPassword =
                 input.type === "password";
 
+
             input.type =
                 isPassword
                     ? "text"
                     : "password";
 
+
             button.textContent =
                 isPassword
                     ? "🙈"
                     : "👁";
+
 
             button.setAttribute(
                 "aria-label",
@@ -919,6 +1011,7 @@ function setupPasswordToggle(button, input) {
                     ? "Hide password"
                     : "Show password"
             );
+
         }
     );
 }
@@ -938,6 +1031,7 @@ function updatePasswordStrength(
         return;
     }
 
+
     if (!password) {
 
         container.classList.remove("show");
@@ -947,12 +1041,15 @@ function updatePasswordStrength(
         return;
     }
 
+
     container.classList.add("show");
+
 
     const bars =
         container.querySelectorAll(
             ".strength-bar"
         );
+
 
     let score = 0;
 
@@ -961,17 +1058,21 @@ function updatePasswordStrength(
         score++;
     }
 
+
     if (/[a-z]/.test(password)) {
         score++;
     }
+
 
     if (/[A-Z]/.test(password)) {
         score++;
     }
 
+
     if (/[0-9]/.test(password)) {
         score++;
     }
+
 
     if (/[^A-Za-z0-9]/.test(password)) {
         score++;
@@ -1042,11 +1143,15 @@ function showMessage(
             "authMessage"
         );
 
+
     if (!element) {
         return;
     }
 
-    element.textContent = message;
+
+    element.textContent =
+        message;
+
 
     element.className =
         `auth-message show ${type}`;
@@ -1060,9 +1165,11 @@ function clearMessage() {
             "authMessage"
         );
 
+
     if (!element) {
         return;
     }
+
 
     element.textContent = "";
 
@@ -1085,10 +1192,13 @@ function setButtonLoading(
         return;
     }
 
+
     button.disabled = loading;
+
 
     const span =
         button.querySelector("span");
+
 
     if (span) {
 
@@ -1097,6 +1207,7 @@ function setButtonLoading(
             button.dataset.originalText =
                 span.textContent;
         }
+
 
         span.textContent = loading
             ? text
@@ -1109,6 +1220,7 @@ function setButtonLoading(
             button.dataset.originalText =
                 button.textContent;
         }
+
 
         button.textContent = loading
             ? text
@@ -1126,6 +1238,7 @@ function getAuthErrorMessage(error) {
     if (!error) {
         return "وقع خطأ غير معروف.";
     }
+
 
     const message =
         String(
