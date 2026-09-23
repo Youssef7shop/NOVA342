@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>NOVA MARKET — My Services</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #050509;
+            --panel: #0d0d14;
+            --panel2: #12121b;
+            --border: rgba(255,255,255,.09);
+            --text: #fff;
+            --muted: #9b9baa;
+            --blue: #4d7cff;
+            --purple: #8b5cf6;
+            --green: #22c55e;
+            --orange: #f59e0b;
+            --red: #ef4444;
+        }
+
+        body {
+            font-family: Inter, sans-serif;
+            background:
+                radial-gradient(
+                    circle at 10% 0%,
+                    rgba(77,124,255,.13),
+                    transparent 30%
+                ),
+                radial-gradient(
+                    circle at 90% 10%,
+                    rgba(139,92,246,.13),
+                    transparent 30%
+                ),
+                var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        button,
+        input,
+        textarea,
+        select {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        .navbar {
+            height: 74px;
+            padding: 0 6%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            background: rgba(5,5,9,.8);
+            backdrop-filter: blur(20px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            color: white;
+            text-decoration: none;
+            font-size: 25px;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .logo span {
+            color: var(--blue);
+        }
+
+        .nav {
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .nav a:hover,
+        .nav a.active {
+            color: white;
+        }
+
+        .container {
+            width: min(1400px, 90%);
+            margin: auto;
+        }
+
+        .header {
+            padding: 65px 0 35px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 30px;
+        }
+
+        .eyebrow {
+            color: var(--blue);
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        h1 {
+            font-size: clamp(35px, 5vw, 58px);
+            letter-spacing: -2.5px;
+        }
+
+        .header p {
+            color: var(--muted);
+            margin-top: 12px;
+        }
+
+        .primary-btn {
+            border: 0;
+            padding: 14px 20px;
+            border-radius: 13px;
+            color: white;
+            font-weight: 700;
+            background: linear-gradient(
+                135deg,
+                var(--blue),
+                var(--purple)
+            );
+            box-shadow: 0 10px 35px rgba(77,124,255,.2);
+        }
+
+        .primary-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 22px;
+            padding-bottom: 80px;
+        }
+
+        .card {
+            background: linear-gradient(
+                145deg,
+                rgba(255,255,255,.055),
+                rgba(255,255,255,.018)
+            );
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            overflow: hidden;
+        }
+
+        .image {
+            height: 180px;
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(77,124,255,.2),
+                    rgba(139,92,246,.25)
+                );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-placeholder {
+            font-size: 50px;
+            font-weight: 800;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .category {
+            display: inline-block;
+            font-size: 11px;
+            padding: 6px 9px;
+            border-radius: 999px;
+            color: #bfcaff;
+            background: rgba(77,124,255,.12);
+            margin-bottom: 12px;
+        }
+
+        .title {
+            font-size: 18px;
+            line-height: 1.35;
+            margin-bottom: 9px;
+        }
+
+        .description {
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.55;
+            min-height: 40px;
+        }
+
+        .meta {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 18px;
+            padding-top: 17px;
+            border-top: 1px solid var(--border);
+        }
+
+        .price {
+            font-weight: 800;
+            font-size: 19px;
+        }
+
+        .delivery {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .status {
+            margin-top: 15px;
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-block;
+            padding: 6px 9px;
+            border-radius: 999px;
+        }
+
+        .status.published {
+            background: rgba(34,197,94,.12);
+            color: #6ee7a0;
+        }
+
+        .status.draft {
+            background: rgba(245,158,11,.12);
+            color: #fbbf24;
+        }
+
+        .status.paused {
+            background: rgba(239,68,68,.12);
+            color: #f87171;
+        }
+
+        .actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 9px;
+            margin-top: 18px;
+        }
+
+        .action-btn {
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,.04);
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+
+        .action-btn:hover {
+            background: rgba(255,255,255,.08);
+        }
+
+        .delete-btn {
+            color: #ff7b8f;
+        }
+
+        .empty {
+            grid-column: 1 / -1;
+            padding: 90px 20px;
+            text-align: center;
+            border: 1px dashed var(--border);
+            border-radius: 20px;
+            color: var(--muted);
+        }
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.75);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 200;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-box {
+            width: min(650px, 100%);
+            max-height: 90vh;
+            overflow-y: auto;
+            background: #0c0c13;
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 28px;
+            box-shadow: 0 30px 100px rgba(0,0,0,.5);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+        }
+
+        .modal-header h2 {
+            font-size: 23px;
+        }
+
+        .close {
+            width: 38px;
+            height: 38px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,.04);
+            color: white;
+            border-radius: 10px;
+            font-size: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 17px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: #d7d7df;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 13px 14px;
+            color: white;
+            background: rgba(255,255,255,.04);
+            border: 1px solid var(--border);
+            border-radius: 11px;
+            outline: none;
+        }
+
+        .form-group textarea {
+            min-height: 130px;
+            resize: vertical;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            border-color: rgba(77,124,255,.7);
+        }
+
+        .form-group select option {
+            background: #11111a;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .preview {
+            height: 180px;
+            border: 1px dashed var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            display: none;
+            margin-top: 10px;
+        }
+
+        .preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .secondary-btn {
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,.04);
+            color: white;
+            padding: 12px 18px;
+            border-radius: 11px;
+        }
+
+        .loading {
+            grid-column: 1 / -1;
+            padding: 80px;
+            text-align: center;
+            color: var(--muted);
+        }
+
+        @media(max-width: 1000px) {
+            .services-grid {
+                grid-template-columns: repeat(2,1fr);
+            }
+        }
+
+        @media(max-width: 700px) {
+            .nav {
+                display: none;
+            }
+
+            .header {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="navbar">
+
+    <a href="index.html" class="logo">
+        NOVA<span>.</span>
+    </a>
+
+    <nav class="nav">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="services.html">Marketplace</a>
+        <a href="worker-services.html" class="active">
+            My Services
+        </a>
+        <a href="projects.html">Projects</a>
+        <a href="profile.html">Profile</a>
+    </nav>
+
+</header>
+
+<main class="container">
+
+    <section class="header">
+
+        <div>
+            <div class="eyebrow">WORKER CENTER</div>
+
+            <h1>My Services</h1>
+
+            <p>
+                Create, manage and publish your digital services.
+            </p>
+        </div>
+
+        <button
+            class="primary-btn"
+            id="newServiceBtn"
+        >
+            + Create Service
+        </button>
+
+    </section>
+
+    <section
+        class="services-grid"
+        id="servicesGrid"
+    >
+        <div class="loading">
+            Loading your services...
+        </div>
+    </section>
+
+</main>
+
+<!-- CREATE / EDIT MODAL -->
+
+<div
+    class="modal"
+    id="serviceModal"
+>
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+
+            <h2 id="modalTitle">
+                Create Service
+            </h2>
+
+            <button
+                class="close"
+                id="closeModal"
+            >
+                ×
+            </button>
+
+        </div>
+
+        <form id="serviceForm">
+
+            <input
+                type="hidden"
+                id="serviceId"
+            >
+
+            <div class="form-group">
+
+                <label>
+                    Service title
+                </label>
+
+                <input
+                    id="title"
+                    type="text"
+                    placeholder="Example: I will build a modern website"
+                    required
+                    maxlength="120"
+                >
+
+            </div>
+
+            <div class="form-group">
+
+                <label>
+                    Description
+                </label>
+
+                <textarea
+                    id="description"
+                    placeholder="Describe exactly what you offer..."
+                    required
+                    maxlength="2000"
+                ></textarea>
+
+            </div>
+
+            <div class="row">
+
+                <div class="form-group">
+
+                    <label>
+                        Category
+                    </label>
+
+                    <select id="category">
+
+                        <option value="Web Development">
+                            Web Development
+                        </option>
+
+                        <option value="Design">
+                            Design
+                        </option>
+
+                        <option value="Video">
+                            Video
+                        </option>
+
+                        <option value="Marketing">
+                            Marketing
+                        </option>
+
+                        <option value="Writing">
+                            Writing
+                        </option>
+
+                        <option value="AI">
+                            AI
+                        </option>
+
+                        <option value="Other">
+                            Other
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>
+                        Delivery
+                    </label>
+
+                    <input
+                        id="deliveryDays"
+                        type="number"
+                        min="1"
+                        max="365"
+                        value="3"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+            <div class="row">
+
+                <div class="form-group">
+
+                    <label>
+                        Price (USD)
+                    </label>
+
+                    <input
+                        id="price"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        placeholder="50"
+                        required
+                    >
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>
+                        Status
+                    </label>
+
+                    <select id="status">
+
+                        <option value="draft">
+                            Draft
+                        </option>
+
+                        <option value="published">
+                            Published
+                        </option>
+
+                        <option value="paused">
+                            Paused
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>
+                    Service image
+                </label>
+
+                <input
+                    id="image"
+                    type="file"
+                    accept="image/*"
+                >
+
+                <div
+                    class="preview"
+                    id="imagePreview"
+                >
+                    <img
+                        id="previewImage"
+                        alt="Preview"
+                    >
+                </div>
+
+            </div>
+
+            <div class="form-actions">
+
+                <button
+                    type="button"
+                    class="secondary-btn"
+                    id="cancelBtn"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    type="submit"
+                    class="primary-btn"
+                    id="saveBtn"
+                >
+                    Save Service
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/worker-services.js"></script>
+
+</body>
+</html>

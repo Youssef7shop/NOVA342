@@ -573,6 +573,11 @@
                 Services
             </a>
 
+            <a href="worker-services.html">
+                <span class="nav-icon">✦</span>
+                My Services
+            </a>
+
             <a href="projects.html">
                 <span class="nav-icon">▣</span>
                 Projects
@@ -650,6 +655,7 @@
                 <button
                     class="btn"
                     id="profileBtn"
+                    type="button"
                 >
                     Profile
                 </button>
@@ -657,6 +663,7 @@
                 <button
                     class="btn btn-primary"
                     id="newProjectBtn"
+                    type="button"
                 >
                     + New Project
                 </button>
@@ -720,6 +727,7 @@
             <button
                 class="btn"
                 id="editProfileBtn"
+                type="button"
             >
                 Edit Profile
             </button>
@@ -849,6 +857,7 @@
                     <button
                         class="quick"
                         id="createProject"
+                        type="button"
                     >
                         <strong>＋ Create Project</strong>
                         <span>Start something new</span>
@@ -857,6 +866,7 @@
                     <button
                         class="quick"
                         id="findService"
+                        type="button"
                     >
                         <strong>⌕ Find Service</strong>
                         <span>Explore marketplace</span>
@@ -864,7 +874,17 @@
 
                     <button
                         class="quick"
+                        id="myServices"
+                        type="button"
+                    >
+                        <strong>✦ My Services</strong>
+                        <span>Manage your services</span>
+                    </button>
+
+                    <button
+                        class="quick"
                         id="openProfile"
+                        type="button"
                     >
                         <strong>◉ Profile</strong>
                         <span>Manage your account</span>
@@ -873,6 +893,7 @@
                     <button
                         class="quick"
                         id="supportBtn"
+                        type="button"
                     >
                         <strong>◌ Support</strong>
                         <span>Get help from NOVA</span>
@@ -898,6 +919,51 @@
 <script src="js/supabase-config.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/dashboard.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const go = (url) => {
+        window.location.href = url;
+    };
+
+    document.getElementById("profileBtn")?.addEventListener("click", () => {
+        go("profile.html");
+    });
+
+    document.getElementById("editProfileBtn")?.addEventListener("click", () => {
+        go("profile.html");
+    });
+
+    document.getElementById("newProjectBtn")?.addEventListener("click", () => {
+        go("projects.html");
+    });
+
+    document.getElementById("createProject")?.addEventListener("click", () => {
+        go("projects.html");
+    });
+
+    document.getElementById("findService")?.addEventListener("click", () => {
+        go("services.html");
+    });
+
+    document.getElementById("myServices")?.addEventListener("click", () => {
+        go("worker-services.html");
+    });
+
+    document.getElementById("openProfile")?.addEventListener("click", () => {
+        go("profile.html");
+    });
+
+    document.getElementById("supportBtn")?.addEventListener("click", () => {
+        const toast = document.getElementById("toast");
+        if (toast) {
+            toast.textContent = "Support center will be available soon.";
+            toast.classList.add("show");
+            setTimeout(() => toast.classList.remove("show"), 2500);
+        }
+    });
+});
+</script>
 
 </body>
 </html>
