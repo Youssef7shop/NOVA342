@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>NOVA MARKET — Service Details</title>
+
+    <meta
+        name="description"
+        content="View NOVA MARKET service details, worker information, pricing and delivery."
+    >
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <style>
+        :root {
+            --bg: #05060a;
+            --bg2: #090c14;
+            --card: rgba(13, 17, 27, 0.82);
+            --card-solid: #0e131e;
+
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(89, 108, 255, 0.35);
+
+            --text: #ffffff;
+            --text-soft: #aab2c5;
+            --text-muted: #727c91;
+
+            --blue: #536dff;
+            --purple: #8b5cf6;
+            --green: #2bd98b;
+            --danger: #ff5c7a;
+
+            --radius: 24px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            min-height: 100vh;
+
+            font-family: "Inter", sans-serif;
+
+            color: var(--text);
+
+            background:
+                radial-gradient(
+                    circle at 10% 0%,
+                    rgba(83, 109, 255, 0.14),
+                    transparent 30%
+                ),
+                radial-gradient(
+                    circle at 90% 5%,
+                    rgba(139, 92, 246, 0.12),
+                    transparent 28%
+                ),
+                var(--bg);
+        }
+
+        body::before {
+            content: "";
+
+            position: fixed;
+            inset: 0;
+
+            pointer-events: none;
+
+            background:
+                linear-gradient(
+                    rgba(255,255,255,.018) 1px,
+                    transparent 1px
+                ),
+                linear-gradient(
+                    90deg,
+                    rgba(255,255,255,.018) 1px,
+                    transparent 1px
+                );
+
+            background-size: 50px 50px;
+
+            mask-image:
+                linear-gradient(
+                    to bottom,
+                    black,
+                    transparent 80%
+                );
+
+            z-index: -1;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button {
+            font-family: inherit;
+        }
+
+        .page {
+            width: min(1380px, calc(100% - 40px));
+            margin: 0 auto;
+
+            padding: 26px 0 70px;
+        }
+
+        /* ====================================
+           NAVBAR
+        ==================================== */
+
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 20px;
+
+            margin-bottom: 35px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+        }
+
+        .logo-mark {
+            width: 45px;
+            height: 45px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 14px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--blue),
+                    var(--purple)
+                );
+
+            font-size: 20px;
+            font-weight: 800;
+
+            box-shadow:
+                0 15px 35px rgba(83,109,255,.25);
+        }
+
+        .logo-name {
+            font-size: 18px;
+            font-weight: 800;
+
+            letter-spacing: -.5px;
+        }
+
+        .logo-name span {
+            color: #8290ff;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+
+            padding: 11px 16px;
+
+            border: 1px solid var(--border);
+            border-radius: 13px;
+
+            background: rgba(255,255,255,.035);
+
+            color: var(--text-soft);
+
+            font-size: 13px;
+            font-weight: 600;
+
+            transition: .25s ease;
+        }
+
+        .back-btn:hover {
+            color: white;
+
+            border-color:
+                var(--border-hover);
+
+            background:
+                rgba(83,109,255,.08);
+
+            transform: translateY(-2px);
+        }
+
+        /* ====================================
+           LOADING
+        ==================================== */
+
+        .loading {
+            min-height: 620px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading-box {
+            text-align: center;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+
+            margin: 0 auto 18px;
+
+            border: 3px solid
+                rgba(255,255,255,.07);
+
+            border-top-color:
+                var(--blue);
+
+            border-radius: 50%;
+
+            animation:
+                spin .8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-box h3 {
+            font-size: 17px;
+            margin-bottom: 7px;
+        }
+
+        .loading-box p {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        /* ====================================
+           ERROR
+        ==================================== */
+
+        .error-state {
+            display: none;
+
+            min-height: 550px;
+
+            align-items: center;
+            justify-content: center;
+
+            text-align: center;
+        }
+
+        .error-inner {
+            max-width: 520px;
+        }
+
+        .error-icon {
+            width: 72px;
+            height: 72px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            margin: 0 auto 20px;
+
+            border-radius: 22px;
+
+            background:
+                rgba(255,92,122,.08);
+
+            border:
+                1px solid rgba(255,92,122,.18);
+
+            color: var(--danger);
+
+            font-size: 30px;
+            font-weight: 800;
+        }
+
+        .error-state h2 {
+            font-size: 27px;
+            margin-bottom: 10px;
+        }
+
+        .error-state p {
+            color: var(--text-muted);
+            line-height: 1.7;
+            margin-bottom: 24px;
+        }
+
+        .browse-btn {
+            border: 0;
+
+            padding: 13px 19px;
+
+            border-radius: 12px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--blue),
+                    var(--purple)
+                );
+
+            color: white;
+
+            cursor: pointer;
+
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        /* ====================================
+           CONTENT
+        ==================================== */
+
+        .service-content {
+            display: none;
+        }
+
+        .breadcrumbs {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+
+            gap: 8px;
+
+            margin-bottom: 22px;
+
+            color: var(--text-muted);
+
+            font-size: 12px;
+        }
+
+        .breadcrumbs span:last-child {
+            color: #d6dcef;
+        }
+
+        .service-grid {
+            display: grid;
+
+            grid-template-columns:
+                minmax(0, 1.42fr)
+                minmax(320px, .58fr);
+
+            gap: 28px;
+
+            align-items: start;
+        }
+
+        /* ====================================
+           SERVICE CARD
+        ==================================== */
+
+        .service-card {
+            overflow: hidden;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: var(--radius);
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(255,255,255,.035),
+                    rgba(255,255,255,.012)
+                );
+
+            box-shadow:
+                0 30px 90px rgba(0,0,0,.45);
+        }
+
+        .service-image-wrap {
+            position: relative;
+
+            height: 470px;
+
+            overflow: hidden;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #111a35,
+                    #090c15
+                );
+        }
+
+        .service-image-wrap::after {
+            content: "";
+
+            position: absolute;
+            inset: 0;
+
+            background:
+                linear-gradient(
+                    to top,
+                    rgba(5,6,10,.45),
+                    transparent 45%
+                );
+
+            pointer-events: none;
+        }
+
+        .service-image {
+            width: 100%;
+            height: 100%;
+
+            display: block;
+
+            object-fit: cover;
+
+            transition: transform .5s ease;
+        }
+
+        .service-card:hover .service-image {
+            transform: scale(1.02);
+        }
+
+        .category-badge {
+            position: absolute;
+
+            top: 20px;
+            left: 20px;
+
+            z-index: 2;
+
+            padding: 9px 14px;
+
+            border:
+                1px solid rgba(255,255,255,.13);
+
+            border-radius: 999px;
+
+            background:
+                rgba(5,7,13,.72);
+
+            backdrop-filter: blur(18px);
+
+            color: #e5eaff;
+
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .service-body {
+            padding: 32px;
+        }
+
+        .service-title {
+            font-size:
+                clamp(27px, 3vw, 42px);
+
+            line-height: 1.12;
+
+            letter-spacing: -1px;
+
+            margin-bottom: 17px;
+        }
+
+        .service-description {
+            color: var(--text-soft);
+
+            font-size: 15px;
+
+            line-height: 1.85;
+
+            white-space: pre-line;
+        }
+
+        .divider {
+            height: 1px;
+
+            background: var(--border);
+
+            margin: 31px 0;
+        }
+
+        /* ====================================
+           WORKER
+        ==================================== */
+
+        .section-title {
+            font-size: 15px;
+            margin-bottom: 17px;
+        }
+
+        .worker-card {
+            display: flex;
+            align-items: center;
+
+            gap: 15px;
+
+            padding: 16px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 18px;
+
+            background:
+                rgba(255,255,255,.025);
+        }
+
+        .worker-avatar {
+            width: 60px;
+            height: 60px;
+
+            flex: 0 0 60px;
+
+            border-radius: 18px;
+
+            object-fit: cover;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--blue),
+                    var(--purple)
+                );
+        }
+
+        .worker-info {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .worker-name-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            margin-bottom: 6px;
+        }
+
+        .worker-name {
+            font-size: 14px;
+            font-weight: 700;
+
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .verified {
+            width: 17px;
+            height: 17px;
+
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            flex: 0 0 17px;
+
+            border-radius: 50%;
+
+            background: var(--blue);
+
+            font-size: 9px;
+            font-weight: 900;
+        }
+
+        .worker-email {
+            color: var(--text-muted);
+
+            font-size: 11px;
+        }
+
+        .worker-profile {
+            padding: 9px 12px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 10px;
+
+            color: #cbd3e6;
+
+            font-size: 11px;
+            font-weight: 700;
+
+            white-space: nowrap;
+        }
+
+        .worker-profile:hover {
+            border-color: var(--border-hover);
+            color: white;
+        }
+
+        /* ====================================
+           DETAILS
+        ==================================== */
+
+        .details-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+
+            gap: 12px;
+        }
+
+        .detail-item {
+            padding: 17px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 15px;
+
+            background:
+                rgba(255,255,255,.025);
+        }
+
+        .detail-label {
+            color: var(--text-muted);
+
+            font-size: 10px;
+            font-weight: 600;
+
+            margin-bottom: 7px;
+        }
+
+        .detail-value {
+            color: #eef2fa;
+
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        /* ====================================
+           ORDER SIDEBAR
+        ==================================== */
+
+        .order-card {
+            position: sticky;
+            top: 22px;
+
+            padding: 26px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: var(--radius);
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(16,21,34,.96),
+                    rgba(8,11,19,.96)
+                );
+
+            box-shadow:
+                0 30px 90px rgba(0,0,0,.45);
+        }
+
+        .order-label {
+            color: var(--text-muted);
+
+            font-size: 10px;
+            font-weight: 700;
+
+            text-transform: uppercase;
+
+            letter-spacing: 1.2px;
+
+            margin-bottom: 8px;
+        }
+
+        .price-row {
+            display: flex;
+            align-items: baseline;
+            gap: 7px;
+
+            margin-bottom: 24px;
+        }
+
+        .price-value {
+            font-size: 43px;
+
+            font-weight: 800;
+
+            letter-spacing: -1.6px;
+        }
+
+        .price-currency {
+            color: var(--text-muted);
+
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .delivery-box {
+            display: flex;
+            align-items: center;
+
+            gap: 12px;
+
+            padding: 15px;
+
+            margin-bottom: 18px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 15px;
+
+            background:
+                rgba(255,255,255,.025);
+        }
+
+        .delivery-icon {
+            width: 39px;
+            height: 39px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            flex: 0 0 39px;
+
+            border-radius: 11px;
+
+            background:
+                rgba(83,109,255,.1);
+
+            color: #8b98ff;
+
+            font-size: 17px;
+        }
+
+        .delivery-label {
+            color: var(--text-muted);
+
+            font-size: 10px;
+
+            margin-bottom: 4px;
+        }
+
+        .delivery-value {
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .order-btn {
+            width: 100%;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            gap: 10px;
+
+            padding: 16px;
+
+            border: 0;
+
+            border-radius: 14px;
+
+            cursor: pointer;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--blue),
+                    var(--purple)
+                );
+
+            color: white;
+
+            font-size: 14px;
+            font-weight: 800;
+
+            box-shadow:
+                0 15px 38px rgba(83,109,255,.22);
+
+            transition: .25s ease;
+        }
+
+        .order-btn:hover {
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 20px 50px rgba(83,109,255,.3);
+        }
+
+        .order-btn:active {
+            transform: translateY(0);
+        }
+
+        .order-note {
+            color: var(--text-muted);
+
+            font-size: 10px;
+
+            line-height: 1.7;
+
+            text-align: center;
+
+            margin-top: 15px;
+        }
+
+        .secure {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            gap: 7px;
+
+            margin-top: 17px;
+
+            color: #858da0;
+
+            font-size: 10px;
+        }
+
+        .secure span {
+            color: var(--green);
+        }
+
+        /* ====================================
+           TOAST
+        ==================================== */
+
+        .toast {
+            position: fixed;
+
+            right: 22px;
+            bottom: 22px;
+
+            z-index: 1000;
+
+            min-width: 280px;
+
+            padding: 15px 17px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 14px;
+
+            background:
+                rgba(14,18,29,.96);
+
+            backdrop-filter: blur(20px);
+
+            box-shadow:
+                0 25px 60px rgba(0,0,0,.45);
+
+            color: white;
+
+            font-size: 13px;
+            font-weight: 600;
+
+            opacity: 0;
+
+            transform: translateY(20px);
+
+            pointer-events: none;
+
+            transition: .3s ease;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ====================================
+           RESPONSIVE
+        ==================================== */
+
+        @media (max-width: 1050px) {
+
+            .service-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .order-card {
+                position: static;
+            }
+        }
+
+        @media (max-width: 700px) {
+
+            .page {
+                width: min(100% - 24px, 1380px);
+                padding-top: 18px;
+            }
+
+            .navbar {
+                margin-bottom: 24px;
+            }
+
+            .logo-name {
+                font-size: 16px;
+            }
+
+            .logo-mark {
+                width: 40px;
+                height: 40px;
+                border-radius: 13px;
+            }
+
+            .back-btn {
+                padding: 9px 12px;
+                font-size: 11px;
+            }
+
+            .service-image-wrap {
+                height: 280px;
+            }
+
+            .service-body {
+                padding: 22px;
+            }
+
+            .service-title {
+                font-size: 28px;
+            }
+
+            .service-description {
+                font-size: 14px;
+            }
+
+            .worker-card {
+                align-items: flex-start;
+            }
+
+            .worker-profile {
+                display: none;
+            }
+
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .order-card {
+                padding: 21px;
+            }
+
+            .price-value {
+                font-size: 37px;
+            }
+
+            .toast {
+                left: 12px;
+                right: 12px;
+                bottom: 12px;
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="page">
+
+        <!-- NAVBAR -->
+        <header class="navbar">
+
+            <a href="index.html" class="logo">
+
+                <div class="logo-mark">
+                    N
+                </div>
+
+                <div class="logo-name">
+                    NOVA<span>MARKET</span>
+                </div>
+
+            </a>
+
+
+            <a
+                href="services.html"
+                class="back-btn"
+            >
+                ← Back to Services
+            </a>
+
+        </header>
+
+
+        <!-- LOADING -->
+        <section
+            id="loadingState"
+            class="loading"
+        >
+
+            <div class="loading-box">
+
+                <div class="spinner"></div>
+
+                <h3>
+                    Loading service...
+                </h3>
+
+                <p>
+                    Please wait while NOVA loads the service.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- ERROR -->
+        <section
+            id="errorState"
+            class="error-state"
+        >
+
+            <div class="error-inner">
+
+                <div class="error-icon">
+                    !
+                </div>
+
+                <h2>
+                    Service not found
+                </h2>
+
+                <p id="errorMessage">
+                    We couldn't find this service.
+                </p>
+
+                <button
+                    type="button"
+                    class="browse-btn"
+                    onclick="window.location.href='services.html'"
+                >
+                    Browse Services
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- SERVICE CONTENT -->
+        <main
+            id="serviceContent"
+            class="service-content"
+        >
+
+            <!-- BREADCRUMBS -->
+            <div class="breadcrumbs">
+
+                <a href="services.html">
+                    Services
+                </a>
+
+                <span>›</span>
+
+                <span id="breadcrumbCategory">
+                    Category
+                </span>
+
+                <span>›</span>
+
+                <span id="breadcrumbTitle">
+                    Service
+                </span>
+
+            </div>
+
+
+            <div class="service-grid">
+
+                <!-- ====================================
+                     LEFT
+                ===================================== -->
+
+                <article class="service-card">
+
+                    <!-- IMAGE -->
+                    <div class="service-image-wrap">
+
+                        <img
+                            id="serviceImage"
+                            class="service-image"
+                            src=""
+                            alt="Service image"
+                        >
+
+                        <div
+                            id="categoryBadge"
+                            class="category-badge"
+                        >
+                            Category
+                        </div>
+
+                    </div>
+
+
+                    <!-- BODY -->
+                    <div class="service-body">
+
+                        <h1
+                            id="serviceTitle"
+                            class="service-title"
+                        >
+                            Service Title
+                        </h1>
+
+
+                        <p
+                            id="serviceDescription"
+                            class="service-description"
+                        >
+                            Loading service description...
+                        </p>
+
+
+                        <div class="divider"></div>
+
+
+                        <!-- WORKER -->
+                        <section>
+
+                            <h3 class="section-title">
+                                About the Worker
+                            </h3>
+
+
+                            <div class="worker-card">
+
+                                <img
+                                    id="workerAvatar"
+                                    class="worker-avatar"
+                                    src=""
+                                    alt="Worker avatar"
+                                >
+
+
+                                <div class="worker-info">
+
+                                    <div class="worker-name-row">
+
+                                        <span
+                                            id="workerName"
+                                            class="worker-name"
+                                        >
+                                            NOVA Worker
+                                        </span>
+
+                                        <span class="verified">
+                                            ✓
+                                        </span>
+
+                                    </div>
+
+
+                                    <div
+                                        id="workerEmail"
+                                        class="worker-email"
+                                    >
+                                        Professional NOVA Worker
+                                    </div>
+
+                                </div>
+
+
+                                <a
+                                    id="workerProfileBtn"
+                                    href="#"
+                                    class="worker-profile"
+                                >
+                                    View Profile
+                                </a>
+
+                            </div>
+
+                        </section>
+
+
+                        <div class="divider"></div>
+
+
+                        <!-- DETAILS -->
+                        <section>
+
+                            <h3 class="section-title">
+                                Service Details
+                            </h3>
+
+
+                            <div class="details-grid">
+
+                                <div class="detail-item">
+
+                                    <div class="detail-label">
+                                        Category
+                                    </div>
+
+                                    <div
+                                        id="detailCategory"
+                                        class="detail-value"
+                                    >
+                                        —
+                                    </div>
+
+                                </div>
+
+
+                                <div class="detail-item">
+
+                                    <div class="detail-label">
+                                        Delivery
+                                    </div>
+
+                                    <div
+                                        id="detailDelivery"
+                                        class="detail-value"
+                                    >
+                                        —
+                                    </div>
+
+                                </div>
+
+
+                                <div class="detail-item">
+
+                                    <div class="detail-label">
+                                        Price
+                                    </div>
+
+                                    <div
+                                        id="detailPrice"
+                                        class="detail-value"
+                                    >
+                                        —
+                                    </div>
+
+                                </div>
+
+
+                                <div class="detail-item">
+
+                                    <div class="detail-label">
+                                        Status
+                                    </div>
+
+                                    <div
+                                        id="detailStatus"
+                                        class="detail-value"
+                                    >
+                                        —
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </section>
+
+                    </div>
+
+                </article>
+
+
+                <!-- ====================================
+                     RIGHT
+                ===================================== -->
+
+                <aside class="order-card">
+
+                    <div class="order-label">
+                        Starting Price
+                    </div>
+
+
+                    <div class="price-row">
+
+                        <span
+                            id="servicePrice"
+                            class="price-value"
+                        >
+                            0
+                        </span>
+
+                        <span class="price-currency">
+                            MAD
+                        </span>
+
+                    </div>
+
+
+                    <div class="delivery-box">
+
+                        <div class="delivery-icon">
+                            ⏱
+                        </div>
+
+
+                        <div>
+
+                            <div class="delivery-label">
+                                Delivery Time
+                            </div>
+
+                            <div
+                                id="deliveryTime"
+                                class="delivery-value"
+                            >
+                                —
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <button
+                        id="orderNowBtn"
+                        type="button"
+                        class="order-btn"
+                    >
+
+                        <span>
+                            Order Now
+                        </span>
+
+                        <b>
+                            →
+                        </b>
+
+                    </button>
+
+
+                    <p class="order-note">
+                        You will review your order before
+                        confirming the purchase.
+                    </p>
+
+
+                    <div class="secure">
+                        <span>●</span>
+                        Secure NOVA Marketplace
+                    </div>
+
+                </aside>
+
+            </div>
+
+        </main>
+
+    </div>
+
+
+    <!-- TOAST -->
+    <div
+        id="toast"
+        class="toast"
+    ></div>
+
+
+    <!-- ====================================
+         SCRIPTS
+    ===================================== -->
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+    ></script>
+
+    <script src="js/supabase-config.js"></script>
+
+    <script src="js/auth.js"></script>
+
+    <script src="js/service.js"></script>
+
+</body>
+</html>
