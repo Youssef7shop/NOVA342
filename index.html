@@ -1,0 +1,1670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description"
+          content="NOVA - Digital Services Marketplace. Find professional digital services from verified workers.">
+
+    <meta name="theme-color" content="#05070d">
+
+    <title>NOVA — Digital Services Marketplace</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<!-- =========================
+     LOADING SCREEN
+========================= -->
+
+<div id="pageLoader" class="page-loader">
+    <div class="loader-logo">N</div>
+    <div class="loader-spinner"></div>
+    <p>Loading NOVA...</p>
+</div>
+
+
+<!-- =========================
+     NAVBAR
+========================= -->
+
+<header class="navbar">
+
+    <div class="nav-container">
+
+        <a href="index.html" class="brand">
+            <div class="brand-logo">N</div>
+
+            <div class="brand-text">
+                <strong>NOVA</strong>
+                <span>MARKET</span>
+            </div>
+        </a>
+
+
+        <nav class="desktop-nav">
+
+            <a href="index.html" class="active">
+                Home
+            </a>
+
+            <a href="services.html">
+                Services
+            </a>
+
+            <a href="#categories">
+                Categories
+            </a>
+
+            <a href="#how-it-works">
+                How it works
+            </a>
+
+            <a href="#support">
+                Support
+            </a>
+
+        </nav>
+
+
+        <div class="nav-actions">
+
+            <button
+                class="icon-btn"
+                id="searchToggle"
+                aria-label="Search"
+            >
+                🔍
+            </button>
+
+            <a href="login.html" class="login-btn">
+                Login
+            </a>
+
+            <a href="register.html" class="register-btn">
+                Get Started
+            </a>
+
+            <button
+                class="menu-btn"
+                id="menuBtn"
+                aria-label="Open menu"
+            >
+                ☰
+            </button>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+<!-- =========================
+     MOBILE MENU
+========================= -->
+
+<div class="mobile-menu" id="mobileMenu">
+
+    <div class="mobile-menu-header">
+
+        <div class="brand">
+            <div class="brand-logo">N</div>
+
+            <div class="brand-text">
+                <strong>NOVA</strong>
+                <span>MARKET</span>
+            </div>
+        </div>
+
+        <button id="closeMenu">
+            ✕
+        </button>
+
+    </div>
+
+
+    <nav>
+
+        <a href="index.html">
+            Home
+        </a>
+
+        <a href="services.html">
+            Services
+        </a>
+
+        <a href="#categories">
+            Categories
+        </a>
+
+        <a href="#how-it-works">
+            How it works
+        </a>
+
+        <a href="#support">
+            Support
+        </a>
+
+        <div class="mobile-actions">
+
+            <a href="login.html" class="login-btn">
+                Login
+            </a>
+
+            <a href="register.html" class="register-btn">
+                Get Started
+            </a>
+
+        </div>
+
+    </nav>
+
+</div>
+
+
+<!-- =========================
+     SEARCH OVERLAY
+========================= -->
+
+<div class="search-overlay" id="searchOverlay">
+
+    <div class="search-box">
+
+        <button
+            class="close-search"
+            id="closeSearch"
+        >
+            ✕
+        </button>
+
+        <span class="search-label">
+            Search NOVA
+        </span>
+
+        <div class="big-search">
+
+            <span>🔍</span>
+
+            <input
+                type="text"
+                id="globalSearch"
+                placeholder="What service are you looking for?"
+                autocomplete="off"
+            >
+
+        </div>
+
+        <div class="search-suggestions">
+
+            <span>Popular:</span>
+
+            <button data-search="Logo Design">
+                Logo Design
+            </button>
+
+            <button data-search="Video Editing">
+                Video Editing
+            </button>
+
+            <button data-search="Social Media">
+                Social Media
+            </button>
+
+            <button data-search="Website">
+                Website
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<main>
+
+
+<!-- =========================
+     HERO
+========================= -->
+
+<section class="hero">
+
+    <div class="hero-background">
+
+        <div class="glow glow-one"></div>
+        <div class="glow glow-two"></div>
+        <div class="glow glow-three"></div>
+
+    </div>
+
+
+    <div class="hero-container">
+
+        <div class="hero-content">
+
+            <div class="hero-badge">
+
+                <span class="status-dot"></span>
+
+                <span>
+                    The digital services marketplace
+                </span>
+
+            </div>
+
+
+            <h1>
+
+                Find the right
+
+                <span class="gradient-text">
+                    digital talent
+                </span>
+
+                for your next project.
+
+            </h1>
+
+
+            <p class="hero-description">
+
+                Discover professional digital services from talented
+                creators, designers, developers, editors and specialists
+                around the world.
+
+            </p>
+
+
+            <div class="hero-search">
+
+                <div class="search-icon">
+                    🔍
+                </div>
+
+                <input
+                    id="heroSearch"
+                    type="text"
+                    placeholder="Search for a service..."
+                    autocomplete="off"
+                >
+
+                <button id="heroSearchBtn">
+                    Search
+                </button>
+
+            </div>
+
+
+            <div class="popular-searches">
+
+                <span>Popular:</span>
+
+                <button data-search="Logo Design">
+                    Logo Design
+                </button>
+
+                <button data-search="Video Editing">
+                    Video Editing
+                </button>
+
+                <button data-search="TikTok">
+                    TikTok
+                </button>
+
+                <button data-search="Website">
+                    Website
+                </button>
+
+            </div>
+
+
+            <div class="hero-actions">
+
+                <a
+                    href="services.html"
+                    class="primary-btn"
+                >
+                    Explore Services
+                    <span>→</span>
+                </a>
+
+                <a
+                    href="register.html"
+                    class="secondary-btn"
+                >
+                    Become a Worker
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <div class="hero-visual">
+
+            <div class="hero-card main-card">
+
+                <div class="hero-card-top">
+
+                    <div class="mini-profile">
+
+                        <div class="avatar purple">
+                            A
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Alex Studio
+                            </strong>
+
+                            <span>
+                                Verified Worker
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <span class="verified">
+                        ✓
+                    </span>
+
+                </div>
+
+
+                <div class="service-preview">
+
+                    <div class="preview-image">
+
+                        <span>
+                            CREATIVE
+                        </span>
+
+                    </div>
+
+                    <div class="preview-info">
+
+                        <h3>
+                            Premium Brand Identity
+                        </h3>
+
+                        <div class="rating">
+                            ★ 4.9
+                            <span>
+                                (128)
+                            </span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="card-footer">
+
+                    <div>
+                        <small>
+                            Starting at
+                        </small>
+
+                        <strong>
+                            $45
+                        </strong>
+                    </div>
+
+                    <button>
+                        View
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div class="floating-card floating-one">
+
+                <div class="floating-icon">
+                    ✓
+                </div>
+
+                <div>
+                    <strong>
+                        Verified Workers
+                    </strong>
+
+                    <span>
+                        Trusted professionals
+                    </span>
+                </div>
+
+            </div>
+
+
+            <div class="floating-card floating-two">
+
+                <span class="small-star">
+                    ★
+                </span>
+
+                <strong>
+                    4.9/5
+                </strong>
+
+                <span>
+                    Average rating
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="hero-bottom">
+
+        <div>
+            <strong>
+                10K+
+            </strong>
+            <span>
+                Digital Services
+            </span>
+        </div>
+
+        <div>
+            <strong>
+                5K+
+            </strong>
+            <span>
+                Verified Workers
+            </span>
+        </div>
+
+        <div>
+            <strong>
+                20K+
+            </strong>
+            <span>
+                Completed Orders
+            </span>
+        </div>
+
+        <div>
+            <strong>
+                99%
+            </strong>
+            <span>
+                Happy Clients
+            </span>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     CATEGORIES
+========================= -->
+
+<section
+    class="section"
+    id="categories"
+>
+
+    <div class="section-container">
+
+        <div class="section-heading">
+
+            <div>
+
+                <span class="section-label">
+                    EXPLORE
+                </span>
+
+                <h2>
+                    Browse by category
+                </h2>
+
+                <p>
+                    Find exactly what you need from our growing
+                    marketplace of digital services.
+                </p>
+
+            </div>
+
+            <a
+                href="services.html"
+                class="view-all"
+            >
+                View all categories →
+            </a>
+
+        </div>
+
+
+        <div class="categories-grid">
+
+            <a href="services.html?category=design"
+               class="category-card">
+
+                <div class="category-icon blue">
+                    🎨
+                </div>
+
+                <h3>
+                    Design
+                </h3>
+
+                <p>
+                    Logos, thumbnails, banners & more
+                </p>
+
+                <span>
+                    Explore →
+                </span>
+
+            </a>
+
+
+            <a href="services.html?category=video"
+               class="category-card">
+
+                <div class="category-icon purple">
+                    🎬
+                </div>
+
+                <h3>
+                    Video Editing
+                </h3>
+
+                <p>
+                    Reels, TikTok, YouTube & ads
+                </p>
+
+                <span>
+                    Explore →
+                </span>
+
+            </a>
+
+
+            <a href="services.html?category=social"
+               class="category-card">
+
+                <div class="category-icon pink">
+                    📱
+                </div>
+
+                <h3>
+                    Social Media
+                </h3>
+
+                <p>
+                    Content, management & growth
+                </p>
+
+                <span>
+                    Explore →
+                </span>
+
+            </a>
+
+
+            <a href="services.html?category=development"
+               class="category-card">
+
+                <div class="category-icon cyan">
+                    💻
+                </div>
+
+                <h3>
+                    Development
+                </h3>
+
+                <p>
+                    Websites, apps & software
+                </p>
+
+                <span>
+                    Explore →
+                </span>
+
+            </a>
+
+
+            <a href="services.html?category=gaming"
+               class="category-card">
+
+                <div class="category-icon orange">
+                    🎮
+                </div>
+
+                <h3>
+                    Gaming
+                </h3>
+
+                <p>
+                    Creative gaming services
+                </p>
+
+                <span>
+                    Explore →
+                </span>
+
+            </a>
+
+
+            <a href="services.html?category=marketing"
+               class="category-card">
+
+                <div class="category-icon green">
+                    📈
+                </div>
+
+                <h3>
+                    Marketing
+                </h3>
+
+                <p>
+                    Advertising & digital marketing
+                </p>
+
+                <span>
+                    Explore →
+                </span>
+
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     POPULAR SERVICES
+========================= -->
+
+<section class="section dark-section">
+
+    <div class="section-container">
+
+        <div class="section-heading">
+
+            <div>
+
+                <span class="section-label">
+                    TRENDING NOW
+                </span>
+
+                <h2>
+                    Popular services
+                </h2>
+
+                <p>
+                    Services clients are discovering right now.
+                </p>
+
+            </div>
+
+            <a
+                href="services.html"
+                class="view-all"
+            >
+                See all services →
+            </a>
+
+        </div>
+
+
+        <div class="services-grid">
+
+
+            <!-- SERVICE 1 -->
+
+            <article class="service-card">
+
+                <div class="service-image image-one">
+
+                    <span class="service-tag">
+                        FEATURED
+                    </span>
+
+                    <button
+                        class="favorite-btn"
+                        aria-label="Favorite"
+                    >
+                        ♡
+                    </button>
+
+                </div>
+
+
+                <div class="service-body">
+
+                    <div class="worker-mini">
+
+                        <div class="avatar">
+                            M
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Max Design
+                            </strong>
+
+                            <span>
+                                ✓ Verified
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <h3>
+                        I will create a premium modern logo for your brand
+                    </h3>
+
+
+                    <div class="service-rating">
+
+                        <span>
+                            ★ 4.9
+                        </span>
+
+                        <small>
+                            (84)
+                        </small>
+
+                    </div>
+
+
+                    <div class="service-bottom">
+
+                        <span>
+                            Starting at
+                        </span>
+
+                        <strong>
+                            $25
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+
+            <!-- SERVICE 2 -->
+
+            <article class="service-card">
+
+                <div class="service-image image-two">
+
+                    <span class="service-tag">
+                        POPULAR
+                    </span>
+
+                    <button
+                        class="favorite-btn"
+                        aria-label="Favorite"
+                    >
+                        ♡
+                    </button>
+
+                </div>
+
+
+                <div class="service-body">
+
+                    <div class="worker-mini">
+
+                        <div class="avatar purple">
+                            S
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Studio X
+                            </strong>
+
+                            <span>
+                                ✓ Verified
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <h3>
+                        I will edit professional TikTok and Reels videos
+                    </h3>
+
+
+                    <div class="service-rating">
+
+                        <span>
+                            ★ 5.0
+                        </span>
+
+                        <small>
+                            (156)
+                        </small>
+
+                    </div>
+
+
+                    <div class="service-bottom">
+
+                        <span>
+                            Starting at
+                        </span>
+
+                        <strong>
+                            $30
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+
+            <!-- SERVICE 3 -->
+
+            <article class="service-card">
+
+                <div class="service-image image-three">
+
+                    <button
+                        class="favorite-btn"
+                        aria-label="Favorite"
+                    >
+                        ♡
+                    </button>
+
+                </div>
+
+
+                <div class="service-body">
+
+                    <div class="worker-mini">
+
+                        <div class="avatar cyan">
+                            Y
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                YCode
+                            </strong>
+
+                            <span>
+                                ✓ Verified
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <h3>
+                        I will build a modern responsive website
+                    </h3>
+
+
+                    <div class="service-rating">
+
+                        <span>
+                            ★ 4.8
+                        </span>
+
+                        <small>
+                            (62)
+                        </small>
+
+                    </div>
+
+
+                    <div class="service-bottom">
+
+                        <span>
+                            Starting at
+                        </span>
+
+                        <strong>
+                            $80
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+
+            <!-- SERVICE 4 -->
+
+            <article class="service-card">
+
+                <div class="service-image image-four">
+
+                    <button
+                        class="favorite-btn"
+                        aria-label="Favorite"
+                    >
+                        ♡
+                    </button>
+
+                </div>
+
+
+                <div class="service-body">
+
+                    <div class="worker-mini">
+
+                        <div class="avatar orange">
+                            R
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Reel Pro
+                            </strong>
+
+                            <span>
+                                ✓ Verified
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <h3>
+                        I will create engaging social media content
+                    </h3>
+
+
+                    <div class="service-rating">
+
+                        <span>
+                            ★ 4.9
+                        </span>
+
+                        <small>
+                            (91)
+                        </small>
+
+                    </div>
+
+
+                    <div class="service-bottom">
+
+                        <span>
+                            Starting at
+                        </span>
+
+                        <strong>
+                            $20
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     FEATURED WORKERS
+========================= -->
+
+<section class="section">
+
+    <div class="section-container">
+
+        <div class="section-heading">
+
+            <div>
+
+                <span class="section-label">
+                    TOP TALENT
+                </span>
+
+                <h2>
+                    Meet our workers
+                </h2>
+
+                <p>
+                    Discover talented professionals ready to work
+                    on your next project.
+                </p>
+
+            </div>
+
+            <a
+                href="services.html"
+                class="view-all"
+            >
+                Discover workers →
+            </a>
+
+        </div>
+
+
+        <div class="workers-grid">
+
+
+            <article class="worker-card">
+
+                <div class="worker-cover cover-one"></div>
+
+                <div class="worker-profile">
+
+                    <div class="worker-avatar">
+                        A
+                    </div>
+
+                    <span class="worker-verified">
+                        ✓
+                    </span>
+
+                </div>
+
+
+                <div class="worker-info">
+
+                    <h3>
+                        Alex Creative
+                    </h3>
+
+                    <span class="worker-role">
+                        Brand Designer
+                    </span>
+
+                    <p>
+                        Helping brands build strong visual identities.
+                    </p>
+
+
+                    <div class="worker-stats">
+
+                        <span>
+                            ★ 4.9
+                        </span>
+
+                        <span>
+                            127 orders
+                        </span>
+
+                    </div>
+
+
+                    <a href="worker.html" class="worker-btn">
+                        View Profile
+                    </a>
+
+                </div>
+
+            </article>
+
+
+            <article class="worker-card">
+
+                <div class="worker-cover cover-two"></div>
+
+                <div class="worker-profile">
+
+                    <div class="worker-avatar purple">
+                        S
+                    </div>
+
+                    <span class="worker-verified">
+                        ✓
+                    </span>
+
+                </div>
+
+
+                <div class="worker-info">
+
+                    <h3>
+                        Sarah Studio
+                    </h3>
+
+                    <span class="worker-role">
+                        Video Editor
+                    </span>
+
+                    <p>
+                        Short-form video editing for modern creators.
+                    </p>
+
+
+                    <div class="worker-stats">
+
+                        <span>
+                            ★ 5.0
+                        </span>
+
+                        <span>
+                            203 orders
+                        </span>
+
+                    </div>
+
+
+                    <a href="worker.html" class="worker-btn">
+                        View Profile
+                    </a>
+
+                </div>
+
+            </article>
+
+
+            <article class="worker-card">
+
+                <div class="worker-cover cover-three"></div>
+
+                <div class="worker-profile">
+
+                    <div class="worker-avatar cyan">
+                        K
+                    </div>
+
+                    <span class="worker-verified">
+                        ✓
+                    </span>
+
+                </div>
+
+
+                <div class="worker-info">
+
+                    <h3>
+                        KodeLab
+                    </h3>
+
+                    <span class="worker-role">
+                        Web Developer
+                    </span>
+
+                    <p>
+                        Modern websites and digital experiences.
+                    </p>
+
+
+                    <div class="worker-stats">
+
+                        <span>
+                            ★ 4.9
+                        </span>
+
+                        <span>
+                            89 orders
+                        </span>
+
+                    </div>
+
+
+                    <a href="worker.html" class="worker-btn">
+                        View Profile
+                    </a>
+
+                </div>
+
+            </article>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     HOW IT WORKS
+========================= -->
+
+<section
+    class="section process-section"
+    id="how-it-works"
+>
+
+    <div class="section-container">
+
+        <div class="center-heading">
+
+            <span class="section-label">
+                SIMPLE PROCESS
+            </span>
+
+            <h2>
+                Get your project done in 3 steps
+            </h2>
+
+            <p>
+                NOVA makes it simple to find talent,
+                collaborate and get results.
+            </p>
+
+        </div>
+
+
+        <div class="process-grid">
+
+
+            <div class="process-card">
+
+                <div class="process-number">
+                    01
+                </div>
+
+                <div class="process-icon">
+                    🔎
+                </div>
+
+                <h3>
+                    Find a service
+                </h3>
+
+                <p>
+                    Search thousands of digital services
+                    and find the right professional.
+                </p>
+
+            </div>
+
+
+            <div class="process-line"></div>
+
+
+            <div class="process-card">
+
+                <div class="process-number">
+                    02
+                </div>
+
+                <div class="process-icon">
+                    💬
+                </div>
+
+                <h3>
+                    Collaborate
+                </h3>
+
+                <p>
+                    Send requirements, communicate with
+                    your worker and track your order.
+                </p>
+
+            </div>
+
+
+            <div class="process-line"></div>
+
+
+            <div class="process-card">
+
+                <div class="process-number">
+                    03
+                </div>
+
+                <div class="process-icon">
+                    🚀
+                </div>
+
+                <h3>
+                    Get it done
+                </h3>
+
+                <p>
+                    Receive your delivery, request revisions
+                    and complete your project.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     WORKER CTA
+========================= -->
+
+<section class="cta-section">
+
+    <div class="cta-container">
+
+        <div class="cta-content">
+
+            <span class="section-label">
+                FOR PROFESSIONALS
+            </span>
+
+            <h2>
+                Turn your skills into
+                <span class="gradient-text">
+                    opportunities.
+                </span>
+            </h2>
+
+            <p>
+                Join NOVA as a digital professional,
+                showcase your work and connect with clients
+                looking for your skills.
+            </p>
+
+            <a
+                href="register.html?role=worker"
+                class="primary-btn"
+            >
+                Become a Worker
+                <span>→</span>
+            </a>
+
+        </div>
+
+
+        <div class="cta-visual">
+
+            <div class="orbit orbit-one"></div>
+            <div class="orbit orbit-two"></div>
+
+            <div class="cta-center">
+                N
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     SUPPORT
+========================= -->
+
+<section
+    class="section support-section"
+    id="support"
+>
+
+    <div class="section-container">
+
+        <div class="support-box">
+
+            <div class="support-content">
+
+                <span class="section-label">
+                    NEED HELP?
+                </span>
+
+                <h2>
+                    We're here for you.
+                </h2>
+
+                <p>
+                    Have a question about an order, payment,
+                    account or anything else? Our support team
+                    is ready to help.
+                </p>
+
+                <a
+                    href="support.html"
+                    class="primary-btn"
+                >
+                    Contact Support
+                    <span>→</span>
+                </a>
+
+            </div>
+
+
+            <div class="support-icon">
+                ?
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+</main>
+
+
+<!-- =========================
+     FOOTER
+========================= -->
+
+<footer class="footer">
+
+    <div class="footer-container">
+
+
+        <div class="footer-brand">
+
+            <a href="index.html" class="brand">
+
+                <div class="brand-logo">
+                    N
+                </div>
+
+                <div class="brand-text">
+
+                    <strong>
+                        NOVA
+                    </strong>
+
+                    <span>
+                        MARKET
+                    </span>
+
+                </div>
+
+            </a>
+
+
+            <p>
+                The modern marketplace for digital services.
+                Connect with talented professionals and
+                bring your ideas to life.
+            </p>
+
+
+            <div class="social-links">
+
+                <a href="#" aria-label="Instagram">
+                    ◎
+                </a>
+
+                <a href="#" aria-label="Facebook">
+                    f
+                </a>
+
+                <a href="#" aria-label="Telegram">
+                    ✈
+                </a>
+
+                <a href="#" aria-label="YouTube">
+                    ▶
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <div class="footer-column">
+
+            <h4>
+                Marketplace
+            </h4>
+
+            <a href="services.html">
+                Browse Services
+            </a>
+
+            <a href="#categories">
+                Categories
+            </a>
+
+            <a href="#">
+                Featured Workers
+            </a>
+
+            <a href="#">
+                Promotions
+            </a>
+
+        </div>
+
+
+        <div class="footer-column">
+
+            <h4>
+                For Workers
+            </h4>
+
+            <a href="register.html?role=worker">
+                Become a Worker
+            </a>
+
+            <a href="#">
+                Worker Guide
+            </a>
+
+            <a href="#">
+                Seller Resources
+            </a>
+
+            <a href="#">
+                Community
+            </a>
+
+        </div>
+
+
+        <div class="footer-column">
+
+            <h4>
+                Support
+            </h4>
+
+            <a href="support.html">
+                Help Center
+            </a>
+
+            <a href="#">
+                Contact Us
+            </a>
+
+            <a href="#">
+                Terms
+            </a>
+
+            <a href="#">
+                Privacy
+            </a>
+
+        </div>
+
+
+    </div>
+
+
+    <div class="footer-bottom">
+
+        <span>
+            © 2026 NOVA. All rights reserved.
+        </span>
+
+
+        <div class="footer-bottom-links">
+
+            <span>
+                Language: English
+            </span>
+
+            <span>
+                Currency: USD
+            </span>
+
+        </div>
+
+    </div>
+
+</footer>
+
+
+<!-- =========================
+     TOAST
+========================= -->
+
+<div
+    id="toast"
+    class="toast"
+>
+
+    <div class="toast-icon">
+        ✓
+    </div>
+
+    <div class="toast-content">
+
+        <strong id="toastTitle">
+            Success
+        </strong>
+
+        <span id="toastMessage">
+            Action completed.
+        </span>
+
+    </div>
+
+</div>
+
+
+<script src="js/app.js"></script>
+
+</body>
+</html>
