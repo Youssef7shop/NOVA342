@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>NOVA MARKET — Payments</title>
+
+    <link
+        rel="stylesheet"
+        href="../../css/admin/admin.css?v=20"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../../css/admin/payments.css?v=1"
+    >
+
+</head>
+
+
+<body>
+
+<div class="admin-app">
+
+
+    <!-- SIDEBAR -->
+
+    <aside
+        class="sidebar"
+        id="sidebar"
+    >
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                N
+            </div>
+
+            <div class="brand-text">
+
+                <strong>
+                    NOVA
+                </strong>
+
+                <span>
+                    MARKET ADMIN
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <a
+                href="./index.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">⌂</span>
+                <span>Dashboard</span>
+            </a>
+
+
+            <a
+                href="./users.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">♙</span>
+                <span>Users</span>
+            </a>
+
+
+            <a
+                href="./workers.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">◈</span>
+                <span>Workers</span>
+            </a>
+
+
+            <a
+                href="./services.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">▦</span>
+                <span>Services</span>
+            </a>
+
+
+            <a
+                href="./orders.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">◫</span>
+                <span>Orders</span>
+            </a>
+
+
+            <a
+                href="./payments.html"
+                class="nav-item active"
+            >
+                <span class="nav-icon">₿</span>
+                <span>Payments</span>
+            </a>
+
+
+            <a
+                href="./support.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">◌</span>
+                <span>Support</span>
+            </a>
+
+
+            <div class="nav-section-title">
+                MANAGEMENT
+            </div>
+
+
+            <a
+                href="./reports.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">▥</span>
+                <span>Reports</span>
+            </a>
+
+
+            <a
+                href="./nova-guard.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">◉</span>
+                <span>NOVA Guard</span>
+            </a>
+
+
+            <a
+                href="./logs.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">≋</span>
+                <span>Activity Logs</span>
+            </a>
+
+
+            <a
+                href="./settings.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">⚙</span>
+                <span>Settings</span>
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <div class="security-box">
+
+                <div class="security-dot"></div>
+
+                <div>
+
+                    <strong>
+                        NOVA Guard
+                    </strong>
+
+                    <span>
+                        System Protected
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <button
+                type="button"
+                id="logoutBtn"
+                class="logout-btn"
+            >
+
+                <span>
+                    ⇥
+                </span>
+
+                Logout
+
+            </button>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- MAIN -->
+
+    <main class="main-content">
+
+
+        <!-- TOPBAR -->
+
+        <header class="topbar">
+
+            <div class="topbar-left">
+
+                <button
+                    type="button"
+                    id="sidebarToggle"
+                    class="menu-btn"
+                >
+                    ☰
+                </button>
+
+                <div>
+
+                    <p class="eyebrow">
+                        FINANCE & REVENUE
+                    </p>
+
+                    <h1>
+                        Payments
+                    </h1>
+
+                </div>
+
+            </div>
+
+
+            <div class="topbar-right">
+
+                <button
+                    type="button"
+                    id="refreshBtn"
+                    class="icon-btn"
+                    title="Refresh"
+                >
+                    ↻
+                </button>
+
+
+                <div class="admin-profile">
+
+                    <div class="admin-avatar">
+
+                        <span id="adminInitial">
+                            A
+                        </span>
+
+                    </div>
+
+
+                    <div class="admin-profile-text">
+
+                        <strong id="adminName">
+                            Admin
+                        </strong>
+
+                        <span id="adminEmail">
+                            Loading...
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+
+        <!-- PAGE -->
+
+        <section class="page-content">
+
+
+            <!-- ACCESS -->
+
+            <div
+                id="accessLoading"
+                class="page-state"
+            >
+
+                <div class="loader"></div>
+
+                <h2>
+                    Checking Admin Access
+                </h2>
+
+                <p>
+                    Please wait...
+                </p>
+
+            </div>
+
+
+            <div
+                id="accessDenied"
+                class="page-state hidden"
+            >
+
+                <div class="state-icon danger">
+                    !
+                </div>
+
+                <h2>
+                    Access Denied
+                </h2>
+
+                <p>
+                    This area is only available to NOVA administrators.
+                </p>
+
+                <button
+                    type="button"
+                    id="backHomeBtn"
+                    class="primary-btn"
+                >
+                    Back to NOVA
+                </button>
+
+            </div>
+
+
+
+            <!-- PAYMENTS CONTENT -->
+
+            <div
+                id="paymentsContent"
+                class="hidden"
+            >
+
+
+                <!-- HEADER -->
+
+                <section class="payments-heading">
+
+                    <div>
+
+                        <p class="payments-kicker">
+                            NOVA MARKET
+                        </p>
+
+                        <h2>
+                            Payments & Revenue
+                        </h2>
+
+                        <p>
+                            Monitor payment status, order amounts,
+                            platform fees and worker payouts.
+                        </p>
+
+                    </div>
+
+
+                    <div class="payment-mode-badge">
+
+                        <span></span>
+
+                        Order-based Finance
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- STATS -->
+
+                <section class="payment-stats">
+
+
+                    <article class="payment-stat-card">
+
+                        <div class="payment-stat-icon blue">
+                            ₿
+                        </div>
+
+                        <div>
+
+                            <span>
+                                TRANSACTIONS
+                            </span>
+
+                            <strong id="totalTransactions">
+                                0
+                            </strong>
+
+                        </div>
+
+                    </article>
+
+
+                    <article class="payment-stat-card">
+
+                        <div class="payment-stat-icon green">
+                            ✓
+                        </div>
+
+                        <div>
+
+                            <span>
+                                PAID
+                            </span>
+
+                            <strong id="paidTransactions">
+                                0
+                            </strong>
+
+                        </div>
+
+                    </article>
+
+
+                    <article class="payment-stat-card">
+
+                        <div class="payment-stat-icon gold">
+                            ◷
+                        </div>
+
+                        <div>
+
+                            <span>
+                                PENDING
+                            </span>
+
+                            <strong id="pendingTransactions">
+                                0
+                            </strong>
+
+                        </div>
+
+                    </article>
+
+
+                    <article class="payment-stat-card">
+
+                        <div class="payment-stat-icon danger">
+                            !
+                        </div>
+
+                        <div>
+
+                            <span>
+                                FAILED
+                            </span>
+
+                            <strong id="failedTransactions">
+                                0
+                            </strong>
+
+                        </div>
+
+                    </article>
+
+
+                    <article class="payment-stat-card">
+
+                        <div class="payment-stat-icon purple">
+                            $
+                        </div>
+
+                        <div>
+
+                            <span>
+                                PAID VOLUME · MAD
+                            </span>
+
+                            <strong id="paidAmount">
+                                0 MAD
+                            </strong>
+
+                        </div>
+
+                    </article>
+
+
+                    <article class="payment-stat-card">
+
+                        <div class="payment-stat-icon cyan">
+                            %
+                        </div>
+
+                        <div>
+
+                            <span>
+                                PLATFORM FEES · MAD
+                            </span>
+
+                            <strong id="platformFees">
+                                0 MAD
+                            </strong>
+
+                        </div>
+
+                    </article>
+
+                </section>
+
+
+
+                <!-- TABLE PANEL -->
+
+                <section class="payments-panel">
+
+
+                    <!-- TOOLBAR -->
+
+                    <div class="payments-toolbar">
+
+
+                        <div class="payment-search">
+
+                            <span>
+                                ⌕
+                            </span>
+
+                            <input
+                                type="search"
+                                id="searchInput"
+                                placeholder="Search order, service, customer, worker..."
+                                autocomplete="off"
+                            >
+
+                        </div>
+
+
+                        <select
+                            id="paymentStatusFilter"
+                            class="payment-select"
+                        >
+
+                            <option value="">
+                                All Payment Status
+                            </option>
+
+                            <option value="unpaid">
+                                Unpaid
+                            </option>
+
+                            <option value="pending">
+                                Pending
+                            </option>
+
+                            <option value="paid">
+                                Paid
+                            </option>
+
+                            <option value="refunded">
+                                Refunded
+                            </option>
+
+                            <option value="failed">
+                                Failed
+                            </option>
+
+                        </select>
+
+
+                        <select
+                            id="currencyFilter"
+                            class="payment-select"
+                        >
+
+                            <option value="">
+                                All Currencies
+                            </option>
+
+                            <option value="MAD">
+                                MAD
+                            </option>
+
+                            <option value="USD">
+                                USD
+                            </option>
+
+                            <option value="EUR">
+                                EUR
+                            </option>
+
+                        </select>
+
+
+                        <button
+                            type="button"
+                            id="clearFiltersBtn"
+                            class="clear-btn"
+                        >
+                            Clear
+                        </button>
+
+                    </div>
+
+
+
+                    <!-- TABLE -->
+
+                    <div class="payments-table-wrap">
+
+                        <table class="payments-table">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        ORDER
+                                    </th>
+
+                                    <th>
+                                        CUSTOMER
+                                    </th>
+
+                                    <th>
+                                        WORKER
+                                    </th>
+
+                                    <th>
+                                        AMOUNT
+                                    </th>
+
+                                    <th>
+                                        PLATFORM FEE
+                                    </th>
+
+                                    <th>
+                                        WORKER AMOUNT
+                                    </th>
+
+                                    <th>
+                                        PAYMENT
+                                    </th>
+
+                                    <th>
+                                        ORDER STATUS
+                                    </th>
+
+                                    <th>
+                                        DATE
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody id="paymentsTableBody">
+
+                                <tr>
+
+                                    <td
+                                        colspan="9"
+                                        class="table-loading"
+                                    >
+                                        Loading payments...
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+
+
+                    <!-- FOOTER -->
+
+                    <div class="payments-footer">
+
+                        <span id="resultsInfo">
+                            0 payments
+                        </span>
+
+
+                        <button
+                            type="button"
+                            id="loadMoreBtn"
+                            class="load-more-btn"
+                        >
+                            Load More
+                        </button>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+
+<!-- PAYMENT DETAILS MODAL -->
+
+<div
+    id="paymentModal"
+    class="modal-backdrop hidden"
+>
+
+    <div class="payment-modal">
+
+
+        <button
+            type="button"
+            id="closeModalBtn"
+            class="modal-close"
+        >
+            ×
+        </button>
+
+
+        <div class="modal-heading">
+
+            <span>
+                PAYMENT DETAILS
+            </span>
+
+            <h2 id="modalService">
+                Service
+            </h2>
+
+            <p id="modalOrderId">
+                Order #
+            </p>
+
+        </div>
+
+
+        <div class="modal-grid">
+
+
+            <div class="modal-info">
+
+                <span>
+                    CUSTOMER
+                </span>
+
+                <strong id="modalCustomer">
+                    —
+                </strong>
+
+            </div>
+
+
+            <div class="modal-info">
+
+                <span>
+                    WORKER
+                </span>
+
+                <strong id="modalWorker">
+                    —
+                </strong>
+
+            </div>
+
+
+            <div class="modal-info">
+
+                <span>
+                    ORDER AMOUNT
+                </span>
+
+                <strong id="modalAmount">
+                    —
+                </strong>
+
+            </div>
+
+
+            <div class="modal-info">
+
+                <span>
+                    PLATFORM FEE
+                </span>
+
+                <strong id="modalFee">
+                    —
+                </strong>
+
+            </div>
+
+
+            <div class="modal-info">
+
+                <span>
+                    WORKER AMOUNT
+                </span>
+
+                <strong id="modalWorkerAmount">
+                    —
+                </strong>
+
+            </div>
+
+
+            <div class="modal-info">
+
+                <span>
+                    PAYMENT STATUS
+                </span>
+
+                <strong id="modalPaymentStatus">
+                    —
+                </strong>
+
+            </div>
+
+
+            <div class="modal-info">
+
+                <span>
+                    ORDER STATUS
+                </span>
+
+                <strong id="modalOrderStatus">
+                    —
+                </strong>
+
+            </div>
+
+
+            <div class="modal-info">
+
+                <span>
+                    CREATED
+                </span>
+
+                <strong id="modalCreated">
+                    —
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- TOAST -->
+
+<div
+    id="toast"
+    class="toast"
+></div>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script
+    src="../../js/supabase-config.js?v=21"
+></script>
+
+<script
+    src="../../js/admin/payments.js?v=1"
+></script>
+
+</body>
+
+</html>
