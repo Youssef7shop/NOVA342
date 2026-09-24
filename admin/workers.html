@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>NOVA MARKET — Workers</title>
+
+    <link
+        rel="stylesheet"
+        href="../../css/admin/admin.css?v=20"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../../css/admin/workers.css?v=1"
+    >
+
+</head>
+
+
+<body>
+
+<div class="admin-app">
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside
+        class="sidebar"
+        id="sidebar"
+    >
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                N
+            </div>
+
+            <div class="brand-text">
+
+                <strong>
+                    NOVA
+                </strong>
+
+                <span>
+                    MARKET ADMIN
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <a
+                href="./index.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">⌂</span>
+                <span>Dashboard</span>
+            </a>
+
+
+            <a
+                href="./users.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">♙</span>
+                <span>Users</span>
+            </a>
+
+
+            <a
+                href="./workers.html"
+                class="nav-item active"
+            >
+                <span class="nav-icon">◈</span>
+                <span>Workers</span>
+            </a>
+
+
+            <a
+                href="./services.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">▦</span>
+                <span>Services</span>
+            </a>
+
+
+            <a
+                href="./orders.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">◫</span>
+                <span>Orders</span>
+            </a>
+
+
+            <a
+                href="./payments.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">₿</span>
+                <span>Payments</span>
+            </a>
+
+
+            <a
+                href="./support.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">◌</span>
+                <span>Support</span>
+            </a>
+
+
+            <div class="nav-section-title">
+                MANAGEMENT
+            </div>
+
+
+            <a
+                href="./reports.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">▥</span>
+                <span>Reports</span>
+            </a>
+
+
+            <a
+                href="./nova-guard.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">◉</span>
+                <span>NOVA Guard</span>
+            </a>
+
+
+            <a
+                href="./logs.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">≋</span>
+                <span>Activity Logs</span>
+            </a>
+
+
+            <a
+                href="./settings.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">⚙</span>
+                <span>Settings</span>
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <div class="security-box">
+
+                <div class="security-dot"></div>
+
+                <div>
+
+                    <strong>
+                        NOVA Guard
+                    </strong>
+
+                    <span>
+                        System Protected
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <button
+                type="button"
+                id="logoutBtn"
+                class="logout-btn"
+            >
+
+                <span>
+                    ⇥
+                </span>
+
+                Logout
+
+            </button>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="main-content">
+
+
+        <!-- TOPBAR -->
+
+        <header class="topbar">
+
+            <div class="topbar-left">
+
+                <button
+                    type="button"
+                    id="sidebarToggle"
+                    class="menu-btn"
+                >
+                    ☰
+                </button>
+
+                <div>
+
+                    <p class="eyebrow">
+                        WORKER MANAGEMENT
+                    </p>
+
+                    <h1>
+                        Workers
+                    </h1>
+
+                </div>
+
+            </div>
+
+
+            <div class="topbar-right">
+
+                <button
+                    type="button"
+                    id="refreshBtn"
+                    class="icon-btn"
+                    title="Refresh"
+                >
+                    ↻
+                </button>
+
+
+                <div class="admin-profile">
+
+                    <div class="admin-avatar">
+
+                        <span id="adminInitial">
+                            A
+                        </span>
+
+                    </div>
+
+
+                    <div class="admin-profile-text">
+
+                        <strong id="adminName">
+                            Admin
+                        </strong>
+
+                        <span id="adminEmail">
+                            Loading...
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+
+        <!-- =====================================================
+             PAGE CONTENT
+        ====================================================== -->
+
+        <section class="page-content">
+
+
+            <!-- ACCESS -->
+
+            <div
+                id="accessLoading"
+                class="page-state"
+            >
+
+                <div class="loader"></div>
+
+                <h2>
+                    Checking Admin Access
+                </h2>
+
+                <p>
+                    Please wait...
+                </p>
+
+            </div>
+
+
+            <div
+                id="accessDenied"
+                class="page-state hidden"
+            >
+
+                <div class="state-icon danger">
+                    !
+                </div>
+
+                <h2>
+                    Access Denied
+                </h2>
+
+                <p>
+                    This area is only available to NOVA administrators.
+                </p>
+
+                <button
+                    type="button"
+                    id="backHomeBtn"
+                    class="primary-btn"
+                >
+                    Back to NOVA
+                </button>
+
+            </div>
+
+
+
+            <!-- WORKERS -->
+
+            <div
+                id="workersContent"
+                class="hidden"
+            >
+
+
+                <!-- HEADER -->
+
+                <section class="workers-heading">
+
+                    <div>
+
+                        <p class="workers-kicker">
+                            NOVA MARKET
+                        </p>
+
+                        <h2>
+                            Service Providers
+                        </h2>
+
+                        <p>
+                            Manage workers, activity, services and accounts.
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- STATS -->
+
+                <section class="workers-stats">
+
+
+                    <article class="worker-stat-card">
+
+                        <div class="worker-stat-icon blue">
+                            ◈
+                        </div>
+
+                        <div>
+
+                            <span>
+                                TOTAL WORKERS
+                            </span>
+
+                            <strong id="totalWorkers">
+                                0
+                            </strong>
+
+                        </div>
+
+                    </article>
+
+
+                    <article class="worker-stat-card">
+
+                        <div class="worker-stat-icon green">
+                            ●
+                        </div>
+
+                        <div>
+
+                            <span>
+                                ACTIVE
+                            </span>
+
+                            <strong id="activeWorkers">
+                                0
+                            </strong>
+
+                        </div>
+
+                    </article>
+
+
+                    <article class="worker-stat-card">
+
+                        <div class="worker-stat-icon danger">
+                            ●
+                        </div>
+
+                        <div>
+
+                            <span>
+                                INACTIVE
+                            </span>
+
+                            <strong id="inactiveWorkers">
+                                0
+                            </strong>
+
+                        </div>
+
+                    </article>
+
+
+                    <article class="worker-stat-card">
+
+                        <div class="worker-stat-icon purple">
+                            ▦
+                        </div>
+
+                        <div>
+
+                            <span>
+                                WITH SERVICES
+                            </span>
+
+                            <strong id="workersWithServices">
+                                0
+                            </strong>
+
+                        </div>
+
+                    </article>
+
+                </section>
+
+
+
+                <!-- PANEL -->
+
+                <section class="workers-panel">
+
+
+                    <!-- TOOLBAR -->
+
+                    <div class="workers-toolbar">
+
+
+                        <div class="worker-search">
+
+                            <span>
+                                ⌕
+                            </span>
+
+                            <input
+                                id="searchInput"
+                                type="search"
+                                placeholder="Search worker by name or email..."
+                                autocomplete="off"
+                            >
+
+                        </div>
+
+
+                        <select
+                            id="statusFilter"
+                            class="worker-select"
+                        >
+
+                            <option value="">
+                                All Status
+                            </option>
+
+                            <option value="active">
+                                Active
+                            </option>
+
+                            <option value="inactive">
+                                Inactive
+                            </option>
+
+                        </select>
+
+
+                        <select
+                            id="planFilter"
+                            class="worker-select"
+                        >
+
+                            <option value="">
+                                All Plans
+                            </option>
+
+                            <option value="free">
+                                Free
+                            </option>
+
+                            <option value="pro">
+                                Pro
+                            </option>
+
+                            <option value="business">
+                                Business
+                            </option>
+
+                        </select>
+
+
+                        <button
+                            type="button"
+                            id="clearFiltersBtn"
+                            class="clear-btn"
+                        >
+                            Clear
+                        </button>
+
+                    </div>
+
+
+
+                    <!-- TABLE -->
+
+                    <div class="workers-table-wrap">
+
+                        <table class="workers-table">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        WORKER
+                                    </th>
+
+                                    <th>
+                                        PLAN
+                                    </th>
+
+                                    <th>
+                                        SERVICES
+                                    </th>
+
+                                    <th>
+                                        ORDERS
+                                    </th>
+
+                                    <th>
+                                        REVENUE
+                                    </th>
+
+                                    <th>
+                                        STATUS
+                                    </th>
+
+                                    <th>
+                                        CREATED
+                                    </th>
+
+                                    <th>
+                                        ACTION
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody id="workersTableBody">
+
+                                <tr>
+
+                                    <td
+                                        colspan="8"
+                                        class="table-loading"
+                                    >
+                                        Loading workers...
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+
+<!-- =====================================================
+     WORKER MODAL
+====================================================== -->
+
+<div
+    id="workerModal"
+    class="modal-backdrop hidden"
+>
+
+    <div class="worker-modal">
+
+
+        <button
+            type="button"
+            id="closeModalBtn"
+            class="modal-close"
+        >
+            ×
+        </button>
+
+
+        <div class="worker-modal-header">
+
+
+            <div
+                class="modal-avatar"
+                id="modalAvatar"
+            >
+                W
+            </div>
+
+
+            <div>
+
+                <span class="modal-kicker">
+                    WORKER ACCOUNT
+                </span>
+
+                <h2 id="modalWorkerName">
+                    Worker
+                </h2>
+
+                <p id="modalWorkerEmail">
+                    worker@example.com
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- INFO -->
+
+        <div class="worker-info-grid">
+
+
+            <div class="worker-info-box">
+
+                <span>
+                    PLAN
+                </span>
+
+                <strong id="modalPlan">
+                    Free
+                </strong>
+
+            </div>
+
+
+            <div class="worker-info-box">
+
+                <span>
+                    SERVICES
+                </span>
+
+                <strong id="modalServices">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="worker-info-box">
+
+                <span>
+                    ORDERS
+                </span>
+
+                <strong id="modalOrders">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="worker-info-box">
+
+                <span>
+                    REVENUE
+                </span>
+
+                <strong id="modalRevenue">
+                    0 MAD
+                </strong>
+
+            </div>
+
+
+            <div class="worker-info-box">
+
+                <span>
+                    STATUS
+                </span>
+
+                <strong id="modalStatus">
+                    Active
+                </strong>
+
+            </div>
+
+
+            <div class="worker-info-box">
+
+                <span>
+                    JOINED
+                </span>
+
+                <strong id="modalCreated">
+                    —
+                </strong>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ROLE -->
+
+        <div class="role-control">
+
+            <label for="modalRole">
+                Account Role
+            </label>
+
+            <select
+                id="modalRole"
+                class="modal-select"
+            >
+
+                <option value="worker">
+                    Worker
+                </option>
+
+                <option value="customer">
+                    Customer
+                </option>
+
+                <option value="admin">
+                    Admin
+                </option>
+
+            </select>
+
+        </div>
+
+
+
+        <!-- ACTIONS -->
+
+        <div class="modal-actions">
+
+            <button
+                type="button"
+                id="saveWorkerBtn"
+                class="save-worker-btn"
+            >
+                Save Changes
+            </button>
+
+
+            <button
+                type="button"
+                id="toggleWorkerBtn"
+                class="toggle-worker-btn"
+            >
+                Disable Worker
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- TOAST -->
+
+<div
+    id="toast"
+    class="toast"
+></div>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script
+    src="../../js/supabase-config.js?v=21"
+></script>
+
+<script
+    src="../../js/admin/workers.js?v=1"
+></script>
+
+</body>
+
+</html>
