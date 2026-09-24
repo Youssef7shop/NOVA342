@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>NOVA MARKET — Support</title>
+
+    <link
+        rel="stylesheet"
+        href="../css/support.css?v=1"
+    >
+</head>
+
+<body>
+
+<div class="dashboard-app">
+
+    <!-- SIDEBAR -->
+    <aside
+        class="sidebar"
+        id="sidebar"
+    >
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                N
+            </div>
+
+            <div class="brand-info">
+
+                <strong>
+                    NOVA
+                </strong>
+
+                <span>
+                    MARKET
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <a
+                href="./index.html"
+                class="nav-item"
+            >
+                <span>⌂</span>
+                <strong>Dashboard</strong>
+            </a>
+
+
+            <a
+                href="../services.html"
+                class="nav-item"
+            >
+                <span>▦</span>
+                <strong>Services</strong>
+            </a>
+
+
+            <a
+                href="./projects.html"
+                class="nav-item"
+            >
+                <span>◇</span>
+                <strong>Projects</strong>
+            </a>
+
+
+            <a
+                href="../profile.html"
+                class="nav-item"
+            >
+                <span>◉</span>
+                <strong>My Profile</strong>
+            </a>
+
+
+            <a
+                href="./favorites.html"
+                class="nav-item"
+            >
+                <span>♥</span>
+                <strong>Favorites</strong>
+            </a>
+
+
+            <a
+                href="./orders.html"
+                class="nav-item"
+            >
+                <span>◫</span>
+                <strong>Orders</strong>
+            </a>
+
+
+            <a
+                href="./support.html"
+                class="nav-item active"
+            >
+                <span>◌</span>
+                <strong>Support</strong>
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <div class="guard-card">
+
+                <div class="guard-dot"></div>
+
+                <div>
+                    <strong>
+                        NOVA Guard
+                    </strong>
+
+                    <span>
+                        System Protected
+                    </span>
+                </div>
+
+            </div>
+
+
+            <button
+                type="button"
+                id="logoutBtn"
+                class="logout-btn"
+            >
+                ⇥
+                <span>
+                    Logout
+                </span>
+            </button>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+
+            <div class="topbar-left">
+
+                <button
+                    type="button"
+                    id="sidebarToggle"
+                    class="menu-btn"
+                >
+                    ☰
+                </button>
+
+                <div>
+
+                    <p class="eyebrow">
+                        CUSTOMER CARE
+                    </p>
+
+                    <h1>
+                        Support
+                    </h1>
+
+                </div>
+
+            </div>
+
+
+            <div class="profile-mini">
+
+                <div
+                    class="profile-avatar"
+                    id="profileAvatar"
+                >
+                    U
+                </div>
+
+                <div class="profile-info">
+
+                    <strong id="profileName">
+                        User
+                    </strong>
+
+                    <span id="profileEmail">
+                        Loading...
+                    </span>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- PAGE -->
+        <section class="page-content">
+
+            <!-- LOADING -->
+            <div
+                id="loadingState"
+                class="page-state"
+            >
+
+                <div class="loader"></div>
+
+                <h2>
+                    Loading Support
+                </h2>
+
+                <p>
+                    Please wait...
+                </p>
+
+            </div>
+
+
+            <!-- ERROR -->
+            <div
+                id="errorState"
+                class="page-state hidden"
+            >
+
+                <div class="state-icon">
+                    !
+                </div>
+
+                <h2>
+                    Support unavailable
+                </h2>
+
+                <p id="errorMessage">
+                    Something went wrong.
+                </p>
+
+                <button
+                    type="button"
+                    id="retryBtn"
+                    class="primary-btn"
+                >
+                    Try Again
+                </button>
+
+            </div>
+
+
+            <!-- SUPPORT CONTENT -->
+            <div
+                id="supportContent"
+                class="hidden"
+            >
+
+                <!-- HERO -->
+                <section class="support-hero">
+
+                    <div class="hero-main">
+
+                        <span class="hero-kicker">
+                            NOVA SUPPORT CENTER
+                        </span>
+
+                        <h2>
+                            How can we help you?
+                        </h2>
+
+                        <p>
+                            Contact the NOVA MARKET support team,
+                            create a ticket and follow your requests
+                            from one place.
+                        </p>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        id="newTicketBtn"
+                        class="new-ticket-btn"
+                    >
+                        <span>＋</span>
+                        New Ticket
+                    </button>
+
+                </section>
+
+
+                <!-- STATS -->
+                <section class="support-stats">
+
+                    <article class="support-stat">
+
+                        <div class="stat-icon blue">
+                            ◌
+                        </div>
+
+                        <div>
+                            <span>
+                                TOTAL TICKETS
+                            </span>
+
+                            <strong id="totalTickets">
+                                0
+                            </strong>
+                        </div>
+
+                    </article>
+
+
+                    <article class="support-stat">
+
+                        <div class="stat-icon gold">
+                            ◷
+                        </div>
+
+                        <div>
+                            <span>
+                                OPEN
+                            </span>
+
+                            <strong id="openTickets">
+                                0
+                            </strong>
+                        </div>
+
+                    </article>
+
+
+                    <article class="support-stat">
+
+                        <div class="stat-icon purple">
+                            ◉
+                        </div>
+
+                        <div>
+                            <span>
+                                IN PROGRESS
+                            </span>
+
+                            <strong id="progressTickets">
+                                0
+                            </strong>
+                        </div>
+
+                    </article>
+
+
+                    <article class="support-stat">
+
+                        <div class="stat-icon green">
+                            ✓
+                        </div>
+
+                        <div>
+                            <span>
+                                RESOLVED
+                            </span>
+
+                            <strong id="resolvedTickets">
+                                0
+                            </strong>
+                        </div>
+
+                    </article>
+
+                </section>
+
+
+                <!-- TICKETS -->
+                <section class="tickets-panel">
+
+                    <div class="panel-header">
+
+                        <div>
+
+                            <p>
+                                SUPPORT
+                            </p>
+
+                            <h3>
+                                My Tickets
+                            </h3>
+
+                        </div>
+
+                        <span
+                            id="ticketsResult"
+                            class="tickets-result"
+                        >
+                            0 tickets
+                        </span>
+
+                    </div>
+
+
+                    <div
+                        id="ticketsList"
+                        class="tickets-list"
+                    >
+                    </div>
+
+
+                    <div
+                        id="ticketsEmpty"
+                        class="tickets-empty hidden"
+                    >
+
+                        <div class="empty-icon">
+                            ◌
+                        </div>
+
+                        <h3>
+                            No support tickets
+                        </h3>
+
+                        <p>
+                            You haven't contacted support yet.
+                            Create a ticket and our team will help you.
+                        </p>
+
+                        <button
+                            type="button"
+                            id="emptyNewTicketBtn"
+                            class="primary-btn"
+                        >
+                            Create First Ticket
+                        </button>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- NEW TICKET MODAL -->
+<div
+    id="ticketModal"
+    class="modal-backdrop hidden"
+>
+
+    <div class="ticket-modal">
+
+        <button
+            type="button"
+            id="closeTicketModal"
+            class="modal-close"
+        >
+            ×
+        </button>
+
+
+        <div class="modal-heading">
+
+            <span>
+                NOVA SUPPORT
+            </span>
+
+            <h2>
+                Create New Ticket
+            </h2>
+
+            <p>
+                Tell us what you need help with.
+            </p>
+
+        </div>
+
+
+        <form id="ticketForm">
+
+            <div class="form-group">
+
+                <label for="ticketSubject">
+                    Subject
+                </label>
+
+                <input
+                    type="text"
+                    id="ticketSubject"
+                    maxlength="150"
+                    placeholder="What do you need help with?"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-row">
+
+                <div class="form-group">
+
+                    <label for="ticketCategory">
+                        Category
+                    </label>
+
+                    <select
+                        id="ticketCategory"
+                        required
+                    >
+
+                        <option value="General">
+                            General
+                        </option>
+
+                        <option value="Order">
+                            Order
+                        </option>
+
+                        <option value="Payment">
+                            Payment
+                        </option>
+
+                        <option value="Account">
+                            Account
+                        </option>
+
+                        <option value="Service">
+                            Service
+                        </option>
+
+                        <option value="Technical">
+                            Technical
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="ticketPriority">
+                        Priority
+                    </label>
+
+                    <select
+                        id="ticketPriority"
+                        required
+                    >
+
+                        <option value="normal">
+                            Normal
+                        </option>
+
+                        <option value="high">
+                            High
+                        </option>
+
+                        <option value="urgent">
+                            Urgent
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="ticketMessage">
+                    Message
+                </label>
+
+                <textarea
+                    id="ticketMessage"
+                    rows="7"
+                    maxlength="5000"
+                    placeholder="Describe your issue..."
+                    required
+                ></textarea>
+
+            </div>
+
+
+            <div class="modal-form-footer">
+
+                <button
+                    type="button"
+                    id="cancelTicketBtn"
+                    class="secondary-btn"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    type="submit"
+                    id="submitTicketBtn"
+                    class="primary-btn"
+                >
+                    Create Ticket
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- TICKET DETAILS MODAL -->
+<div
+    id="detailsModal"
+    class="modal-backdrop hidden"
+>
+
+    <div class="details-modal">
+
+        <button
+            type="button"
+            id="closeDetailsModal"
+            class="modal-close"
+        >
+            ×
+        </button>
+
+
+        <div class="details-header">
+
+            <div>
+
+                <span class="details-kicker">
+                    SUPPORT TICKET
+                </span>
+
+                <h2 id="detailsSubject">
+                    Ticket
+                </h2>
+
+                <div
+                    id="detailsMeta"
+                    class="details-meta"
+                >
+                    —
+                </div>
+
+            </div>
+
+            <span
+                id="detailsStatus"
+                class="ticket-status"
+            >
+                OPEN
+            </span>
+
+        </div>
+
+
+        <div
+            id="messagesList"
+            class="messages-list"
+        >
+        </div>
+
+
+        <form
+            id="replyForm"
+            class="reply-form"
+        >
+
+            <textarea
+                id="replyMessage"
+                rows="4"
+                maxlength="5000"
+                placeholder="Write a reply..."
+                required
+            ></textarea>
+
+
+            <div class="reply-footer">
+
+                <span>
+                    Support conversation
+                </span>
+
+                <button
+                    type="submit"
+                    id="sendReplyBtn"
+                    class="primary-btn"
+                >
+                    Send Reply
+                </button>
+
+            </div>
+
+        </form>
+
+
+        <div class="close-ticket-area">
+
+            <button
+                type="button"
+                id="closeCurrentTicketBtn"
+                class="close-ticket-btn"
+            >
+                Close Ticket
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- TOAST -->
+<div
+    id="toast"
+    class="toast"
+></div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="../js/supabase-config.js?v=21"></script>
+
+<script src="../js/support.js?v=1"></script>
+
+</body>
+</html>
