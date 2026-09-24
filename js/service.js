@@ -568,3 +568,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         );
     }
 });
+<script>
+    console.log("NOVA: service.html loaded");
+    console.log("NOVA: supabase client =", !!window.supabaseClient);
+    console.log("NOVA: URL =", window.location.href);
+</script>
