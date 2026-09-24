@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        NOVA MARKET — Checkout
+    </title>
+
+    <meta
+        name="description"
+        content="Review and confirm your NOVA MARKET service order."
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <style>
+
+        :root {
+
+            --bg: #05060a;
+            --card: #0d121d;
+
+            --border: rgba(255,255,255,.08);
+
+            --text: #ffffff;
+            --text-soft: #aab3c7;
+            --text-muted: #727c90;
+
+            --blue: #536dff;
+            --purple: #8b5cf6;
+
+            --green: #2bd98b;
+            --red: #ff5c7a;
+
+            --radius: 22px;
+        }
+
+
+        * {
+
+            margin: 0;
+            padding: 0;
+
+            box-sizing: border-box;
+        }
+
+
+        body {
+
+            min-height: 100vh;
+
+            font-family:
+                "Inter",
+                sans-serif;
+
+            color: var(--text);
+
+            background:
+                radial-gradient(
+                    circle at 10% 0%,
+                    rgba(83,109,255,.12),
+                    transparent 30%
+                ),
+                radial-gradient(
+                    circle at 90% 0%,
+                    rgba(139,92,246,.11),
+                    transparent 28%
+                ),
+                var(--bg);
+        }
+
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+
+        button,
+        input,
+        textarea {
+            font-family: inherit;
+        }
+
+
+        .container {
+
+            width:
+                min(
+                    1200px,
+                    calc(100% - 32px)
+                );
+
+            margin: 0 auto;
+
+            padding-bottom: 70px;
+        }
+
+
+        /* NAV */
+
+        .navbar {
+
+            min-height: 78px;
+
+            display: flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                space-between;
+
+            border-bottom:
+                1px solid
+                rgba(255,255,255,.05);
+        }
+
+
+        .brand {
+
+            display: flex;
+
+            align-items:
+                center;
+
+            gap: 11px;
+        }
+
+
+        .brand-logo {
+
+            width: 42px;
+            height: 42px;
+
+            display: flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
+
+            border-radius: 13px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--blue),
+                    var(--purple)
+                );
+
+            font-size: 19px;
+            font-weight: 800;
+        }
+
+
+        .brand-name {
+
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+
+        .brand-name span {
+            color: #8290ff;
+        }
+
+
+        .back {
+
+            padding:
+                10px 14px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 11px;
+
+            color:
+                var(--text-soft);
+
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+
+        /* MAIN */
+
+        .page {
+
+            padding-top: 45px;
+        }
+
+
+        .eyebrow {
+
+            color:
+                #8c9aff;
+
+            font-size: 10px;
+
+            font-weight: 700;
+
+            text-transform:
+                uppercase;
+
+            letter-spacing:
+                1.3px;
+
+            margin-bottom:
+                10px;
+        }
+
+
+        h1 {
+
+            font-size:
+                clamp(
+                    30px,
+                    5vw,
+                    48px
+                );
+
+            letter-spacing:
+                -1.4px;
+
+            margin-bottom:
+                10px;
+        }
+
+
+        .intro {
+
+            color:
+                var(--text-muted);
+
+            font-size: 13px;
+
+            line-height:
+                1.7;
+
+            margin-bottom:
+                30px;
+        }
+
+
+        .checkout-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                minmax(0,1.25fr)
+                minmax(320px,.75fr);
+
+            gap: 22px;
+
+            align-items:
+                start;
+        }
+
+
+        .card {
+
+            border:
+                1px solid var(--border);
+
+            border-radius:
+                var(--radius);
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(255,255,255,.035),
+                    rgba(255,255,255,.01)
+                );
+
+            box-shadow:
+                0 25px 80px
+                rgba(0,0,0,.3);
+        }
+
+
+        /* SERVICE */
+
+        .service-card {
+
+            overflow:
+                hidden;
+        }
+
+
+        .service-image {
+
+            width: 100%;
+
+            height: 300px;
+
+            object-fit:
+                cover;
+
+            display: block;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #101a3a,
+                    #321558
+                );
+        }
+
+
+        .service-info {
+
+            padding: 26px;
+        }
+
+
+        .category {
+
+            display: inline-flex;
+
+            padding:
+                6px 9px;
+
+            margin-bottom:
+                12px;
+
+            border-radius:
+                999px;
+
+            background:
+                rgba(83,109,255,.09);
+
+            color:
+                #91a0ff;
+
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+
+        .service-title {
+
+            font-size: 27px;
+
+            line-height:
+                1.2;
+
+            margin-bottom:
+                12px;
+        }
+
+
+        .description {
+
+            color:
+                var(--text-soft);
+
+            font-size: 13px;
+
+            line-height:
+                1.8;
+        }
+
+
+        .meta {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(3,1fr);
+
+            gap: 10px;
+
+            margin-top:
+                24px;
+        }
+
+
+        .meta-item {
+
+            padding:
+                15px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius:
+                14px;
+
+            background:
+                rgba(255,255,255,.02);
+        }
+
+
+        .meta-label {
+
+            color:
+                var(--text-muted);
+
+            font-size:
+                9px;
+
+            margin-bottom:
+                6px;
+        }
+
+
+        .meta-value {
+
+            color:
+                white;
+
+            font-size:
+                13px;
+
+            font-weight:
+                700;
+        }
+
+
+        /* WORKER */
+
+        .worker {
+
+            display: flex;
+
+            align-items:
+                center;
+
+            gap: 12px;
+
+            margin-top:
+                22px;
+
+            padding:
+                14px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius:
+                15px;
+
+            background:
+                rgba(255,255,255,.02);
+        }
+
+
+        .worker img {
+
+            width: 48px;
+            height: 48px;
+
+            border-radius:
+                14px;
+
+            object-fit:
+                cover;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--blue),
+                    var(--purple)
+                );
+        }
+
+
+        .worker-name {
+
+            font-size:
+                13px;
+
+            font-weight:
+                700;
+
+            margin-bottom:
+                4px;
+        }
+
+
+        .worker-label {
+
+            color:
+                var(--text-muted);
+
+            font-size:
+                10px;
+        }
+
+
+        /* CHECKOUT CARD */
+
+        .checkout-card {
+
+            padding:
+                24px;
+
+            position:
+                sticky;
+
+            top: 20px;
+        }
+
+
+        .checkout-title {
+
+            font-size:
+                17px;
+
+            margin-bottom:
+                20px;
+        }
+
+
+        .summary-row {
+
+            display: flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                space-between;
+
+            gap: 15px;
+
+            padding:
+                12px 0;
+
+            border-bottom:
+                1px solid var(--border);
+
+            color:
+                var(--text-soft);
+
+            font-size:
+                12px;
+        }
+
+
+        .summary-row strong {
+
+            color:
+                white;
+
+            font-weight:
+                700;
+        }
+
+
+        .total {
+
+            display: flex;
+
+            align-items:
+                flex-end;
+
+            justify-content:
+                space-between;
+
+            padding:
+                20px 0 22px;
+        }
+
+
+        .total-label {
+
+            color:
+                var(--text-muted);
+
+            font-size:
+                10px;
+
+            text-transform:
+                uppercase;
+
+            letter-spacing:
+                1px;
+        }
+
+
+        .total-value {
+
+            font-size:
+                34px;
+
+            font-weight:
+                800;
+
+            letter-spacing:
+                -1px;
+        }
+
+
+        .field {
+
+            margin-bottom:
+                15px;
+        }
+
+
+        .field label {
+
+            display:
+                block;
+
+            margin-bottom:
+                7px;
+
+            color:
+                #c7cedd;
+
+            font-size:
+                11px;
+
+            font-weight:
+                600;
+        }
+
+
+        .field textarea {
+
+            width: 100%;
+
+            min-height: 100px;
+
+            resize: vertical;
+
+            padding:
+                12px 13px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius:
+                12px;
+
+            outline: none;
+
+            background:
+                rgba(255,255,255,.025);
+
+            color:
+                white;
+
+            font-size:
+                12px;
+        }
+
+
+        .field textarea:focus {
+
+            border-color:
+                rgba(83,109,255,.5);
+        }
+
+
+        .confirm-btn {
+
+            width: 100%;
+
+            border: 0;
+
+            border-radius:
+                13px;
+
+            padding:
+                15px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--blue),
+                    var(--purple)
+                );
+
+            color:
+                white;
+
+            font-size:
+                13px;
+
+            font-weight:
+                800;
+
+            cursor:
+                pointer;
+
+            transition:
+                .2s ease;
+        }
+
+
+        .confirm-btn:hover {
+
+            transform:
+                translateY(-2px);
+        }
+
+
+        .confirm-btn:disabled {
+
+            opacity:
+                .55;
+
+            cursor:
+                not-allowed;
+
+            transform:
+                none;
+        }
+
+
+        .secure {
+
+            display: flex;
+
+            justify-content:
+                center;
+
+            gap: 7px;
+
+            margin-top:
+                14px;
+
+            color:
+                var(--text-muted);
+
+            font-size:
+                9px;
+        }
+
+
+        .secure span {
+            color:
+                var(--green);
+        }
+
+
+        /* STATES */
+
+        .loading {
+
+            min-height:
+                500px;
+
+            display: flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
+
+            text-align:
+                center;
+
+            color:
+                var(--text-muted);
+        }
+
+
+        .error {
+
+            display: none;
+
+            padding:
+                50px 20px;
+
+            text-align:
+                center;
+        }
+
+
+        .error h2 {
+
+            margin-bottom:
+                10px;
+        }
+
+
+        .error p {
+
+            color:
+                var(--text-muted);
+
+            font-size:
+                12px;
+
+            margin-bottom:
+                20px;
+        }
+
+
+        .error button {
+
+            border: 0;
+
+            padding:
+                11px 16px;
+
+            border-radius:
+                11px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--blue),
+                    var(--purple)
+                );
+
+            color:
+                white;
+
+            cursor:
+                pointer;
+        }
+
+
+        .toast {
+
+            position: fixed;
+
+            left: 50%;
+
+            bottom: 22px;
+
+            transform:
+                translate(-50%,20px);
+
+            opacity: 0;
+
+            pointer-events: none;
+
+            padding:
+                13px 17px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius:
+                12px;
+
+            background:
+                rgba(14,18,29,.96);
+
+            color:
+                white;
+
+            font-size:
+                11px;
+
+            transition:
+                .25s ease;
+
+            z-index:
+                100;
+        }
+
+
+        .toast.show {
+
+            opacity: 1;
+
+            transform:
+                translate(-50%,0);
+        }
+
+
+        @media (max-width: 900px) {
+
+            .checkout-grid {
+
+                grid-template-columns:
+                    1fr;
+            }
+
+            .checkout-card {
+
+                position:
+                    static;
+            }
+        }
+
+
+        @media (max-width: 600px) {
+
+            .container {
+
+                width:
+                    calc(100% - 24px);
+            }
+
+
+            .service-image {
+
+                height:
+                    230px;
+            }
+
+
+            .service-info,
+            .checkout-card {
+
+                padding:
+                    20px;
+            }
+
+
+            .meta {
+
+                grid-template-columns:
+                    1fr;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+    <div class="container">
+
+        <header class="navbar">
+
+            <a
+                href="index.html"
+                class="brand"
+            >
+
+                <div class="brand-logo">
+                    N
+                </div>
+
+                <div class="brand-name">
+                    NOVA<span>MARKET</span>
+                </div>
+
+            </a>
+
+
+            <a
+                href="services.html"
+                class="back"
+            >
+                ← Services
+            </a>
+
+        </header>
+
+
+        <!-- LOADING -->
+
+        <section
+            id="loadingState"
+            class="loading"
+        >
+
+            <div>
+
+                <h2>
+                    Loading checkout...
+                </h2>
+
+                <p>
+                    Please wait.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- ERROR -->
+
+        <section
+            id="errorState"
+            class="error"
+        >
+
+            <h2>
+                Checkout unavailable
+            </h2>
+
+            <p id="errorMessage">
+                We could not load this order.
+            </p>
+
+            <button
+                type="button"
+                onclick="
+                    window.location.href='services.html'
+                "
+            >
+                Back to Services
+            </button>
+
+        </section>
+
+
+        <!-- CONTENT -->
+
+        <main
+            id="checkoutContent"
+            style="display:none;"
+            class="page"
+        >
+
+            <div class="eyebrow">
+                NOVA MARKET
+            </div>
+
+
+            <h1>
+                Confirm your order
+            </h1>
+
+
+            <p class="intro">
+                Review the service details, add your requirements,
+                then confirm the order.
+            </p>
+
+
+            <div class="checkout-grid">
+
+                <!-- SERVICE -->
+
+                <section class="card service-card">
+
+                    <img
+                        id="serviceImage"
+                        class="service-image"
+                        src=""
+                        alt="Service"
+                    >
+
+
+                    <div class="service-info">
+
+                        <span
+                            id="serviceCategory"
+                            class="category"
+                        >
+                            Category
+                        </span>
+
+
+                        <h2
+                            id="serviceTitle"
+                            class="service-title"
+                        >
+                            Service
+                        </h2>
+
+
+                        <p
+                            id="serviceDescription"
+                            class="description"
+                        >
+                            Service description
+                        </p>
+
+
+                        <div class="meta">
+
+                            <div class="meta-item">
+
+                                <div class="meta-label">
+                                    Price
+                                </div>
+
+                                <div
+                                    id="metaPrice"
+                                    class="meta-value"
+                                >
+                                    0 MAD
+                                </div>
+
+                            </div>
+
+
+                            <div class="meta-item">
+
+                                <div class="meta-label">
+                                    Delivery
+                                </div>
+
+                                <div
+                                    id="metaDelivery"
+                                    class="meta-value"
+                                >
+                                    1 day
+                                </div>
+
+                            </div>
+
+
+                            <div class="meta-item">
+
+                                <div class="meta-label">
+                                    Status
+                                </div>
+
+                                <div
+                                    id="metaStatus"
+                                    class="meta-value"
+                                >
+                                    Published
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- WORKER -->
+
+                        <div class="worker">
+
+                            <img
+                                id="workerAvatar"
+                                src=""
+                                alt="Worker"
+                            >
+
+
+                            <div>
+
+                                <div
+                                    id="workerName"
+                                    class="worker-name"
+                                >
+                                    NOVA Worker
+                                </div>
+
+
+                                <div class="worker-label">
+                                    Professional service provider
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- CHECKOUT -->
+
+                <aside class="card checkout-card">
+
+                    <h2 class="checkout-title">
+                        Order Summary
+                    </h2>
+
+
+                    <div class="summary-row">
+
+                        <span>
+                            Service
+                        </span>
+
+                        <strong
+                            id="summaryService"
+                        >
+                            —
+                        </strong>
+
+                    </div>
+
+
+                    <div class="summary-row">
+
+                        <span>
+                            Delivery
+                        </span>
+
+                        <strong
+                            id="summaryDelivery"
+                        >
+                            —
+                        </strong>
+
+                    </div>
+
+
+                    <div class="summary-row">
+
+                        <span>
+                            Payment
+                        </span>
+
+                        <strong>
+                            Pending
+                        </strong>
+
+                    </div>
+
+
+                    <div class="total">
+
+                        <div class="total-label">
+                            Total
+                        </div>
+
+                        <div>
+                            <span
+                                id="totalPrice"
+                                class="total-value"
+                            >
+                                0
+                            </span>
+
+                            <span>
+                                MAD
+                            </span>
+                        </div>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label for="requirements">
+                            Project Requirements
+                        </label>
+
+                        <textarea
+                            id="requirements"
+                            placeholder="Tell the worker what you need..."
+                        ></textarea>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label for="notes">
+                            Additional Note
+                        </label>
+
+                        <textarea
+                            id="notes"
+                            placeholder="Anything else the worker should know?"
+                        ></textarea>
+
+                    </div>
+
+
+                    <button
+                        id="confirmOrderBtn"
+                        type="button"
+                        class="confirm-btn"
+                    >
+                        Confirm Order
+                    </button>
+
+
+                    <div class="secure">
+
+                        <span>
+                            ●
+                        </span>
+
+                        Secure NOVA Marketplace
+
+                    </div>
+
+                </aside>
+
+            </div>
+
+        </main>
+
+    </div>
+
+
+    <div
+        id="toast"
+        class="toast"
+    ></div>
+
+
+    <!-- SUPABASE -->
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+    ></script>
+
+
+    <script
+        src="./js/supabase-config.js?v=10"
+    ></script>
+
+
+    <script
+        src="./js/order.js?v=10"
+    ></script>
+
+</body>
+
+</html>
