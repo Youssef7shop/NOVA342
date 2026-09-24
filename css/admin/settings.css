@@ -1,0 +1,689 @@
+.settings-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    margin-bottom: 22px;
+}
+
+.settings-kicker {
+    color: #626574;
+
+    font-size: 8px;
+
+    font-weight: 900;
+
+    letter-spacing: 1.5px;
+}
+
+.settings-heading h2 {
+    margin-top: 5px;
+
+    font-size: 28px;
+}
+
+.settings-heading p:last-child {
+    margin-top: 7px;
+
+    color: var(--text-muted);
+
+    font-size: 12px;
+
+    line-height: 1.6;
+}
+
+.save-indicator {
+    display: flex;
+    align-items: center;
+
+    gap: 7px;
+
+    color: var(--green);
+
+    font-size: 9px;
+
+    font-weight: 800;
+}
+
+#saveDot {
+    width: 7px;
+    height: 7px;
+
+    border-radius: 50%;
+
+    background: var(--green);
+
+    box-shadow:
+        0 0 12px rgba(41,217,139,.7);
+}
+
+
+/* =========================================================
+   PANEL
+========================================================= */
+
+.settings-panel {
+    margin-bottom: 18px;
+
+    overflow: hidden;
+
+    border-radius: 19px;
+
+    background: var(--panel);
+
+    border:
+        1px solid var(--border);
+}
+
+.panel-header {
+    min-height: 78px;
+
+    padding:
+        17px 20px;
+
+    display: flex;
+    align-items: center;
+
+    border-bottom:
+        1px solid var(--border);
+}
+
+.panel-header p {
+    color: #626574;
+
+    font-size: 8px;
+
+    font-weight: 900;
+
+    letter-spacing: 1.4px;
+}
+
+.panel-header h3 {
+    margin-top: 4px;
+
+    font-size: 16px;
+}
+
+
+/* =========================================================
+   GRID
+========================================================= */
+
+.settings-grid {
+    padding: 20px;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 16px;
+}
+
+.setting-field {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.full-width {
+    grid-column: 1 / -1;
+}
+
+.setting-field label {
+    margin-bottom: 7px;
+
+    color: #c8cad3;
+
+    font-size: 9px;
+
+    font-weight: 800;
+}
+
+.setting-field input,
+.setting-field select,
+.setting-field textarea {
+    width: 100%;
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 11px;
+
+    background:
+        rgba(255,255,255,.025);
+
+    color: white;
+
+    outline: none;
+
+    padding:
+        11px 12px;
+
+    font-size: 10px;
+}
+
+.setting-field input,
+.setting-field select {
+    min-height: 42px;
+}
+
+.setting-field textarea {
+    resize: vertical;
+
+    line-height: 1.6;
+}
+
+.setting-field input:focus,
+.setting-field select:focus,
+.setting-field textarea:focus {
+    border-color:
+        rgba(40,124,255,.35);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(40,124,255,.05);
+}
+
+.setting-field small {
+    margin-top: 6px;
+
+    color: var(--text-muted);
+
+    font-size: 8px;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   INPUT SUFFIX
+========================================================= */
+
+.input-with-suffix {
+    position: relative;
+}
+
+.input-with-suffix input {
+    padding-right: 40px;
+}
+
+.input-with-suffix span {
+    position: absolute;
+
+    top: 50%;
+    right: 12px;
+
+    transform:
+        translateY(-50%);
+
+    color: var(--text-muted);
+
+    font-size: 10px;
+
+    font-weight: 900;
+}
+
+
+/* =========================================================
+   TOGGLES
+========================================================= */
+
+.toggle-list {
+    border-top:
+        1px solid rgba(255,255,255,.045);
+}
+
+.toggle-item {
+    min-height: 76px;
+
+    padding:
+        15px 20px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    border-bottom:
+        1px solid rgba(255,255,255,.045);
+}
+
+.toggle-item:last-child {
+    border-bottom: 0;
+}
+
+.toggle-item > div {
+    display: flex;
+    flex-direction: column;
+}
+
+.toggle-item strong {
+    font-size: 10px;
+}
+
+.toggle-item span {
+    margin-top: 4px;
+
+    color: var(--text-muted);
+
+    font-size: 8px;
+}
+
+
+/* SWITCH */
+
+.switch {
+    position: relative;
+
+    width: 45px;
+    height: 25px;
+
+    flex-shrink: 0;
+}
+
+.switch input {
+    display: none;
+}
+
+.slider {
+    position: absolute;
+
+    inset: 0;
+
+    border-radius: 999px;
+
+    background:
+        #20212b;
+
+    border:
+        1px solid rgba(255,255,255,.08);
+
+    cursor: pointer;
+
+    transition:
+        .2s ease;
+}
+
+.slider::after {
+    content: "";
+
+    position: absolute;
+
+    top: 3px;
+    left: 3px;
+
+    width: 17px;
+    height: 17px;
+
+    border-radius: 50%;
+
+    background:
+        #9699a6;
+
+    transition:
+        .2s ease;
+}
+
+.switch input:checked + .slider {
+    background:
+        rgba(40,124,255,.35);
+
+    border-color:
+        rgba(40,124,255,.35);
+}
+
+.switch input:checked + .slider::after {
+    transform:
+        translateX(20px);
+
+    background:
+        var(--blue-2);
+
+    box-shadow:
+        0 0 12px rgba(40,124,255,.6);
+}
+
+.danger-switch input:checked + .slider {
+    background:
+        rgba(255,85,119,.22);
+
+    border-color:
+        rgba(255,85,119,.3);
+}
+
+.danger-switch input:checked + .slider::after {
+    background:
+        var(--danger);
+
+    box-shadow:
+        0 0 12px rgba(255,85,119,.55);
+}
+
+
+/* =========================================================
+   PLANS
+========================================================= */
+
+.plans-grid {
+    padding: 20px;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 14px;
+}
+
+.plan-setting-card {
+    padding: 18px;
+
+    border-radius: 16px;
+
+    border:
+        1px solid var(--border);
+
+    background:
+        rgba(255,255,255,.018);
+
+    transition:
+        border-color .2s,
+        transform .2s;
+}
+
+.plan-setting-card:hover {
+    transform:
+        translateY(-2px);
+
+    border-color:
+        rgba(255,255,255,.13);
+}
+
+.plan-setting-card.featured {
+    border-color:
+        rgba(40,124,255,.2);
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(40,124,255,.055),
+            rgba(139,92,246,.035)
+        );
+}
+
+.plan-icon {
+    width: 40px;
+    height: 40px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 12px;
+
+    font-size: 15px;
+
+    font-weight: 900;
+}
+
+.plan-icon.free {
+    background:
+        rgba(255,255,255,.06);
+
+    color: #b9bbc5;
+}
+
+.plan-icon.pro {
+    background:
+        rgba(40,124,255,.1);
+
+    color: var(--blue-2);
+}
+
+.plan-icon.business {
+    background:
+        rgba(244,201,93,.1);
+
+    color: var(--gold);
+}
+
+.plan-card-heading {
+    margin-top: 13px;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.plan-card-heading h3 {
+    font-size: 15px;
+}
+
+.plan-card-heading span {
+    margin-top: 3px;
+
+    color: var(--text-muted);
+
+    font-size: 8px;
+}
+
+.plan-price {
+    margin-top: 17px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 7px;
+}
+
+.plan-price input {
+    width: 100px;
+
+    height: 38px;
+
+    border-radius: 10px;
+
+    border:
+        1px solid var(--border);
+
+    background:
+        rgba(255,255,255,.025);
+
+    color: white;
+
+    outline: none;
+
+    padding: 0 10px;
+
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.plan-price span {
+    color: var(--text-muted);
+
+    font-size: 8px;
+}
+
+.plan-limit {
+    margin-top: 14px;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 6px;
+}
+
+.plan-limit label {
+    color: var(--text-muted);
+
+    font-size: 8px;
+
+    font-weight: 700;
+}
+
+.plan-limit input {
+    width: 100%;
+
+    height: 37px;
+
+    border-radius: 9px;
+
+    border:
+        1px solid var(--border);
+
+    background:
+        rgba(255,255,255,.025);
+
+    color: white;
+
+    outline: none;
+
+    padding: 0 10px;
+
+    font-size: 10px;
+}
+
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+
+.settings-actions {
+    min-height: 74px;
+
+    margin-top: 5px;
+
+    padding:
+        14px 2px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+}
+
+.unsaved-label {
+    color: var(--text-muted);
+
+    font-size: 8px;
+}
+
+.action-buttons {
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+}
+
+.secondary-btn,
+.save-btn {
+    min-height: 42px;
+
+    padding:
+        0 16px;
+
+    border-radius: 10px;
+
+    font-size: 9px;
+
+    font-weight: 900;
+
+    cursor: pointer;
+}
+
+.secondary-btn {
+    border:
+        1px solid var(--border);
+
+    background:
+        rgba(255,255,255,.03);
+
+    color: var(--text-soft);
+}
+
+.save-btn {
+    border: 0;
+
+    color: white;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--blue),
+            var(--purple)
+        );
+
+    box-shadow:
+        0 12px 30px
+        rgba(40,124,255,.12);
+}
+
+.save-btn:disabled,
+.secondary-btn:disabled {
+    opacity: .5;
+
+    cursor: not-allowed;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1050px) {
+
+    .plans-grid {
+        grid-template-columns:
+            1fr;
+    }
+}
+
+@media (max-width: 800px) {
+
+    .settings-grid {
+        grid-template-columns:
+            1fr;
+    }
+
+    .full-width {
+        grid-column: auto;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .settings-heading {
+        flex-direction: column;
+    }
+
+    .settings-heading h2 {
+        font-size: 23px;
+    }
+
+    .toggle-item {
+        align-items: flex-start;
+    }
+
+    .settings-actions {
+        align-items: stretch;
+
+        flex-direction: column;
+    }
+
+    .action-buttons {
+        width: 100%;
+    }
+
+    .secondary-btn,
+    .save-btn {
+        flex: 1;
+    }
+}
