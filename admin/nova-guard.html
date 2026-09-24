@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    />
+
+    <title>NOVA Guard — Admin</title>
+
+    <meta
+        name="description"
+        content="NOVA Guard security and AI safety controls"
+    />
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- NOVA Supabase Config -->
+    <script src="../../js/supabase-config.js?v=22"></script>
+
+    <!-- Existing Admin CSS -->
+    <link
+        rel="stylesheet"
+        href="../../css/admin/admin.css?v=22"
+    />
+
+    <!-- NOVA Guard CSS -->
+    <link
+        rel="stylesheet"
+        href="../../css/admin/nova-guard.css?v=1"
+    />
+</head>
+
+<body>
+
+    <!-- =========================
+         ADMIN LAYOUT
+    ========================== -->
+
+    <div class="admin-layout" id="adminLayout">
+
+        <!-- SIDEBAR -->
+        <aside class="admin-sidebar" id="adminSidebar">
+
+            <div class="sidebar-top">
+
+                <a href="./index.html" class="admin-brand">
+                    <div class="brand-logo">N</div>
+
+                    <div class="brand-text">
+                        <strong>NOVA</strong>
+                        <span>ADMIN</span>
+                    </div>
+                </a>
+
+                <button
+                    type="button"
+                    class="sidebar-close"
+                    id="sidebarClose"
+                    aria-label="Close sidebar"
+                >
+                    ×
+                </button>
+            </div>
+
+            <nav class="admin-nav">
+
+                <a href="./index.html" class="nav-item">
+                    <span class="nav-icon">⌂</span>
+                    <span>Dashboard</span>
+                </a>
+
+                <a href="./users.html" class="nav-item">
+                    <span class="nav-icon">◉</span>
+                    <span>Users</span>
+                </a>
+
+                <a href="./workers.html" class="nav-item">
+                    <span class="nav-icon">◆</span>
+                    <span>Workers</span>
+                </a>
+
+                <a href="./support.html" class="nav-item">
+                    <span class="nav-icon">✉</span>
+                    <span>Support</span>
+                </a>
+
+                <a href="./payments.html" class="nav-item">
+                    <span class="nav-icon">₿</span>
+                    <span>Payments</span>
+                </a>
+
+                <a href="./logs.html" class="nav-item">
+                    <span class="nav-icon">☷</span>
+                    <span>Activity Logs</span>
+                </a>
+
+                <a href="./settings.html" class="nav-item">
+                    <span class="nav-icon">⚙</span>
+                    <span>Settings</span>
+                </a>
+
+                <a
+                    href="./nova-guard.html"
+                    class="nav-item active"
+                >
+                    <span class="nav-icon">🛡</span>
+                    <span>NOVA Guard</span>
+                </a>
+
+            </nav>
+
+            <div class="sidebar-bottom">
+
+                <div class="guard-mini-card">
+                    <div class="guard-mini-icon">🛡</div>
+
+                    <div class="guard-mini-info">
+                        <strong>NOVA Guard</strong>
+                        <span id="sidebarGuardStatus">
+                            Loading...
+                        </span>
+                    </div>
+                </div>
+
+                <button
+                    type="button"
+                    class="logout-btn"
+                    id="logoutBtn"
+                >
+                    <span>↪</span>
+                    Logout
+                </button>
+
+            </div>
+
+        </aside>
+
+        <!-- MAIN -->
+        <main class="admin-main">
+
+            <!-- TOPBAR -->
+            <header class="admin-topbar">
+
+                <button
+                    type="button"
+                    class="sidebar-toggle"
+                    id="sidebarToggle"
+                    aria-label="Open sidebar"
+                >
+                    ☰
+                </button>
+
+                <div class="topbar-page">
+
+                    <div>
+                        <h1>NOVA Guard</h1>
+
+                        <p>
+                            AI safety, security and behavior controls
+                        </p>
+                    </div>
+
+                </div>
+
+                <div class="topbar-right">
+
+                    <button
+                        type="button"
+                        class="refresh-btn"
+                        id="refreshBtn"
+                        title="Refresh"
+                    >
+                        ↻
+                    </button>
+
+                    <div class="admin-profile" id="adminProfile">
+
+                        <div class="profile-avatar">
+                            N
+                        </div>
+
+                        <div class="profile-meta">
+                            <strong id="adminName">
+                                Admin
+                            </strong>
+
+                            <span id="adminEmail">
+                                Loading...
+                            </span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </header>
+
+            <!-- CONTENT -->
+            <section class="admin-content">
+
+                <!-- ALERT -->
+                <div
+                    class="page-alert"
+                    id="pageAlert"
+                    hidden
+                ></div>
+
+                <!-- HERO -->
+                <section class="guard-hero">
+
+                    <div class="guard-hero-left">
+
+                        <div class="guard-hero-icon">
+                            🛡
+                        </div>
+
+                        <div>
+                            <div class="guard-eyebrow">
+                                NOVA SECURITY LAYER
+                            </div>
+
+                            <h2>
+                                Control how NOVA AI behaves
+                            </h2>
+
+                            <p>
+                                Configure safety rules, blocked content,
+                                prompt protection and responsible AI
+                                behavior from one place.
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <div class="guard-status-box">
+
+                        <div class="status-label">
+                            SYSTEM STATUS
+                        </div>
+
+                        <div class="status-line">
+
+                            <span
+                                class="status-dot"
+                                id="guardStatusDot"
+                            ></span>
+
+                            <strong id="guardStatusText">
+                                Loading...
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <!-- MAIN GRID -->
+                <div class="guard-grid">
+
+                    <!-- GENERAL -->
+                    <section class="guard-card">
+
+                        <div class="card-header">
+
+                            <div>
+                                <span class="card-kicker">
+                                    GENERAL
+                                </span>
+
+                                <h3>
+                                    Guard Protection
+                                </h3>
+
+                                <p>
+                                    Enable or disable NOVA Guard
+                                    globally.
+                                </p>
+                            </div>
+
+                            <div class="card-icon">
+                                🛡
+                            </div>
+
+                        </div>
+
+                        <div class="setting-row">
+
+                            <div class="setting-info">
+                                <strong>
+                                    Enable NOVA Guard
+                                </strong>
+
+                                <span>
+                                    Apply security controls to
+                                    NOVA AI requests.
+                                </span>
+                            </div>
+
+                            <label class="switch">
+                                <input
+                                    type="checkbox"
+                                    id="guardEnabled"
+                                />
+
+                                <span class="switch-slider"></span>
+                            </label>
+
+                        </div>
+
+                        <div class="setting-row">
+
+                            <div class="setting-info">
+                                <strong>
+                                    Block policy violations
+                                </strong>
+
+                                <span>
+                                    Refuse requests that violate
+                                    configured safety rules.
+                                </span>
+                            </div>
+
+                            <label class="switch">
+                                <input
+                                    type="checkbox"
+                                    id="blockPolicyViolations"
+                                />
+
+                                <span class="switch-slider"></span>
+                            </label>
+
+                        </div>
+
+                        <div class="setting-row">
+
+                            <div class="setting-info">
+                                <strong>
+                                    Safe response mode
+                                </strong>
+
+                                <span>
+                                    Prefer safer alternatives when
+                                    a request must be refused.
+                                </span>
+                            </div>
+
+                            <label class="switch">
+                                <input
+                                    type="checkbox"
+                                    id="safeResponseMode"
+                                />
+
+                                <span class="switch-slider"></span>
+                            </label>
+
+                        </div>
+
+                    </section>
+
+                    <!-- PROMPT SECURITY -->
+                    <section class="guard-card">
+
+                        <div class="card-header">
+
+                            <div>
+                                <span class="card-kicker">
+                                    PROMPT SECURITY
+                                </span>
+
+                                <h3>
+                                    Attack Protection
+                                </h3>
+
+                                <p>
+                                    Protect NOVA from malicious
+                                    prompt behavior.
+                                </p>
+                            </div>
+
+                            <div class="card-icon">
+                                🔐
+                            </div>
+
+                        </div>
+
+                        <div class="setting-row">
+
+                            <div class="setting-info">
+                                <strong>
+                                    Prompt injection protection
+                                </strong>
+
+                                <span>
+                                    Detect attempts to manipulate
+                                    system instructions.
+                                </span>
+                            </div>
+
+                            <label class="switch">
+                                <input
+                                    type="checkbox"
+                                    id="promptInjectionProtection"
+                                />
+
+                                <span class="switch-slider"></span>
+                            </label>
+
+                        </div>
+
+                        <div class="setting-row">
+
+                            <div class="setting-info">
+                                <strong>
+                                    Jailbreak protection
+                                </strong>
+
+                                <span>
+                                    Detect common attempts to bypass
+                                    safety controls.
+                                </span>
+                            </div>
+
+                            <label class="switch">
+                                <input
+                                    type="checkbox"
+                                    id="jailbreakProtection"
+                                />
+
+                                <span class="switch-slider"></span>
+                            </label>
+
+                        </div>
+
+                        <div class="setting-row">
+
+                            <div class="setting-info">
+                                <strong>
+                                    Ignore user system overrides
+                                </strong>
+
+                                <span>
+                                    Prevent user prompts from
+                                    replacing protected rules.
+                                </span>
+                            </div>
+
+                            <label class="switch">
+                                <input
+                                    type="checkbox"
+                                    id="systemOverrideProtection"
+                                />
+
+                                <span class="switch-slider"></span>
+                            </label>
+
+                        </div>
+
+                    </section>
+
+                    <!-- CONTENT RULES -->
+                    <section class="guard-card">
+
+                        <div class="card-header">
+
+                            <div>
+                                <span class="card-kicker">
+                                    CONTENT RULES
+                                </span>
+
+                                <h3>
+                                    Restricted Categories
+                                </h3>
+
+                                <p>
+                                    Categories that NOVA Guard should
+                                    automatically block.
+                                </p>
+                            </div>
+
+                            <div class="card-icon">
+                                🚫
+                            </div>
+
+                        </div>
+
+                        <div class="checks-grid">
+
+                            <label class="check-item">
+
+                                <input
+                                    type="checkbox"
+                                    id="blockIllegalActivities"
+                                />
+
+                                <span>
+                                    <strong>
+                                        Illegal activities
+                                    </strong>
+
+                                    <small>
+                                        Requests involving unlawful
+                                        conduct.
+                                    </small>
+                                </span>
+
+                            </label>
+
+                            <label class="check-item">
+
+                                <input
+                                    type="checkbox"
+                                    id="blockViolence"
+                                />
+
+                                <span>
+                                    <strong>
+                                        Violent wrongdoing
+                                    </strong>
+
+                                    <small>
+                                        Assistance intended to
+                                        facilitate serious harm.
+                                    </small>
+                                </span>
+
+                            </label>
+
+                            <label class="check-item">
+
+                                <input
+                                    type="checkbox"
+                                    id="blockFraud"
+                                />
+
+                                <span>
+                                    <strong>
+                                        Fraud & deception
+                                    </strong>
+
+                                    <small>
+                                        Scams, credential theft and
+                                        deceptive abuse.
+                                    </small>
+
+                                </span>
+
+                            </label>
+
+                            <label class="check-item">
+
+                                <input
+                                    type="checkbox"
+                                    id="blockMalware"
+                                />
+
+                                <span>
+                                    <strong>
+                                        Malware & harmful code
+                                    </strong>
+
+                                    <small>
+                                        Malicious software creation
+                                        or deployment.
+                                    </small>
+                                </span>
+
+                            </label>
+
+                            <label class="check-item">
+
+                                <input
+                                    type="checkbox"
+                                    id="blockPrivacy"
+                                />
+
+                                <span>
+                                    <strong>
+                                        Privacy abuse
+                                    </strong>
+
+                                    <small>
+                                        Unauthorized personal-data
+                                        exploitation.
+                                    </small>
+
+                                </span>
+
+                            </label>
+
+                            <label class="check-item">
+
+                                <input
+                                    type="checkbox"
+                                    id="blockDangerousInstructions"
+                                />
+
+                                <span>
+                                    <strong>
+                                        Dangerous instructions
+                                    </strong>
+
+                                    <small>
+                                        Content creating serious
+                                        physical safety risks.
+                                    </small>
+                                </span>
+
+                            </label>
+
+                        </div>
+
+                    </section>
+
+                    <!-- DATA PROTECTION -->
+                    <section class="guard-card">
+
+                        <div class="card-header">
+
+                            <div>
+                                <span class="card-kicker">
+                                    DATA PROTECTION
+                                </span>
+
+                                <h3>
+                                    Privacy Controls
+                                </h3>
+
+                                <p>
+                                    Reduce accidental exposure of
+                                    sensitive information.
+                                </p>
+                            </div>
+
+                            <div class="card-icon">
+                                🔒
+                            </div>
+
+                        </div>
+
+                        <div class="setting-row">
+
+                            <div class="setting-info">
+                                <strong>
+                                    Personal data protection
+                                </strong>
+
+                                <span>
+                                    Detect and protect sensitive
+                                    personal information.
+                                </span>
+                            </div>
+
+                            <label class="switch">
+                                <input
+                                    type="checkbox"
+                                    id="personalDataProtection"
+                                />
+
+                                <span class="switch-slider"></span>
+                            </label>
+
+                        </div>
+
+                        <div class="setting-row">
+
+                            <div class="setting-info">
+                                <strong>
+                                    Credential protection
+                                </strong>
+
+                                <span>
+                                    Warn or block exposed passwords,
+                                    tokens and secrets.
+                                </span>
+                            </div>
+
+                            <label class="switch">
+                                <input
+                                    type="checkbox"
+                                    id="credentialProtection"
+                                />
+
+                                <span class="switch-slider"></span>
+                            </label>
+
+                        </div>
+
+                        <div class="setting-row">
+
+                            <div class="setting-info">
+                                <strong>
+                                    Secret masking
+                                </strong>
+
+                                <span>
+                                    Mask detected secrets in
+                                    security logs.
+                                </span>
+                            </div>
+
+                            <label class="switch">
+                                <input
+                                    type="checkbox"
+                                    id="secretMasking"
+                                />
+
+                                <span class="switch-slider"></span>
+                            </label>
+
+                        </div>
+
+                    </section>
+
+                    <!-- AI BEHAVIOR -->
+                    <section class="guard-card">
+
+                        <div class="card-header">
+
+                            <div>
+                                <span class="card-kicker">
+                                    AI BEHAVIOR
+                                </span>
+
+                                <h3>
+                                    Response Controls
+                                </h3>
+
+                                <p>
+                                    Define how NOVA should react when
+                                    a request is restricted.
+                                </p>
+                            </div>
+
+                            <div class="card-icon">
+                                🤖
+                            </div>
+
+                        </div>
+
+                        <div class="field-group">
+
+                            <label for="refusalStyle">
+                                Refusal style
+                            </label>
+
+                            <select id="refusalStyle">
+
+                                <option value="concise">
+                                    Concise
+                                </option>
+
+                                <option value="helpful">
+                                    Helpful
+                                </option>
+
+                                <option value="strict">
+                                    Strict
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="field-group">
+
+                            <label for="safeAlternativeMode">
+                                Safe alternative behavior
+                            </label>
+
+                            <select id="safeAlternativeMode">
+
+                                <option value="enabled">
+                                    Offer safe alternatives
+                                </option>
+
+                                <option value="disabled">
+                                    Do not offer alternatives
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="field-group">
+
+                            <label for="maxPromptLength">
+                                Maximum prompt length
+                            </label>
+
+                            <div class="input-with-unit">
+
+                                <input
+                                    type="number"
+                                    id="maxPromptLength"
+                                    min="500"
+                                    max="100000"
+                                    step="500"
+                                />
+
+                                <span>
+                                    chars
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <!-- MONITORING -->
+                    <section class="guard-card">
+
+                        <div class="card-header">
+
+                            <div>
+                                <span class="card-kicker">
+                                    MONITORING
+                                </span>
+
+                                <h3>
+                                    Security Logging
+                                </h3>
+
+                                <p>
+                                    Control what NOVA records when
+                                    Guard is triggered.
+                                </p>
+                            </div>
+
+                            <div class="card-icon">
+                                📊
+                            </div>
+
+                        </div>
+
+                        <div class="setting-row">
+
+                            <div class="setting-info">
+                                <strong>
+                                    Log Guard events
+                                </strong>
+
+                                <span>
+                                    Record blocked or flagged
+                                    requests in activity logs.
+                                </span>
+                            </div>
+
+                            <label class="switch">
+                                <input
+                                    type="checkbox"
+                                    id="logGuardEvents"
+                                />
+
+                                <span class="switch-slider"></span>
+                            </label>
+
+                        </div>
+
+                        <div class="setting-row">
+
+                            <div class="setting-info">
+                                <strong>
+                                    Include detection reason
+                                </strong>
+
+                                <span>
+                                    Store the category that caused
+                                    the Guard action.
+                                </span>
+                            </div>
+
+                            <label class="switch">
+                                <input
+                                    type="checkbox"
+                                    id="logDetectionReason"
+                                />
+
+                                <span class="switch-slider"></span>
+                            </label>
+
+                        </div>
+
+                        <div class="setting-row">
+
+                            <div class="setting-info">
+                                <strong>
+                                    Admin alerts
+                                </strong>
+
+                                <span>
+                                    Prepare important Guard events
+                                    for administrator review.
+                                </span>
+                            </div>
+
+                            <label class="switch">
+                                <input
+                                    type="checkbox"
+                                    id="adminAlerts"
+                                />
+
+                                <span class="switch-slider"></span>
+                            </label>
+
+                        </div>
+
+                    </section>
+
+                </div>
+
+                <!-- ACTION BAR -->
+                <div class="guard-actions">
+
+                    <div class="save-info">
+
+                        <div
+                            class="save-status"
+                            id="saveStatus"
+                        >
+                            No changes yet.
+                        </div>
+
+                        <div class="save-date" id="lastSaved">
+                            —
+                        </div>
+
+                    </div>
+
+                    <div class="action-buttons">
+
+                        <button
+                            type="button"
+                            class="btn-secondary"
+                            id="resetBtn"
+                        >
+                            Reset
+                        </button>
+
+                        <button
+                            type="button"
+                            class="btn-primary"
+                            id="saveBtn"
+                        >
+                            <span id="saveBtnIcon">
+                                ✓
+                            </span>
+
+                            <span id="saveBtnText">
+                                Save Guard Settings
+                            </span>
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <!-- INFORMATION -->
+                <section class="guard-info-panel">
+
+                    <div class="info-icon">
+                        ℹ
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Important
+                        </strong>
+
+                        <p>
+                            These settings define the NOVA Guard
+                            configuration stored for your platform.
+                            The AI provider or server-side enforcement
+                            layer must read these settings before
+                            applying them to actual AI requests.
+                        </p>
+
+                    </div>
+
+                </section>
+
+            </section>
+
+        </main>
+
+    </div>
+
+    <!-- Overlay -->
+    <div
+        class="sidebar-overlay"
+        id="sidebarOverlay"
+    ></div>
+
+
+    <!-- NOVA Guard JS -->
+    <script
+        src="../../js/admin/nova-guard.js?v=1"
+    ></script>
+
+</body>
+</html>
