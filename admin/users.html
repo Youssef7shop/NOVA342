@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    />
+
+    <title>NOVA MARKET — Users</title>
+
+    <link
+        rel="stylesheet"
+        href="../../css/admin/admin.css?v=20"
+    />
+
+    <link
+        rel="stylesheet"
+        href="../../css/admin/users.css?v=1"
+    />
+</head>
+
+<body>
+
+<div class="admin-app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                N
+            </div>
+
+            <div class="brand-text">
+
+                <strong>NOVA</strong>
+
+                <span>
+                    MARKET ADMIN
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <a
+                href="./index.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">⌂</span>
+                <span>Dashboard</span>
+            </a>
+
+
+            <a
+                href="./users.html"
+                class="nav-item active"
+            >
+                <span class="nav-icon">♙</span>
+                <span>Users</span>
+            </a>
+
+
+            <a
+                href="./workers.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">◈</span>
+                <span>Workers</span>
+            </a>
+
+
+            <a
+                href="./services.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">▦</span>
+                <span>Services</span>
+            </a>
+
+
+            <a
+                href="./orders.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">◫</span>
+                <span>Orders</span>
+            </a>
+
+
+            <a
+                href="./payments.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">₿</span>
+                <span>Payments</span>
+            </a>
+
+
+            <a
+                href="./support.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">◌</span>
+                <span>Support</span>
+            </a>
+
+
+            <div class="nav-section-title">
+                MANAGEMENT
+            </div>
+
+
+            <a
+                href="./reports.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">▥</span>
+                <span>Reports</span>
+            </a>
+
+
+            <a
+                href="./nova-guard.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">◉</span>
+                <span>NOVA Guard</span>
+            </a>
+
+
+            <a
+                href="./logs.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">≋</span>
+                <span>Activity Logs</span>
+            </a>
+
+
+            <a
+                href="./settings.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">⚙</span>
+                <span>Settings</span>
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <div class="security-box">
+
+                <div class="security-dot"></div>
+
+                <div>
+
+                    <strong>
+                        NOVA Guard
+                    </strong>
+
+                    <span>
+                        System Protected
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="logout-btn"
+                id="logoutBtn"
+            >
+                <span>⇥</span>
+                Logout
+            </button>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+
+            <div class="topbar-left">
+
+                <button
+                    type="button"
+                    class="menu-btn"
+                    id="sidebarToggle"
+                >
+                    ☰
+                </button>
+
+                <div>
+
+                    <p class="eyebrow">
+                        USER MANAGEMENT
+                    </p>
+
+                    <h1>
+                        Users
+                    </h1>
+
+                </div>
+
+            </div>
+
+
+            <div class="topbar-right">
+
+                <button
+                    type="button"
+                    class="icon-btn"
+                    id="refreshBtn"
+                    title="Refresh"
+                >
+                    ↻
+                </button>
+
+
+                <div class="admin-profile">
+
+                    <div class="admin-avatar">
+
+                        <span id="adminInitial">
+                            A
+                        </span>
+
+                    </div>
+
+
+                    <div class="admin-profile-text">
+
+                        <strong id="adminName">
+                            Admin
+                        </strong>
+
+                        <span id="adminEmail">
+                            Loading...
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- CONTENT -->
+        <section class="page-content">
+
+
+            <!-- ACCESS -->
+            <div
+                id="accessLoading"
+                class="page-state"
+            >
+
+                <div class="loader"></div>
+
+                <h2>
+                    Checking Admin Access
+                </h2>
+
+                <p>
+                    Please wait...
+                </p>
+
+            </div>
+
+
+            <div
+                id="accessDenied"
+                class="page-state hidden"
+            >
+
+                <div class="state-icon danger">
+                    !
+                </div>
+
+                <h2>
+                    Access Denied
+                </h2>
+
+                <p>
+                    This area is only available to NOVA administrators.
+                </p>
+
+                <button
+                    id="backHomeBtn"
+                    class="primary-btn"
+                    type="button"
+                >
+                    Back to NOVA
+                </button>
+
+            </div>
+
+
+            <!-- USERS CONTENT -->
+            <div
+                id="usersContent"
+                class="hidden"
+            >
+
+
+                <!-- HEADER -->
+                <div class="users-page-header">
+
+                    <div>
+
+                        <p class="welcome-label">
+                            NOVA MARKET
+                        </p>
+
+                        <h2>
+                            User Accounts
+                        </h2>
+
+                        <p>
+                            Manage customer, worker and administrator accounts.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- STATS -->
+                <div class="users-stats-grid">
+
+
+                    <article class="user-stat-card">
+
+                        <div class="user-stat-icon blue">
+                            ♙
+                        </div>
+
+                        <div>
+
+                            <span>
+                                TOTAL USERS
+                            </span>
+
+                            <strong id="statTotal">
+                                0
+                            </strong>
+
+                        </div>
+
+                    </article>
+
+
+                    <article class="user-stat-card">
+
+                        <div class="user-stat-icon green">
+                            ●
+                        </div>
+
+                        <div>
+
+                            <span>
+                                ACTIVE
+                            </span>
+
+                            <strong id="statActive">
+                                0
+                            </strong>
+
+                        </div>
+
+                    </article>
+
+
+                    <article class="user-stat-card">
+
+                        <div class="user-stat-icon purple">
+                            ◈
+                        </div>
+
+                        <div>
+
+                            <span>
+                                WORKERS
+                            </span>
+
+                            <strong id="statWorkers">
+                                0
+                            </strong>
+
+                        </div>
+
+                    </article>
+
+
+                    <article class="user-stat-card">
+
+                        <div class="user-stat-icon gold">
+                            ✦
+                        </div>
+
+                        <div>
+
+                            <span>
+                                PRO / BUSINESS
+                            </span>
+
+                            <strong id="statPaid">
+                                0
+                            </strong>
+
+                        </div>
+
+                    </article>
+
+
+                </div>
+
+
+                <!-- FILTER PANEL -->
+                <section class="users-panel">
+
+                    <div class="users-toolbar">
+
+
+                        <div class="search-box">
+
+                            <span>
+                                ⌕
+                            </span>
+
+                            <input
+                                type="search"
+                                id="searchInput"
+                                placeholder="Search by name or email..."
+                                autocomplete="off"
+                            />
+
+                        </div>
+
+
+                        <select
+                            id="roleFilter"
+                            class="filter-select"
+                        >
+                            <option value="">
+                                All Roles
+                            </option>
+
+                            <option value="customer">
+                                Customer
+                            </option>
+
+                            <option value="worker">
+                                Worker
+                            </option>
+
+                            <option value="admin">
+                                Admin
+                            </option>
+                        </select>
+
+
+                        <select
+                            id="statusFilter"
+                            class="filter-select"
+                        >
+                            <option value="">
+                                All Status
+                            </option>
+
+                            <option value="active">
+                                Active
+                            </option>
+
+                            <option value="inactive">
+                                Inactive
+                            </option>
+                        </select>
+
+
+                        <button
+                            type="button"
+                            id="clearFiltersBtn"
+                            class="clear-btn"
+                        >
+                            Clear
+                        </button>
+
+                    </div>
+
+
+                    <!-- TABLE -->
+                    <div class="users-table-wrap">
+
+                        <table class="users-table">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        USER
+                                    </th>
+
+                                    <th>
+                                        ROLE
+                                    </th>
+
+                                    <th>
+                                        PLAN
+                                    </th>
+
+                                    <th>
+                                        STATUS
+                                    </th>
+
+                                    <th>
+                                        CREATED
+                                    </th>
+
+                                    <th>
+                                        ACTIONS
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody id="usersTableBody">
+
+                                <tr>
+
+                                    <td
+                                        colspan="6"
+                                        class="table-loading"
+                                    >
+                                        Loading users...
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+
+                    <!-- PAGINATION -->
+                    <div class="pagination">
+
+                        <button
+                            type="button"
+                            id="previousBtn"
+                            class="pagination-btn"
+                        >
+                            ← Previous
+                        </button>
+
+
+                        <span id="paginationInfo">
+                            Page 1
+                        </span>
+
+
+                        <button
+                            type="button"
+                            id="nextBtn"
+                            class="pagination-btn"
+                        >
+                            Next →
+                        </button>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- USER MODAL -->
+<div
+    id="userModal"
+    class="modal-backdrop hidden"
+>
+
+    <div class="user-modal">
+
+        <button
+            type="button"
+            class="modal-close"
+            id="modalCloseBtn"
+        >
+            ×
+        </button>
+
+
+        <div class="modal-user-header">
+
+            <div
+                class="modal-avatar"
+                id="modalAvatar"
+            >
+                U
+            </div>
+
+            <div>
+
+                <span class="modal-label">
+                    USER ACCOUNT
+                </span>
+
+                <h2 id="modalUserName">
+                    User
+                </h2>
+
+                <p id="modalUserEmail">
+                    email@example.com
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="modal-divider"></div>
+
+
+        <div class="modal-grid">
+
+
+            <div class="modal-field">
+
+                <span>
+                    ROLE
+                </span>
+
+                <select
+                    id="modalRole"
+                    class="modal-select"
+                >
+
+                    <option value="customer">
+                        Customer
+                    </option>
+
+                    <option value="worker">
+                        Worker
+                    </option>
+
+                    <option value="admin">
+                        Admin
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="modal-field">
+
+                <span>
+                    PLAN
+                </span>
+
+                <div
+                    id="modalPlan"
+                    class="modal-value"
+                >
+                    Free
+                </div>
+
+            </div>
+
+
+            <div class="modal-field">
+
+                <span>
+                    STATUS
+                </span>
+
+                <div
+                    id="modalStatus"
+                    class="modal-value"
+                >
+                    Active
+                </div>
+
+            </div>
+
+
+            <div class="modal-field">
+
+                <span>
+                    JOINED
+                </span>
+
+                <div
+                    id="modalCreated"
+                    class="modal-value"
+                >
+                    —
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="modal-actions">
+
+            <button
+                type="button"
+                id="saveUserBtn"
+                class="modal-save-btn"
+            >
+                Save Changes
+            </button>
+
+
+            <button
+                type="button"
+                id="toggleStatusBtn"
+                class="modal-danger-btn"
+            >
+                Disable Account
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div
+    id="toast"
+    class="toast"
+></div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script
+    src="../../js/supabase-config.js?v=20"
+></script>
+
+<script
+    src="../../js/admin/users.js?v=1"
+></script>
+
+</body>
+</html>
