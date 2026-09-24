@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    />
+
+    <title>NOVA MARKET — Admin Dashboard</title>
+
+    <link
+        rel="stylesheet"
+        href="../../css/admin/admin.css?v=1"
+    />
+</head>
+
+<body>
+
+<div id="adminApp" class="admin-app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+
+        <div class="brand">
+            <div class="brand-logo">N</div>
+
+            <div class="brand-text">
+                <strong>NOVA</strong>
+                <span>MARKET ADMIN</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+
+            <a
+                href="./index.html"
+                class="nav-item active"
+            >
+                <span class="nav-icon">⌂</span>
+                <span>Dashboard</span>
+            </a>
+
+            <a
+                href="./users.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">♙</span>
+                <span>Users</span>
+            </a>
+
+            <a
+                href="./workers.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">◈</span>
+                <span>Workers</span>
+            </a>
+
+            <a
+                href="./services.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">▦</span>
+                <span>Services</span>
+            </a>
+
+            <a
+                href="./orders.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">◫</span>
+                <span>Orders</span>
+            </a>
+
+            <a
+                href="./payments.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">₿</span>
+                <span>Payments</span>
+            </a>
+
+            <a
+                href="./support.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">◌</span>
+                <span>Support</span>
+            </a>
+
+            <div class="nav-section-title">
+                MANAGEMENT
+            </div>
+
+            <a
+                href="./reports.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">▥</span>
+                <span>Reports</span>
+            </a>
+
+            <a
+                href="./nova-guard.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">◉</span>
+                <span>NOVA Guard</span>
+            </a>
+
+            <a
+                href="./logs.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">≋</span>
+                <span>Activity Logs</span>
+            </a>
+
+            <a
+                href="./settings.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">⚙</span>
+                <span>Settings</span>
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <div class="security-box">
+                <div class="security-dot"></div>
+
+                <div>
+                    <strong>NOVA Guard</strong>
+                    <span>System Protected</span>
+                </div>
+            </div>
+
+            <button
+                type="button"
+                id="logoutBtn"
+                class="logout-btn"
+            >
+                <span>⇥</span>
+                Logout
+            </button>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+
+            <div class="topbar-left">
+
+                <button
+                    type="button"
+                    id="sidebarToggle"
+                    class="menu-btn"
+                    aria-label="Toggle menu"
+                >
+                    ☰
+                </button>
+
+                <div>
+                    <p class="eyebrow">
+                        NOVA CONTROL CENTER
+                    </p>
+
+                    <h1>
+                        Admin Dashboard
+                    </h1>
+                </div>
+
+            </div>
+
+
+            <div class="topbar-right">
+
+                <button
+                    type="button"
+                    class="icon-btn"
+                    id="refreshBtn"
+                    title="Refresh"
+                >
+                    ↻
+                </button>
+
+                <div class="admin-profile">
+
+                    <div class="admin-avatar">
+                        <span id="adminInitial">A</span>
+                    </div>
+
+                    <div class="admin-profile-text">
+                        <strong id="adminName">
+                            Admin
+                        </strong>
+
+                        <span id="adminEmail">
+                            Loading...
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- PAGE -->
+        <section class="page-content">
+
+            <!-- SECURITY LOADING -->
+            <div
+                id="accessLoading"
+                class="page-state"
+            >
+                <div class="loader"></div>
+
+                <h2>
+                    Checking Admin Access
+                </h2>
+
+                <p>
+                    Please wait...
+                </p>
+            </div>
+
+
+            <!-- ACCESS DENIED -->
+            <div
+                id="accessDenied"
+                class="page-state hidden"
+            >
+
+                <div class="state-icon danger">
+                    !
+                </div>
+
+                <h2>
+                    Access Denied
+                </h2>
+
+                <p>
+                    This area is only available to NOVA administrators.
+                </p>
+
+                <button
+                    type="button"
+                    id="backHomeBtn"
+                    class="primary-btn"
+                >
+                    Back to NOVA
+                </button>
+
+            </div>
+
+
+            <!-- DASHBOARD CONTENT -->
+            <div
+                id="dashboardContent"
+                class="hidden"
+            >
+
+                <!-- WELCOME -->
+                <section class="welcome-card">
+
+                    <div>
+
+                        <p class="welcome-label">
+                            SYSTEM OVERVIEW
+                        </p>
+
+                        <h2>
+                            Welcome back,
+                            <span id="welcomeName">
+                                Admin
+                            </span>
+                        </h2>
+
+                        <p>
+                            Monitor NOVA MARKET, users, workers,
+                            services and orders from one place.
+                        </p>
+
+                    </div>
+
+                    <div class="welcome-status">
+
+                        <span class="status-pulse"></span>
+
+                        <span>
+                            All systems operational
+                        </span>
+
+                    </div>
+
+                </section>
+
+
+                <!-- STATS -->
+                <section class="stats-grid">
+
+                    <article class="stat-card">
+
+                        <div class="stat-top">
+                            <span class="stat-label">
+                                TOTAL USERS
+                            </span>
+
+                            <span class="stat-icon blue">
+                                ♙
+                            </span>
+                        </div>
+
+                        <div
+                            class="stat-value"
+                            id="totalUsers"
+                        >
+                            0
+                        </div>
+
+                        <div class="stat-bottom">
+                            <span>
+                                Registered accounts
+                            </span>
+                        </div>
+
+                    </article>
+
+
+                    <article class="stat-card">
+
+                        <div class="stat-top">
+                            <span class="stat-label">
+                                WORKERS
+                            </span>
+
+                            <span class="stat-icon purple">
+                                ◈
+                            </span>
+                        </div>
+
+                        <div
+                            class="stat-value"
+                            id="totalWorkers"
+                        >
+                            0
+                        </div>
+
+                        <div class="stat-bottom">
+                            <span>
+                                Active providers
+                            </span>
+                        </div>
+
+                    </article>
+
+
+                    <article class="stat-card">
+
+                        <div class="stat-top">
+                            <span class="stat-label">
+                                SERVICES
+                            </span>
+
+                            <span class="stat-icon cyan">
+                                ▦
+                            </span>
+                        </div>
+
+                        <div
+                            class="stat-value"
+                            id="totalServices"
+                        >
+                            0
+                        </div>
+
+                        <div class="stat-bottom">
+                            <span>
+                                Published services
+                            </span>
+                        </div>
+
+                    </article>
+
+
+                    <article class="stat-card">
+
+                        <div class="stat-top">
+                            <span class="stat-label">
+                                ORDERS
+                            </span>
+
+                            <span class="stat-icon green">
+                                ◫
+                            </span>
+                        </div>
+
+                        <div
+                            class="stat-value"
+                            id="totalOrders"
+                        >
+                            0
+                        </div>
+
+                        <div class="stat-bottom">
+                            <span>
+                                Total platform orders
+                            </span>
+                        </div>
+
+                    </article>
+
+
+                    <article class="stat-card">
+
+                        <div class="stat-top">
+                            <span class="stat-label">
+                                GROSS SALES
+                            </span>
+
+                            <span class="stat-icon gold">
+                                $
+                            </span>
+                        </div>
+
+                        <div
+                            class="stat-value money"
+                            id="grossSales"
+                        >
+                            0 MAD
+                        </div>
+
+                        <div class="stat-bottom">
+                            <span>
+                                Order value
+                            </span>
+                        </div>
+
+                    </article>
+
+
+                    <article class="stat-card">
+
+                        <div class="stat-top">
+                            <span class="stat-label">
+                                PLATFORM FEES
+                            </span>
+
+                            <span class="stat-icon pink">
+                                %
+                            </span>
+                        </div>
+
+                        <div
+                            class="stat-value money"
+                            id="platformFees"
+                        >
+                            0 MAD
+                        </div>
+
+                        <div class="stat-bottom">
+                            <span>
+                                NOVA platform fees
+                            </span>
+                        </div>
+
+                    </article>
+
+                </section>
+
+
+                <!-- GRID -->
+                <section class="dashboard-grid">
+
+                    <!-- RECENT ORDERS -->
+                    <div class="panel large-panel">
+
+                        <div class="panel-header">
+
+                            <div>
+                                <p class="panel-eyebrow">
+                                    ORDERS
+                                </p>
+
+                                <h3>
+                                    Recent Orders
+                                </h3>
+                            </div>
+
+                            <a
+                                href="./orders.html"
+                                class="panel-link"
+                            >
+                                View All →
+                            </a>
+
+                        </div>
+
+
+                        <div
+                            class="orders-table-wrap"
+                        >
+
+                            <table class="orders-table">
+
+                                <thead>
+                                    <tr>
+                                        <th>ORDER</th>
+                                        <th>SERVICE</th>
+                                        <th>PRICE</th>
+                                        <th>STATUS</th>
+                                        <th>DATE</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody
+                                    id="recentOrdersBody"
+                                >
+                                    <tr>
+                                        <td
+                                            colspan="5"
+                                            class="table-loading"
+                                        >
+                                            Loading orders...
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- QUICK ACTIONS -->
+                    <div class="panel">
+
+                        <div class="panel-header">
+
+                            <div>
+                                <p class="panel-eyebrow">
+                                    MANAGEMENT
+                                </p>
+
+                                <h3>
+                                    Quick Actions
+                                </h3>
+                            </div>
+
+                        </div>
+
+
+                        <div class="quick-actions">
+
+                            <a
+                                href="./users.html"
+                                class="quick-action"
+                            >
+                                <span class="quick-icon">
+                                    ♙
+                                </span>
+
+                                <span>
+                                    <strong>
+                                        Manage Users
+                                    </strong>
+
+                                    <small>
+                                        Accounts & roles
+                                    </small>
+                                </span>
+
+                                <span class="arrow">
+                                    →
+                                </span>
+                            </a>
+
+
+                            <a
+                                href="./workers.html"
+                                class="quick-action"
+                            >
+                                <span class="quick-icon">
+                                    ◈
+                                </span>
+
+                                <span>
+                                    <strong>
+                                        Manage Workers
+                                    </strong>
+
+                                    <small>
+                                        Providers & status
+                                    </small>
+                                </span>
+
+                                <span class="arrow">
+                                    →
+                                </span>
+                            </a>
+
+
+                            <a
+                                href="./services.html"
+                                class="quick-action"
+                            >
+                                <span class="quick-icon">
+                                    ▦
+                                </span>
+
+                                <span>
+                                    <strong>
+                                        Review Services
+                                    </strong>
+
+                                    <small>
+                                        Published services
+                                    </small>
+                                </span>
+
+                                <span class="arrow">
+                                    →
+                                </span>
+                            </a>
+
+
+                            <a
+                                href="./orders.html"
+                                class="quick-action"
+                            >
+                                <span class="quick-icon">
+                                    ◫
+                                </span>
+
+                                <span>
+                                    <strong>
+                                        Manage Orders
+                                    </strong>
+
+                                    <small>
+                                        Platform orders
+                                    </small>
+                                </span>
+
+                                <span class="arrow">
+                                    →
+                                </span>
+                            </a>
+
+
+                            <a
+                                href="./support.html"
+                                class="quick-action"
+                            >
+                                <span class="quick-icon">
+                                    ◌
+                                </span>
+
+                                <span>
+                                    <strong>
+                                        Support Center
+                                    </strong>
+
+                                    <small>
+                                        Tickets & requests
+                                    </small>
+                                </span>
+
+                                <span class="arrow">
+                                    →
+                                </span>
+                            </a>
+
+
+                            <a
+                                href="./nova-guard.html"
+                                class="quick-action"
+                            >
+                                <span class="quick-icon">
+                                    ◉
+                                </span>
+
+                                <span>
+                                    <strong>
+                                        NOVA Guard
+                                    </strong>
+
+                                    <small>
+                                        AI & platform rules
+                                    </small>
+                                </span>
+
+                                <span class="arrow">
+                                    →
+                                </span>
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- SYSTEM STATUS -->
+                <section class="system-section">
+
+                    <div class="panel">
+
+                        <div class="panel-header">
+
+                            <div>
+                                <p class="panel-eyebrow">
+                                    SYSTEM
+                                </p>
+
+                                <h3>
+                                    Platform Status
+                                </h3>
+                            </div>
+
+                        </div>
+
+
+                        <div class="system-status-grid">
+
+                            <div class="system-status-item">
+
+                                <div class="system-status-left">
+                                    <span class="status-circle online"></span>
+
+                                    <div>
+                                        <strong>
+                                            Supabase
+                                        </strong>
+
+                                        <small>
+                                            Database & Authentication
+                                        </small>
+                                    </div>
+                                </div>
+
+                                <span class="online-text">
+                                    Online
+                                </span>
+
+                            </div>
+
+
+                            <div class="system-status-item">
+
+                                <div class="system-status-left">
+                                    <span class="status-circle online"></span>
+
+                                    <div>
+                                        <strong>
+                                            NOVA API
+                                        </strong>
+
+                                        <small>
+                                            Application backend
+                                        </small>
+                                    </div>
+                                </div>
+
+                                <span class="online-text">
+                                    Online
+                                </span>
+
+                            </div>
+
+
+                            <div class="system-status-item">
+
+                                <div class="system-status-left">
+                                    <span class="status-circle online"></span>
+
+                                    <div>
+                                        <strong>
+                                            Authentication
+                                        </strong>
+
+                                        <small>
+                                            User sessions
+                                        </small>
+                                    </div>
+                                </div>
+
+                                <span class="online-text">
+                                    Online
+                                </span>
+
+                            </div>
+
+
+                            <div class="system-status-item">
+
+                                <div class="system-status-left">
+                                    <span class="status-circle online"></span>
+
+                                    <div>
+                                        <strong>
+                                            NOVA Guard
+                                        </strong>
+
+                                        <small>
+                                            Protection layer
+                                        </small>
+                                    </div>
+                                </div>
+
+                                <span class="online-text">
+                                    Active
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<div
+    id="toast"
+    class="toast"
+></div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script
+    src="../../js/supabase-config.js?v=20"
+></script>
+
+<script
+    src="../../js/admin/admin.js?v=20"
+></script>
+
+</body>
+</html>
