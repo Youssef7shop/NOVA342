@@ -12,9 +12,17 @@ document.addEventListener(
         );
 
 
+        /* =================================================
+           SUPABASE
+        ================================================= */
+
         const supabase =
             window.supabaseClient;
 
+
+        /* =================================================
+           ELEMENTS
+        ================================================= */
 
         const grid =
             document.getElementById(
@@ -36,10 +44,18 @@ document.addEventListener(
 
         let allServices = [];
 
+        let currentUser = null;
 
-        /* =====================================
+        /*
+         * service_id -> favorite_id
+         */
+        const favoriteMap =
+            new Map();
+
+
+        /* =================================================
            CHECK GRID
-        ===================================== */
+        ================================================= */
 
         if (!grid) {
 
@@ -51,11 +67,16 @@ document.addEventListener(
         }
 
 
-        /* =====================================
+        /* =================================================
            CHECK SUPABASE
-        ===================================== */
+        ================================================= */
 
         if (!supabase) {
+
+            console.error(
+                "NOVA: Supabase client not found."
+            );
+
 
             grid.innerHTML = `
                 <div class="empty">
@@ -75,23 +96,20 @@ document.addEventListener(
         }
 
 
-        /* =====================================
-           PROFILE
-        ===================================== */
+        /* =================================================
+           START
+        ================================================= */
 
         await loadProfile();
 
-
-        /* =====================================
-           SERVICES
-        ===================================== */
+        await loadFavoriteState();
 
         await loadServices();
 
 
-        /* =====================================
+        /* =================================================
            FILTER EVENTS
-        ===================================== */
+        ================================================= */
 
         if (searchInput) {
 
@@ -111,9 +129,9 @@ document.addEventListener(
         }
 
 
-        /* =====================================
+        /* =================================================
            LOAD PROFILE
-        ===================================== */
+        ================================================= */
 
         async function loadProfile() {
 
@@ -123,18 +141,33 @@ document.addEventListener(
                     data,
                     error
                 } =
-                    await supabase.auth
+                    await supabase
+                        .auth
                         .getUser();
 
 
                 if (error) {
+
+                    console.warn(
+                        "NOVA auth user error:",
+                        error
+                    );
+
                     return;
                 }
 
 
                 const user =
-                    data?.user;
+                    data?.user || null;
 
+
+                currentUser =
+                    user;
+
+
+                /*
+                 * Profile UI
+                 */
 
                 if (!user) {
                     return;
@@ -154,7 +187,8 @@ document.addEventListener(
 
 
                 const {
-                    data: profile
+                    data: profile,
+                    error: profileError
                 } =
                     await supabase
                         .from("profiles")
@@ -171,9 +205,19 @@ document.addEventListener(
                         .maybeSingle();
 
 
+                if (profileError) {
+
+                    console.warn(
+                        "NOVA profile error:",
+                        profileError
+                    );
+                }
+
+
                 const fullName =
                     profile?.full_name ||
-                    `${profile?.first_name || ""} ${profile?.last_name || ""}`.trim() ||
+                    `${profile?.first_name || ""} ${profile?.last_name || ""}`
+                        .trim() ||
                     user.user_metadata?.full_name ||
                     user.email ||
                     "NOVA";
@@ -200,6 +244,7 @@ document.addEventListener(
                         "block";
                 }
 
+
             } catch (error) {
 
                 console.warn(
@@ -210,9 +255,160 @@ document.addEventListener(
         }
 
 
-        /* =====================================
+        /* =================================================
+           LOAD FAVORITES
+        ================================================= */
+
+        async function loadFavoriteState() {
+
+            favoriteMap.clear();
+
+
+            /*
+             * User is not logged in.
+             * Services remain public.
+             */
+
+            if (!currentUser) {
+                return;
+            }
+
+
+            /*
+             * First try RPC.
+             */
+
+            try {
+
+                const {
+                    data,
+                    error
+                } =
+                    await supabase.rpc(
+                        "get_my_favorites"
+                    );
+
+
+                if (!error) {
+
+                    const favorites =
+                        Array.isArray(data)
+                            ? data
+                            : [];
+
+
+                    favorites.forEach(
+                        (favorite) => {
+
+                            if (
+                                favorite.service_id &&
+                                favorite.favorite_id
+                            ) {
+
+                                favoriteMap.set(
+                                    favorite.service_id,
+                                    favorite.favorite_id
+                                );
+                            }
+                        }
+                    );
+
+
+                    console.log(
+                        "NOVA favorites loaded:",
+                        favoriteMap.size
+                    );
+
+
+                    return;
+                }
+
+
+                console.warn(
+                    "NOVA get_my_favorites RPC unavailable:",
+                    error
+                );
+
+
+            } catch (error) {
+
+                console.warn(
+                    "NOVA favorites RPC failed:",
+                    error
+                );
+            }
+
+
+            /*
+             * Fallback:
+             * Read own favorites directly.
+             */
+
+            try {
+
+                const {
+                    data,
+                    error
+                } =
+                    await supabase
+                        .from(
+                            "favorite_services"
+                        )
+                        .select(`
+                            id,
+                            service_id
+                        `)
+                        .eq(
+                            "user_id",
+                            currentUser.id
+                        );
+
+
+                if (error) {
+
+                    console.warn(
+                        "NOVA favorite fallback failed:",
+                        error
+                    );
+
+                    return;
+                }
+
+
+                (
+                    Array.isArray(data)
+                        ? data
+                        : []
+                ).forEach(
+                    (favorite) => {
+
+                        if (
+                            favorite.service_id &&
+                            favorite.id
+                        ) {
+
+                            favoriteMap.set(
+                                favorite.service_id,
+                                favorite.id
+                            );
+                        }
+                    }
+                );
+
+
+            } catch (error) {
+
+                console.warn(
+                    "NOVA favorite fallback error:",
+                    error
+                );
+            }
+        }
+
+
+        /* =================================================
            LOAD SERVICES
-        ===================================== */
+        ================================================= */
 
         async function loadServices() {
 
@@ -325,9 +521,9 @@ document.addEventListener(
         }
 
 
-        /* =====================================
-           WORKERS
-        ===================================== */
+        /* =================================================
+           ATTACH WORKERS
+        ================================================= */
 
         async function attachWorkers(
             services
@@ -385,15 +581,16 @@ document.addEventListener(
             const map = {};
 
 
-            (profiles || [])
-                .forEach(
-                    profile => {
+            (
+                profiles || []
+            ).forEach(
+                profile => {
 
-                        map[
-                            profile.id
-                        ] = profile;
-                    }
-                );
+                    map[
+                        profile.id
+                    ] = profile;
+                }
+            );
 
 
             services.forEach(
@@ -408,9 +605,9 @@ document.addEventListener(
         }
 
 
-        /* =====================================
+        /* =================================================
            FILTER SERVICES
-        ===================================== */
+        ================================================= */
 
         function filterServices() {
 
@@ -476,9 +673,9 @@ document.addEventListener(
         }
 
 
-        /* =====================================
+        /* =================================================
            RENDER SERVICES
-        ===================================== */
+        ================================================= */
 
         function renderServices(
             services
@@ -512,9 +709,13 @@ document.addEventListener(
                     .join("");
 
 
+            /*
+             * VIEW BUTTONS
+             */
+
             grid
                 .querySelectorAll(
-                    "[data-service-id]"
+                    ".view-btn[data-service-id]"
                 )
                 .forEach(
                     button => {
@@ -589,12 +790,395 @@ document.addEventListener(
                         );
                     }
                 );
+
+
+            /*
+             * FAVORITE BUTTONS
+             */
+
+            grid
+                .querySelectorAll(
+                    ".favorite-btn[data-service-id]"
+                )
+                .forEach(
+                    button => {
+
+                        button.addEventListener(
+                            "click",
+                            async (event) => {
+
+                                event.preventDefault();
+
+                                event.stopPropagation();
+
+
+                                const serviceId =
+                                    button.dataset.serviceId;
+
+
+                                await toggleFavorite(
+                                    serviceId,
+                                    button
+                                );
+                            }
+                        );
+                    }
+                );
         }
 
 
-        /* =====================================
+        /* =================================================
+           TOGGLE FAVORITE
+        ================================================= */
+
+        async function toggleFavorite(
+            serviceId,
+            button
+        ) {
+
+            if (!serviceId) {
+                return;
+            }
+
+
+            /*
+             * Login required
+             */
+
+            if (!currentUser) {
+
+                const redirect =
+                    encodeURIComponent(
+                        window.location.pathname +
+                        window.location.search
+                    );
+
+
+                window.location.href =
+                    `login.html?redirect=${redirect}`;
+
+
+                return;
+            }
+
+
+            const existingFavoriteId =
+                favoriteMap.get(
+                    serviceId
+                );
+
+
+            button.disabled =
+                true;
+
+
+            const originalHTML =
+                button.innerHTML;
+
+
+            try {
+
+                /*
+                 * REMOVE
+                 */
+
+                if (existingFavoriteId) {
+
+                    button.innerHTML =
+                        "…";
+
+
+                    const {
+                        error
+                    } =
+                        await supabase.rpc(
+                            "remove_favorite",
+                            {
+                                p_favorite_id:
+                                    existingFavoriteId
+                            }
+                        );
+
+
+                    if (error) {
+                        throw error;
+                    }
+
+
+                    favoriteMap.delete(
+                        serviceId
+                    );
+
+
+                    setFavoriteButtonState(
+                        button,
+                        false
+                    );
+
+
+                    showFavoriteToast(
+                        "Removed from favorites."
+                    );
+
+
+                } else {
+
+                    /*
+                     * ADD
+                     */
+
+                    button.innerHTML =
+                        "…";
+
+
+                    const {
+                        data,
+                        error
+                    } =
+                        await supabase.rpc(
+                            "add_favorite",
+                            {
+                                p_service_id:
+                                    serviceId
+                            }
+                        );
+
+
+                    if (error) {
+                        throw error;
+                    }
+
+
+                    const favoriteId =
+                        data?.favorite_id;
+
+
+                    if (favoriteId) {
+
+                        favoriteMap.set(
+                            serviceId,
+                            favoriteId
+                        );
+
+                    } else {
+
+                        /*
+                         * Safety fallback:
+                         * reload favorite state
+                         */
+
+                        await loadFavoriteState();
+                    }
+
+
+                    setFavoriteButtonState(
+                        button,
+                        true
+                    );
+
+
+                    showFavoriteToast(
+                        "Added to favorites."
+                    );
+                }
+
+
+            } catch (error) {
+
+                console.error(
+                    "NOVA favorite error:",
+                    error
+                );
+
+
+                button.innerHTML =
+                    originalHTML;
+
+
+                showFavoriteToast(
+                    error?.message ||
+                    "Could not update favorite."
+                );
+
+
+            } finally {
+
+                button.disabled =
+                    false;
+            }
+        }
+
+
+        /* =================================================
+           FAVORITE BUTTON STATE
+        ================================================= */
+
+        function setFavoriteButtonState(
+            button,
+            active
+        ) {
+
+            if (!button) {
+                return;
+            }
+
+
+            button.innerHTML =
+                active
+                    ? "♥"
+                    : "♡";
+
+
+            button.setAttribute(
+                "aria-label",
+                active
+                    ? "Remove from favorites"
+                    : "Add to favorites"
+            );
+
+
+            button.setAttribute(
+                "title",
+                active
+                    ? "Remove from favorites"
+                    : "Add to favorites"
+            );
+
+
+            button.dataset.favorite =
+                active
+                    ? "true"
+                    : "false";
+
+
+            if (active) {
+
+                button.classList.add(
+                    "is-favorite"
+                );
+
+            } else {
+
+                button.classList.remove(
+                    "is-favorite"
+                );
+            }
+        }
+
+
+        /* =================================================
+           TOAST
+        ================================================= */
+
+        function showFavoriteToast(
+            message
+        ) {
+
+            let toast =
+                document.getElementById(
+                    "novaFavoriteToast"
+                );
+
+
+            if (!toast) {
+
+                toast =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                toast.id =
+                    "novaFavoriteToast";
+
+
+                toast.style.position =
+                    "fixed";
+
+                toast.style.right =
+                    "22px";
+
+                toast.style.bottom =
+                    "22px";
+
+                toast.style.zIndex =
+                    "99999";
+
+                toast.style.padding =
+                    "12px 16px";
+
+                toast.style.borderRadius =
+                    "12px";
+
+                toast.style.background =
+                    "#14151d";
+
+                toast.style.color =
+                    "#ffffff";
+
+                toast.style.border =
+                    "1px solid rgba(255,255,255,.10)";
+
+                toast.style.boxShadow =
+                    "0 20px 60px rgba(0,0,0,.40)";
+
+                toast.style.fontSize =
+                    "11px";
+
+                toast.style.fontWeight =
+                    "700";
+
+                toast.style.opacity =
+                    "0";
+
+                toast.style.transform =
+                    "translateY(10px)";
+
+                toast.style.transition =
+                    "opacity .2s ease, transform .2s ease";
+
+
+                document.body.appendChild(
+                    toast
+                );
+            }
+
+
+            toast.textContent =
+                message;
+
+
+            toast.style.opacity =
+                "1";
+
+            toast.style.transform =
+                "translateY(0)";
+
+
+            clearTimeout(
+                window.__novaFavoriteToastTimer
+            );
+
+
+            window.__novaFavoriteToastTimer =
+                setTimeout(
+                    () => {
+
+                        toast.style.opacity =
+                            "0";
+
+                        toast.style.transform =
+                            "translateY(10px)";
+
+                    },
+                    2200
+                );
+        }
+
+
+        /* =================================================
            SERVICE CARD
-        ===================================== */
+        ================================================= */
 
         function createServiceCard(
             service
@@ -606,7 +1190,8 @@ document.addEventListener(
 
             const workerName =
                 worker?.full_name ||
-                `${worker?.first_name || ""} ${worker?.last_name || ""}`.trim() ||
+                `${worker?.first_name || ""} ${worker?.last_name || ""}`
+                    .trim() ||
                 "NOVA Worker";
 
 
@@ -628,10 +1213,22 @@ document.addEventListener(
                 );
 
 
+            const isFavorite =
+                favoriteMap.has(
+                    service.id
+                );
+
+
+            /* ---------------------------------------------
+               WORKER AVATAR
+            --------------------------------------------- */
+
             let avatar;
 
 
-            if (worker?.avatar_url) {
+            if (
+                worker?.avatar_url
+            ) {
 
                 avatar = `
                     <img
@@ -650,16 +1247,24 @@ document.addEventListener(
 
                 avatar = `
                     <div class="worker-avatar">
-                        ${escapeHTML(initial)}
+                        ${escapeHTML(
+                            initial
+                        )}
                     </div>
                 `;
             }
 
 
+            /* ---------------------------------------------
+               SERVICE IMAGE
+            --------------------------------------------- */
+
             let image;
 
 
-            if (service.image_url) {
+            if (
+                service.image_url
+            ) {
 
                 image = `
                     <img
@@ -688,18 +1293,86 @@ document.addEventListener(
             } else {
 
                 image = `
-                    <div class="service-placeholder">
+                    <div
+                        class="service-placeholder"
+                    >
                         N
                     </div>
                 `;
             }
 
 
+            /* ---------------------------------------------
+               FAVORITE BUTTON
+            --------------------------------------------- */
+
+            const favoriteButton = `
+                <button
+                    type="button"
+                    class="favorite-btn"
+                    data-service-id="${escapeAttribute(
+                        service.id
+                    )}"
+                    data-favorite="${
+                        isFavorite
+                            ? "true"
+                            : "false"
+                    }"
+                    aria-label="${
+                        isFavorite
+                            ? "Remove from favorites"
+                            : "Add to favorites"
+                    }"
+                    title="${
+                        isFavorite
+                            ? "Remove from favorites"
+                            : "Add to favorites"
+                    }"
+                    style="
+                        position:absolute;
+                        top:12px;
+                        right:12px;
+                        width:38px;
+                        height:38px;
+                        border-radius:50%;
+                        border:1px solid rgba(255,255,255,.12);
+                        background:rgba(7,7,11,.72);
+                        backdrop-filter:blur(10px);
+                        color:${
+                            isFavorite
+                                ? "#ff5fa8"
+                                : "#ffffff"
+                        };
+                        display:flex;
+                        align-items:center;
+                        justify-content:center;
+                        font-size:19px;
+                        line-height:1;
+                        cursor:pointer;
+                        z-index:5;
+                    "
+                >
+                    ${
+                        isFavorite
+                            ? "♥"
+                            : "♡"
+                    }
+                </button>
+            `;
+
+
             return `
                 <article class="service-card">
 
-                    <div class="service-image">
+                    <div
+                        class="service-image"
+                        style="position:relative;"
+                    >
+
                         ${image}
+
+                        ${favoriteButton}
+
                     </div>
 
 
@@ -780,9 +1453,9 @@ document.addEventListener(
         }
 
 
-        /* =====================================
+        /* =================================================
            FORMAT PRICE
-        ===================================== */
+        ================================================= */
 
         function formatPrice(
             value
@@ -800,9 +1473,9 @@ document.addEventListener(
         }
 
 
-        /* =====================================
-           ESCAPE
-        ===================================== */
+        /* =================================================
+           ESCAPE HTML
+        ================================================= */
 
         function escapeHTML(
             value
@@ -833,6 +1506,10 @@ document.addEventListener(
                 );
         }
 
+
+        /* =================================================
+           ESCAPE ATTRIBUTE
+        ================================================= */
 
         function escapeAttribute(
             value
