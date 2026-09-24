@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>NOVA MARKET — Favorites</title>
+
+    <link
+        rel="stylesheet"
+        href="../css/favorites.css?v=1"
+    >
+</head>
+
+<body>
+
+<div class="dashboard-app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+
+        <div class="brand">
+            <div class="brand-logo">N</div>
+
+            <div class="brand-info">
+                <strong>NOVA</strong>
+                <span>MARKET</span>
+            </div>
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <a href="./index.html" class="nav-item">
+                <span>⌂</span>
+                <strong>Dashboard</strong>
+            </a>
+
+            <a href="../services.html" class="nav-item">
+                <span>▦</span>
+                <strong>Services</strong>
+            </a>
+
+            <a href="./projects.html" class="nav-item">
+                <span>◇</span>
+                <strong>Projects</strong>
+            </a>
+
+            <a href="../profile.html" class="nav-item">
+                <span>◉</span>
+                <strong>My Profile</strong>
+            </a>
+
+            <a
+                href="./favorites.html"
+                class="nav-item active"
+            >
+                <span>♥</span>
+                <strong>Favorites</strong>
+            </a>
+
+            <a href="./orders.html" class="nav-item">
+                <span>◫</span>
+                <strong>Orders</strong>
+            </a>
+
+            <a href="./support.html" class="nav-item">
+                <span>◌</span>
+                <strong>Support</strong>
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <div class="plan-card">
+
+                <div class="plan-top">
+
+                    <span class="plan-label">
+                        CURRENT PLAN
+                    </span>
+
+                    <span
+                        id="planBadge"
+                        class="plan-badge"
+                    >
+                        FREE
+                    </span>
+
+                </div>
+
+                <strong id="planTitle">
+                    NOVA Free
+                </strong>
+
+                <span id="planText">
+                    Explore digital services.
+                </span>
+
+            </div>
+
+
+            <button
+                type="button"
+                id="logoutBtn"
+                class="logout-btn"
+            >
+                ⇥
+                <span>Logout</span>
+            </button>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+
+            <div class="topbar-left">
+
+                <button
+                    type="button"
+                    id="sidebarToggle"
+                    class="menu-btn"
+                >
+                    ☰
+                </button>
+
+                <div>
+
+                    <p class="eyebrow">
+                        YOUR COLLECTION
+                    </p>
+
+                    <h1>
+                        Favorites
+                    </h1>
+
+                </div>
+
+            </div>
+
+
+            <div class="topbar-right">
+
+                <div class="profile-mini">
+
+                    <div
+                        id="userAvatar"
+                        class="profile-avatar"
+                    >
+                        U
+                    </div>
+
+                    <div class="profile-info">
+
+                        <strong id="userName">
+                            User
+                        </strong>
+
+                        <span id="userEmail">
+                            Loading...
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- CONTENT -->
+        <section class="page-content">
+
+            <!-- LOADING -->
+            <div
+                id="loadingState"
+                class="page-state"
+            >
+
+                <div class="loader"></div>
+
+                <h2>
+                    Loading Favorites
+                </h2>
+
+                <p>
+                    Please wait...
+                </p>
+
+            </div>
+
+
+            <!-- ERROR -->
+            <div
+                id="errorState"
+                class="page-state hidden"
+            >
+
+                <div class="state-icon">
+                    !
+                </div>
+
+                <h2>
+                    Something went wrong
+                </h2>
+
+                <p id="errorMessage">
+                    Could not load favorites.
+                </p>
+
+                <button
+                    type="button"
+                    id="retryBtn"
+                    class="primary-btn"
+                >
+                    Try Again
+                </button>
+
+            </div>
+
+
+            <!-- CONTENT -->
+            <div
+                id="favoritesContent"
+                class="hidden"
+            >
+
+                <section class="hero-card">
+
+                    <div class="hero-content">
+
+                        <span class="hero-kicker">
+                            NOVA COLLECTION
+                        </span>
+
+                        <h2>
+                            Your Favorite Services
+                        </h2>
+
+                        <p>
+                            Save the services you like and find
+                            them again whenever you need them.
+                        </p>
+
+                    </div>
+
+
+                    <div class="favorite-counter">
+
+                        <span>
+                            SAVED
+                        </span>
+
+                        <strong id="favoriteCount">
+                            0
+                        </strong>
+
+                        <small>
+                            services
+                        </small>
+
+                    </div>
+
+                </section>
+
+
+                <!-- TOOLBAR -->
+                <section class="toolbar">
+
+                    <div class="toolbar-left">
+
+                        <span class="toolbar-title">
+                            Saved Services
+                        </span>
+
+                        <span
+                            id="resultText"
+                            class="result-text"
+                        >
+                            0 services
+                        </span>
+
+                    </div>
+
+
+                    <a
+                        href="../services.html"
+                        class="browse-btn"
+                    >
+                        Browse Services →
+                    </a>
+
+                </section>
+
+
+                <!-- GRID -->
+                <section
+                    id="favoritesGrid"
+                    class="favorites-grid"
+                >
+                </section>
+
+
+                <!-- EMPTY -->
+                <section
+                    id="emptyState"
+                    class="empty-state hidden"
+                >
+
+                    <div class="empty-icon">
+                        ♥
+                    </div>
+
+                    <h2>
+                        No Favorites Yet
+                    </h2>
+
+                    <p>
+                        You haven't saved any services yet.
+                        Browse NOVA MARKET and add the services
+                        you want to keep.
+                    </p>
+
+                    <a
+                        href="../services.html"
+                        class="primary-btn"
+                    >
+                        Explore Services
+                    </a>
+
+                </section>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- TOAST -->
+<div
+    id="toast"
+    class="toast"
+></div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script
+    src="../js/supabase-config.js?v=21"
+></script>
+
+<script
+    src="../js/favorites.js?v=1"
+></script>
+
+</body>
+</html>
