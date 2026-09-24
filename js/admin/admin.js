@@ -29,6 +29,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById("sidebar");
 
 
+    /* =====================================================
+       UI STATES
+    ===================================================== */
+
     function showDenied() {
 
         accessLoading?.classList.add("hidden");
@@ -49,6 +53,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
 
+    /* =====================================================
+       TOAST
+    ===================================================== */
+
     function showToast(message) {
 
         const toast =
@@ -56,7 +64,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (!toast) return;
 
-        toast.textContent = message;
+        toast.textContent =
+            message;
 
         toast.classList.add("show");
 
@@ -66,8 +75,25 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         window.__novaToastTimer =
             window.setTimeout(() => {
+
                 toast.classList.remove("show");
+
             }, 2500);
+    }
+
+
+    /* =====================================================
+       HELPERS
+    ===================================================== */
+
+    function escapeHtml(value) {
+
+        return String(value ?? "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
     }
 
 
@@ -99,7 +125,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         const date =
             new Date(dateValue);
 
-        if (Number.isNaN(date.getTime())) {
+        if (
+            Number.isNaN(
+                date.getTime()
+            )
+        ) {
             return "—";
         }
 
@@ -120,7 +150,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             return "—";
         }
 
-        return String(id).slice(0, 8).toUpperCase();
+        return String(id)
+            .slice(0, 8)
+            .toUpperCase();
     }
 
 
@@ -161,49 +193,80 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
 
+    /* =====================================================
+       AUTH USER
+    ===================================================== */
+
     async function getCurrentUser() {
+
+        if (!supabaseClient) {
+            throw new Error(
+                "Supabase client is missing."
+            );
+        }
 
         const {
             data,
             error
-        } = await supabaseClient.auth.getUser();
+        } =
+            await supabaseClient
+                .auth
+                .getUser();
 
         if (error) {
             throw error;
         }
 
-        return data.user;
+        return data?.user || null;
     }
 
 
-    async function getAdminProfile(userId) {
+    /* =====================================================
+       ADMIN PROFILE
+       IMPORTANT:
+       We DO NOT query profiles directly here.
+       We use the secure RPC function.
+    ===================================================== */
+
+    async function getAdminProfile() {
+
+        if (!supabaseClient) {
+            throw new Error(
+                "Supabase client is missing."
+            );
+        }
 
         const {
             data,
             error
-        } = await supabaseClient
-            .from("profiles")
-            .select(`
-                id,
-                first_name,
-                last_name,
-                full_name,
-                email,
-                role,
-                avatar_url,
-                is_active,
-                plan
-            `)
-            .eq("id", userId)
-            .maybeSingle();
+        } =
+            await supabaseClient.rpc(
+                "admin_current_profile"
+            );
 
         if (error) {
+
+            console.error(
+                "NOVA admin_current_profile error:",
+                error
+            );
+
             throw error;
+        }
+
+        if (!data) {
+            throw new Error(
+                "Admin profile was not returned."
+            );
         }
 
         return data;
     }
 
+
+    /* =====================================================
+       APPLY ADMIN PROFILE
+    ===================================================== */
 
     function applyAdminProfile(
         user,
@@ -222,10 +285,12 @@ document.addEventListener("DOMContentLoaded", async () => {
             user?.email?.split("@")[0] ||
             "Admin";
 
+
         const email =
             profile?.email ||
             user?.email ||
             "";
+
 
         const firstLetter =
             fullName
@@ -234,34 +299,54 @@ document.addEventListener("DOMContentLoaded", async () => {
                 .toUpperCase() ||
             "A";
 
+
         const adminName =
-            document.getElementById("adminName");
+            document.getElementById(
+                "adminName"
+            );
+
 
         const adminEmail =
-            document.getElementById("adminEmail");
+            document.getElementById(
+                "adminEmail"
+            );
+
 
         const adminInitial =
-            document.getElementById("adminInitial");
+            document.getElementById(
+                "adminInitial"
+            );
+
 
         const welcomeName =
-            document.getElementById("welcomeName");
+            document.getElementById(
+                "welcomeName"
+            );
+
 
         if (adminName) {
+
             adminName.textContent =
                 fullName;
         }
 
+
         if (adminEmail) {
+
             adminEmail.textContent =
                 email;
         }
 
+
         if (adminInitial) {
+
             adminInitial.textContent =
                 firstLetter;
         }
 
+
         if (welcomeName) {
+
             welcomeName.textContent =
                 fullName.split(" ")[0] ||
                 "Admin";
@@ -269,7 +354,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
         const avatar =
-            document.querySelector(".admin-avatar");
+            document.querySelector(
+                ".admin-avatar"
+            );
+
 
         if (
             avatar &&
@@ -278,46 +366,82 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             avatar.innerHTML = "";
 
+
             const image =
-                document.createElement("img");
+                document.createElement(
+                    "img"
+                );
+
 
             image.src =
                 profile.avatar_url;
 
+
             image.alt =
                 "Admin";
 
+
             image.width = 40;
+
             image.height = 40;
 
-            image.style.width = "100%";
-            image.style.height = "100%";
-            image.style.objectFit = "cover";
 
-            avatar.appendChild(image);
+            image.style.width =
+                "100%";
+
+            image.style.height =
+                "100%";
+
+            image.style.objectFit =
+                "cover";
+
+
+            avatar.appendChild(
+                image
+            );
         }
     }
 
 
+    /* =====================================================
+       DASHBOARD STATS
+    ===================================================== */
+
     async function loadDashboardStats() {
+
+        if (!supabaseClient) {
+            return;
+        }
+
 
         const {
             data,
             error
-        } = await supabaseClient.rpc(
-            "admin_dashboard_stats"
-        );
+        } =
+            await supabaseClient.rpc(
+                "admin_dashboard_stats"
+            );
+
 
         if (error) {
+
+            console.error(
+                "NOVA dashboard stats error:",
+                error
+            );
+
             throw error;
         }
+
 
         const stats =
             Array.isArray(data)
                 ? data[0]
                 : data;
 
+
         if (!stats) {
+
             throw new Error(
                 "No dashboard statistics returned."
             );
@@ -329,25 +453,30 @@ document.addEventListener("DOMContentLoaded", async () => {
                 "totalUsers"
             );
 
+
         const totalWorkers =
             document.getElementById(
                 "totalWorkers"
             );
+
 
         const totalServices =
             document.getElementById(
                 "totalServices"
             );
 
+
         const totalOrders =
             document.getElementById(
                 "totalOrders"
             );
 
+
         const grossSales =
             document.getElementById(
                 "grossSales"
             );
+
 
         const platformFees =
             document.getElementById(
@@ -356,34 +485,43 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
         if (totalUsers) {
+
             totalUsers.textContent =
                 Number(
                     stats.total_users || 0
                 ).toLocaleString();
         }
 
+
         if (totalWorkers) {
+
             totalWorkers.textContent =
                 Number(
                     stats.total_workers || 0
                 ).toLocaleString();
         }
 
+
         if (totalServices) {
+
             totalServices.textContent =
                 Number(
                     stats.total_services || 0
                 ).toLocaleString();
         }
 
+
         if (totalOrders) {
+
             totalOrders.textContent =
                 Number(
                     stats.total_orders || 0
                 ).toLocaleString();
         }
 
+
         if (grossSales) {
+
             grossSales.textContent =
                 formatMoney(
                     stats.gross_sales,
@@ -391,7 +529,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 );
         }
 
+
         if (platformFees) {
+
             platformFees.textContent =
                 formatMoney(
                     stats.platform_fees,
@@ -401,6 +541,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
 
+    /* =====================================================
+       RECENT ORDERS
+    ===================================================== */
+
     async function loadRecentOrders() {
 
         const body =
@@ -408,7 +552,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                 "recentOrdersBody"
             );
 
-        if (!body) return;
+
+        if (!body) {
+            return;
+        }
 
 
         body.innerHTML = `
@@ -426,15 +573,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         const {
             data,
             error
-        } = await supabaseClient.rpc(
-            "admin_recent_orders"
-        );
+        } =
+            await supabaseClient.rpc(
+                "admin_recent_orders"
+            );
+
 
         if (error) {
+
             console.error(
                 "NOVA admin recent orders error:",
                 error
             );
+
 
             body.innerHTML = `
                 <tr>
@@ -446,6 +597,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     </td>
                 </tr>
             `;
+
 
             return;
         }
@@ -470,6 +622,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 </tr>
             `;
 
+
             return;
         }
 
@@ -483,6 +636,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                             order.status || ""
                         );
 
+
                     return `
                         <tr>
 
@@ -494,6 +648,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                                 </span>
                             </td>
 
+
                             <td>
                                 <span class="service-name">
                                     ${escapeHtml(
@@ -502,6 +657,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                                     )}
                                 </span>
                             </td>
+
 
                             <td>
                                 <span class="order-price">
@@ -514,15 +670,19 @@ document.addEventListener("DOMContentLoaded", async () => {
                                 </span>
                             </td>
 
+
                             <td>
                                 <span
-                                    class="status-badge ${getStatusClass(status)}"
+                                    class="status-badge ${getStatusClass(
+                                        status
+                                    )}"
                                 >
                                     ${escapeHtml(
                                         formatStatus(status)
                                     )}
                                 </span>
                             </td>
+
 
                             <td>
                                 ${escapeHtml(
@@ -539,16 +699,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
 
-    function escapeHtml(value) {
-
-        return String(value ?? "")
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
-
+    /* =====================================================
+       LOAD DASHBOARD
+    ===================================================== */
 
     async function loadDashboard() {
 
@@ -559,19 +712,31 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
 
+    /* =====================================================
+       LOGOUT
+    ===================================================== */
+
     async function logout() {
+
+        if (!supabaseClient) {
+            return;
+        }
+
 
         try {
 
             const {
                 error
-            } = await supabaseClient
-                .auth
-                .signOut();
+            } =
+                await supabaseClient
+                    .auth
+                    .signOut();
+
 
             if (error) {
                 throw error;
             }
+
 
             window.location.replace(
                 "../login.html"
@@ -584,12 +749,17 @@ document.addEventListener("DOMContentLoaded", async () => {
                 error
             );
 
+
             showToast(
                 "Logout failed."
             );
         }
     }
 
+
+    /* =====================================================
+       INITIALIZE ADMIN
+    ===================================================== */
 
     async function initializeAdmin() {
 
@@ -599,6 +769,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 "NOVA: Supabase client missing."
             );
 
+
             showDenied();
 
             return;
@@ -607,8 +778,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         try {
 
+            /* ---------------------------------------------
+               STEP 1
+               Check current Supabase session/user
+            --------------------------------------------- */
+
             const user =
                 await getCurrentUser();
+
 
             if (!user) {
 
@@ -620,13 +797,21 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
 
 
+            /* ---------------------------------------------
+               STEP 2
+               Ask secure RPC for admin profile
+            --------------------------------------------- */
+
             const profile =
-                await getAdminProfile(
-                    user.id
-                );
+                await getAdminProfile();
 
 
             if (!profile) {
+
+                console.error(
+                    "NOVA: Admin profile not returned."
+                );
+
 
                 showDenied();
 
@@ -634,10 +819,16 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
 
 
+            /* ---------------------------------------------
+               STEP 3
+               Extra frontend verification
+            --------------------------------------------- */
+
             const isAdmin =
                 String(
                     profile.role || ""
-                ).toLowerCase() ===
+                )
+                    .toLowerCase() ===
                 "admin";
 
 
@@ -647,11 +838,25 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             if (!isAdmin || !active) {
 
+                console.error(
+                    "NOVA: User is not an active admin.",
+                    {
+                        role: profile.role,
+                        is_active: profile.is_active
+                    }
+                );
+
+
                 showDenied();
 
                 return;
             }
 
+
+            /* ---------------------------------------------
+               STEP 4
+               Save profile
+            --------------------------------------------- */
 
             applyAdminProfile(
                 user,
@@ -659,8 +864,18 @@ document.addEventListener("DOMContentLoaded", async () => {
             );
 
 
+            /* ---------------------------------------------
+               STEP 5
+               Show dashboard
+            --------------------------------------------- */
+
             showDashboard();
 
+
+            /* ---------------------------------------------
+               STEP 6
+               Load real dashboard data
+            --------------------------------------------- */
 
             await loadDashboard();
 
@@ -672,10 +887,15 @@ document.addEventListener("DOMContentLoaded", async () => {
                 error
             );
 
+
             showDenied();
         }
     }
 
+
+    /* =====================================================
+       EVENTS
+    ===================================================== */
 
     logoutBtn?.addEventListener(
         "click",
@@ -686,6 +906,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     backHomeBtn?.addEventListener(
         "click",
         () => {
+
             window.location.replace(
                 "../index.html"
             );
@@ -699,9 +920,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             refreshBtn.disabled = true;
 
+
             try {
 
                 await loadDashboard();
+
 
                 showToast(
                     "Dashboard refreshed."
@@ -709,12 +932,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             } catch (error) {
 
-                console.error(error);
+                console.error(
+                    error
+                );
+
 
                 showToast(
                     "Refresh failed."
                 );
             }
+
 
             refreshBtn.disabled = false;
         }
@@ -748,12 +975,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
 
 
+    /* =====================================================
+       AUTH STATE
+    ===================================================== */
+
     supabaseClient?.auth
         .onAuthStateChange(
             (event) => {
 
                 if (
-                    event === "SIGNED_OUT"
+                    event ===
+                    "SIGNED_OUT"
                 ) {
 
                     window.location.replace(
@@ -763,6 +995,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         );
 
+
+    /* =====================================================
+       START
+    ===================================================== */
 
     await initializeAdmin();
 
