@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>NOVA MARKET — Admin Support</title>
+
+    <link
+        rel="stylesheet"
+        href="../../css/admin/admin.css?v=20"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../../css/admin/support.css?v=1"
+    >
+</head>
+
+<body>
+
+<div class="admin-app">
+
+    <!-- =================================================
+         SIDEBAR
+    ================================================== -->
+
+    <aside
+        class="sidebar"
+        id="sidebar"
+    >
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                N
+            </div>
+
+            <div class="brand-text">
+
+                <strong>
+                    NOVA
+                </strong>
+
+                <span>
+                    MARKET ADMIN
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <a
+                href="./index.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">⌂</span>
+                <span>Dashboard</span>
+            </a>
+
+
+            <a
+                href="./users.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">♙</span>
+                <span>Users</span>
+            </a>
+
+
+            <a
+                href="./workers.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">◈</span>
+                <span>Workers</span>
+            </a>
+
+
+            <a
+                href="./services.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">▦</span>
+                <span>Services</span>
+            </a>
+
+
+            <a
+                href="./orders.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">◫</span>
+                <span>Orders</span>
+            </a>
+
+
+            <a
+                href="./payments.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">₿</span>
+                <span>Payments</span>
+            </a>
+
+
+            <a
+                href="./support.html"
+                class="nav-item active"
+            >
+                <span class="nav-icon">◌</span>
+                <span>Support</span>
+            </a>
+
+
+            <div class="nav-section-title">
+                MANAGEMENT
+            </div>
+
+
+            <a
+                href="./reports.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">▥</span>
+                <span>Reports</span>
+            </a>
+
+
+            <a
+                href="./nova-guard.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">◉</span>
+                <span>NOVA Guard</span>
+            </a>
+
+
+            <a
+                href="./logs.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">≋</span>
+                <span>Activity Logs</span>
+            </a>
+
+
+            <a
+                href="./settings.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">⚙</span>
+                <span>Settings</span>
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <div class="security-box">
+
+                <div class="security-dot"></div>
+
+                <div>
+
+                    <strong>
+                        NOVA Guard
+                    </strong>
+
+                    <span>
+                        System Protected
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <button
+                type="button"
+                id="logoutBtn"
+                class="logout-btn"
+            >
+                <span>⇥</span>
+                Logout
+            </button>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =================================================
+         MAIN
+    ================================================== -->
+
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+
+        <header class="topbar">
+
+            <div class="topbar-left">
+
+                <button
+                    type="button"
+                    id="sidebarToggle"
+                    class="menu-btn"
+                >
+                    ☰
+                </button>
+
+                <div>
+
+                    <p class="eyebrow">
+                        CUSTOMER CARE
+                    </p>
+
+                    <h1>
+                        Support Center
+                    </h1>
+
+                </div>
+
+            </div>
+
+
+            <div class="topbar-right">
+
+                <button
+                    type="button"
+                    id="refreshBtn"
+                    class="icon-btn"
+                    title="Refresh"
+                >
+                    ↻
+                </button>
+
+
+                <div class="admin-profile">
+
+                    <div class="admin-avatar">
+
+                        <span id="adminInitial">
+                            A
+                        </span>
+
+                    </div>
+
+
+                    <div class="admin-profile-text">
+
+                        <strong id="adminName">
+                            Admin
+                        </strong>
+
+                        <span id="adminEmail">
+                            Loading...
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- =================================================
+             CONTENT
+        ================================================== -->
+
+        <section class="page-content">
+
+            <!-- ACCESS LOADING -->
+
+            <div
+                id="accessLoading"
+                class="page-state"
+            >
+
+                <div class="loader"></div>
+
+                <h2>
+                    Checking Admin Access
+                </h2>
+
+                <p>
+                    Please wait...
+                </p>
+
+            </div>
+
+
+            <!-- ACCESS DENIED -->
+
+            <div
+                id="accessDenied"
+                class="page-state hidden"
+            >
+
+                <div class="state-icon danger">
+                    !
+                </div>
+
+                <h2>
+                    Access Denied
+                </h2>
+
+                <p>
+                    This area is only available to NOVA administrators.
+                </p>
+
+                <button
+                    type="button"
+                    id="backHomeBtn"
+                    class="primary-btn"
+                >
+                    Back to NOVA
+                </button>
+
+            </div>
+
+
+            <!-- SUPPORT CONTENT -->
+
+            <div
+                id="supportContent"
+                class="hidden"
+            >
+
+                <!-- HEADER -->
+
+                <section class="support-heading">
+
+                    <div>
+
+                        <p class="support-kicker">
+                            NOVA MARKET
+                        </p>
+
+                        <h2>
+                            Support Tickets
+                        </h2>
+
+                        <p>
+                            Manage customer requests, conversations
+                            and ticket status from one place.
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+                <!-- STATS -->
+
+                <section class="support-stats-grid">
+
+
+                    <article class="support-stat-card">
+
+                        <div class="support-stat-icon blue">
+                            ◌
+                        </div>
+
+                        <div>
+
+                            <span>
+                                TOTAL
+                            </span>
+
+                            <strong id="totalTickets">
+                                0
+                            </strong>
+
+                        </div>
+
+                    </article>
+
+
+                    <article class="support-stat-card">
+
+                        <div class="support-stat-icon gold">
+                            ◷
+                        </div>
+
+                        <div>
+
+                            <span>
+                                OPEN
+                            </span>
+
+                            <strong id="openTickets">
+                                0
+                            </strong>
+
+                        </div>
+
+                    </article>
+
+
+                    <article class="support-stat-card">
+
+                        <div class="support-stat-icon purple">
+                            ◉
+                        </div>
+
+                        <div>
+
+                            <span>
+                                IN PROGRESS
+                            </span>
+
+                            <strong id="progressTickets">
+                                0
+                            </strong>
+
+                        </div>
+
+                    </article>
+
+
+                    <article class="support-stat-card">
+
+                        <div class="support-stat-icon green">
+                            ✓
+                        </div>
+
+                        <div>
+
+                            <span>
+                                RESOLVED
+                            </span>
+
+                            <strong id="resolvedTickets">
+                                0
+                            </strong>
+
+                        </div>
+
+                    </article>
+
+                </section>
+
+
+                <!-- TOOLBAR -->
+
+                <section class="support-panel">
+
+                    <div class="support-toolbar">
+
+
+                        <div class="support-search">
+
+                            <span>
+                                ⌕
+                            </span>
+
+                            <input
+                                id="searchInput"
+                                type="search"
+                                placeholder="Search subject, customer or category..."
+                                autocomplete="off"
+                            >
+
+                        </div>
+
+
+                        <select
+                            id="statusFilter"
+                            class="support-select"
+                        >
+
+                            <option value="">
+                                All Status
+                            </option>
+
+                            <option value="open">
+                                Open
+                            </option>
+
+                            <option value="in_progress">
+                                In Progress
+                            </option>
+
+                            <option value="resolved">
+                                Resolved
+                            </option>
+
+                            <option value="closed">
+                                Closed
+                            </option>
+
+                        </select>
+
+
+                        <select
+                            id="priorityFilter"
+                            class="support-select"
+                        >
+
+                            <option value="">
+                                All Priority
+                            </option>
+
+                            <option value="normal">
+                                Normal
+                            </option>
+
+                            <option value="high">
+                                High
+                            </option>
+
+                            <option value="urgent">
+                                Urgent
+                            </option>
+
+                        </select>
+
+
+                        <button
+                            type="button"
+                            id="clearFiltersBtn"
+                            class="clear-btn"
+                        >
+                            Clear
+                        </button>
+
+                    </div>
+
+
+                    <!-- TABLE -->
+
+                    <div class="support-table-wrap">
+
+                        <table class="support-table">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        TICKET
+                                    </th>
+
+                                    <th>
+                                        CUSTOMER
+                                    </th>
+
+                                    <th>
+                                        CATEGORY
+                                    </th>
+
+                                    <th>
+                                        PRIORITY
+                                    </th>
+
+                                    <th>
+                                        STATUS
+                                    </th>
+
+                                    <th>
+                                        UPDATED
+                                    </th>
+
+                                    <th>
+                                        ACTION
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody id="ticketsTableBody">
+
+                                <tr>
+
+                                    <td
+                                        colspan="7"
+                                        class="table-loading"
+                                    >
+                                        Loading tickets...
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- =================================================
+     TICKET DETAILS MODAL
+================================================== -->
+
+<div
+    id="detailsModal"
+    class="modal-backdrop hidden"
+>
+
+    <div class="details-modal">
+
+        <button
+            type="button"
+            id="closeModalBtn"
+            class="modal-close"
+        >
+            ×
+        </button>
+
+
+        <div class="details-header">
+
+            <div>
+
+                <span class="modal-kicker">
+                    SUPPORT TICKET
+                </span>
+
+                <h2 id="detailsSubject">
+                    Ticket
+                </h2>
+
+                <p id="detailsMeta">
+                    —
+                </p>
+
+            </div>
+
+
+            <span
+                id="detailsStatus"
+                class="ticket-status status-open"
+            >
+                OPEN
+            </span>
+
+        </div>
+
+
+        <!-- CUSTOMER -->
+
+        <div class="customer-box">
+
+            <div
+                class="customer-avatar"
+                id="customerAvatar"
+            >
+                U
+            </div>
+
+            <div>
+
+                <span>
+                    CUSTOMER
+                </span>
+
+                <strong id="customerName">
+                    User
+                </strong>
+
+                <small id="customerEmail">
+                    user@example.com
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <!-- STATUS -->
+
+        <div class="status-control">
+
+            <label for="statusSelect">
+                Ticket Status
+            </label>
+
+            <div class="status-control-row">
+
+                <select
+                    id="statusSelect"
+                    class="status-select"
+                >
+
+                    <option value="open">
+                        Open
+                    </option>
+
+                    <option value="in_progress">
+                        In Progress
+                    </option>
+
+                    <option value="resolved">
+                        Resolved
+                    </option>
+
+                    <option value="closed">
+                        Closed
+                    </option>
+
+                </select>
+
+
+                <button
+                    type="button"
+                    id="saveStatusBtn"
+                    class="save-status-btn"
+                >
+                    Update Status
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- MESSAGES -->
+
+        <div
+            id="messagesList"
+            class="messages-list"
+        >
+
+            <div class="messages-loading">
+                Loading conversation...
+            </div>
+
+        </div>
+
+
+        <!-- REPLY -->
+
+        <form
+            id="replyForm"
+            class="reply-form"
+        >
+
+            <textarea
+                id="replyMessage"
+                rows="4"
+                maxlength="5000"
+                placeholder="Reply to the customer..."
+                required
+            ></textarea>
+
+
+            <div class="reply-footer">
+
+                <span>
+                    Reply as NOVA Support
+                </span>
+
+
+                <button
+                    type="submit"
+                    id="sendReplyBtn"
+                    class="primary-btn"
+                >
+                    Send Reply
+                </button>
+
+            </div>
+
+        </form>
+
+
+    </div>
+
+</div>
+
+
+<!-- TOAST -->
+
+<div
+    id="toast"
+    class="toast"
+></div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="../../js/supabase-config.js?v=21"></script>
+
+<script src="../../js/admin/support.js?v=1"></script>
+
+</body>
+</html>
