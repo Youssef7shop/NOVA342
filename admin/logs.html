@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>NOVA MARKET — Activity Logs</title>
+
+    <link
+        rel="stylesheet"
+        href="../../css/admin/admin.css?v=20"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../../css/admin/logs.css?v=1"
+    >
+
+</head>
+
+
+<body>
+
+<div class="admin-app">
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside
+        class="sidebar"
+        id="sidebar"
+    >
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                N
+            </div>
+
+            <div class="brand-text">
+
+                <strong>
+                    NOVA
+                </strong>
+
+                <span>
+                    MARKET ADMIN
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <a
+                href="./index.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">⌂</span>
+                <span>Dashboard</span>
+            </a>
+
+
+            <a
+                href="./users.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">♙</span>
+                <span>Users</span>
+            </a>
+
+
+            <a
+                href="./workers.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">◈</span>
+                <span>Workers</span>
+            </a>
+
+
+            <a
+                href="./services.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">▦</span>
+                <span>Services</span>
+            </a>
+
+
+            <a
+                href="./orders.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">◫</span>
+                <span>Orders</span>
+            </a>
+
+
+            <a
+                href="./payments.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">₿</span>
+                <span>Payments</span>
+            </a>
+
+
+            <a
+                href="./support.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">◌</span>
+                <span>Support</span>
+            </a>
+
+
+            <div class="nav-section-title">
+                MANAGEMENT
+            </div>
+
+
+            <a
+                href="./reports.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">▥</span>
+                <span>Reports</span>
+            </a>
+
+
+            <a
+                href="./nova-guard.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">◉</span>
+                <span>NOVA Guard</span>
+            </a>
+
+
+            <a
+                href="./logs.html"
+                class="nav-item active"
+            >
+                <span class="nav-icon">≋</span>
+                <span>Activity Logs</span>
+            </a>
+
+
+            <a
+                href="./settings.html"
+                class="nav-item"
+            >
+                <span class="nav-icon">⚙</span>
+                <span>Settings</span>
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <div class="security-box">
+
+                <div class="security-dot"></div>
+
+                <div>
+
+                    <strong>
+                        NOVA Guard
+                    </strong>
+
+                    <span>
+                        System Protected
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <button
+                type="button"
+                id="logoutBtn"
+                class="logout-btn"
+            >
+
+                <span>
+                    ⇥
+                </span>
+
+                Logout
+
+            </button>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="main-content">
+
+
+        <!-- TOPBAR -->
+
+        <header class="topbar">
+
+            <div class="topbar-left">
+
+                <button
+                    type="button"
+                    id="sidebarToggle"
+                    class="menu-btn"
+                >
+                    ☰
+                </button>
+
+                <div>
+
+                    <p class="eyebrow">
+                        PLATFORM MONITORING
+                    </p>
+
+                    <h1>
+                        Activity Logs
+                    </h1>
+
+                </div>
+
+            </div>
+
+
+            <div class="topbar-right">
+
+                <button
+                    type="button"
+                    id="refreshBtn"
+                    class="icon-btn"
+                    title="Refresh"
+                >
+                    ↻
+                </button>
+
+
+                <div class="admin-profile">
+
+                    <div class="admin-avatar">
+
+                        <span id="adminInitial">
+                            A
+                        </span>
+
+                    </div>
+
+
+                    <div class="admin-profile-text">
+
+                        <strong id="adminName">
+                            Admin
+                        </strong>
+
+                        <span id="adminEmail">
+                            Loading...
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+
+        <!-- =====================================================
+             PAGE
+        ====================================================== -->
+
+        <section class="page-content">
+
+
+            <!-- ACCESS LOADING -->
+
+            <div
+                id="accessLoading"
+                class="page-state"
+            >
+
+                <div class="loader"></div>
+
+                <h2>
+                    Checking Admin Access
+                </h2>
+
+                <p>
+                    Please wait...
+                </p>
+
+            </div>
+
+
+
+            <!-- ACCESS DENIED -->
+
+            <div
+                id="accessDenied"
+                class="page-state hidden"
+            >
+
+                <div class="state-icon danger">
+                    !
+                </div>
+
+                <h2>
+                    Access Denied
+                </h2>
+
+                <p>
+                    This area is only available to NOVA administrators.
+                </p>
+
+                <button
+                    type="button"
+                    id="backHomeBtn"
+                    class="primary-btn"
+                >
+                    Back to NOVA
+                </button>
+
+            </div>
+
+
+
+            <!-- LOGS CONTENT -->
+
+            <div
+                id="logsContent"
+                class="hidden"
+            >
+
+
+                <!-- HEADER -->
+
+                <section class="logs-heading">
+
+                    <div>
+
+                        <p class="logs-kicker">
+                            NOVA MARKET
+                        </p>
+
+                        <h2>
+                            Activity & Audit Logs
+                        </h2>
+
+                        <p>
+                            Monitor important actions and system events
+                            across the NOVA platform.
+                        </p>
+
+                    </div>
+
+
+                    <div class="live-indicator">
+
+                        <span></span>
+
+                        Live Monitoring
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- =================================================
+                     STATS
+                ================================================== -->
+
+                <section class="logs-stats-grid">
+
+
+                    <article class="log-stat-card">
+
+                        <div class="log-stat-icon blue">
+                            ≋
+                        </div>
+
+                        <div>
+
+                            <span>
+                                TOTAL LOGS
+                            </span>
+
+                            <strong id="totalLogs">
+                                0
+                            </strong>
+
+                        </div>
+
+                    </article>
+
+
+                    <article class="log-stat-card">
+
+                        <div class="log-stat-icon green">
+                            ◷
+                        </div>
+
+                        <div>
+
+                            <span>
+                                TODAY
+                            </span>
+
+                            <strong id="todayLogs">
+                                0
+                            </strong>
+
+                        </div>
+
+                    </article>
+
+
+                    <article class="log-stat-card">
+
+                        <div class="log-stat-icon purple">
+                            ◉
+                        </div>
+
+                        <div>
+
+                            <span>
+                                ADMIN ACTIONS
+                            </span>
+
+                            <strong id="adminLogs">
+                                0
+                            </strong>
+
+                        </div>
+
+                    </article>
+
+
+                    <article class="log-stat-card">
+
+                        <div class="log-stat-icon gold">
+                            ⚡
+                        </div>
+
+                        <div>
+
+                            <span>
+                                SYSTEM EVENTS
+                            </span>
+
+                            <strong id="systemLogs">
+                                0
+                            </strong>
+
+                        </div>
+
+                    </article>
+
+                </section>
+
+
+
+                <!-- =================================================
+                     FILTER PANEL
+                ================================================== -->
+
+                <section class="logs-panel">
+
+
+                    <div class="logs-toolbar">
+
+
+                        <div class="log-search">
+
+                            <span>
+                                ⌕
+                            </span>
+
+                            <input
+                                type="search"
+                                id="searchInput"
+                                placeholder="Search logs, users, actions..."
+                                autocomplete="off"
+                            >
+
+                        </div>
+
+
+                        <select
+                            id="actionFilter"
+                            class="log-select"
+                        >
+
+                            <option value="">
+                                All Actions
+                            </option>
+
+                            <option value="login">
+                                Login
+                            </option>
+
+                            <option value="logout">
+                                Logout
+                            </option>
+
+                            <option value="create">
+                                Create
+                            </option>
+
+                            <option value="update">
+                                Update
+                            </option>
+
+                            <option value="delete">
+                                Delete
+                            </option>
+
+                            <option value="approve">
+                                Approve
+                            </option>
+
+                            <option value="reject">
+                                Reject
+                            </option>
+
+                            <option value="status_change">
+                                Status Change
+                            </option>
+
+                        </select>
+
+
+                        <select
+                            id="entityFilter"
+                            class="log-select"
+                        >
+
+                            <option value="">
+                                All Entities
+                            </option>
+
+                            <option value="user">
+                                User
+                            </option>
+
+                            <option value="worker">
+                                Worker
+                            </option>
+
+                            <option value="service">
+                                Service
+                            </option>
+
+                            <option value="order">
+                                Order
+                            </option>
+
+                            <option value="support">
+                                Support
+                            </option>
+
+                            <option value="settings">
+                                Settings
+                            </option>
+
+                            <option value="system">
+                                System
+                            </option>
+
+                        </select>
+
+
+                        <button
+                            type="button"
+                            id="clearFiltersBtn"
+                            class="clear-btn"
+                        >
+                            Clear
+                        </button>
+
+                    </div>
+
+
+
+                    <!-- TABLE -->
+
+                    <div class="logs-table-wrap">
+
+                        <table class="logs-table">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        ACTOR
+                                    </th>
+
+                                    <th>
+                                        ACTION
+                                    </th>
+
+                                    <th>
+                                        ENTITY
+                                    </th>
+
+                                    <th>
+                                        DETAILS
+                                    </th>
+
+                                    <th>
+                                        SOURCE
+                                    </th>
+
+                                    <th>
+                                        DATE
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody id="logsTableBody">
+
+                                <tr>
+
+                                    <td
+                                        colspan="6"
+                                        class="table-loading"
+                                    >
+                                        Loading logs...
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+
+
+                    <!-- FOOTER -->
+
+                    <div class="logs-footer">
+
+                        <span id="logsResult">
+                            0 logs
+                        </span>
+
+
+                        <button
+                            type="button"
+                            id="loadMoreBtn"
+                            class="load-more-btn"
+                        >
+                            Load More
+                        </button>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+
+<!-- =====================================================
+     LOG DETAILS MODAL
+====================================================== -->
+
+<div
+    id="logModal"
+    class="modal-backdrop hidden"
+>
+
+    <div class="log-modal">
+
+
+        <button
+            type="button"
+            id="closeModalBtn"
+            class="modal-close"
+        >
+            ×
+        </button>
+
+
+        <div class="modal-heading">
+
+            <span>
+                ACTIVITY EVENT
+            </span>
+
+            <h2 id="modalAction">
+                Action
+            </h2>
+
+            <p id="modalDate">
+                —
+            </p>
+
+        </div>
+
+
+
+        <div class="modal-grid">
+
+
+            <div class="modal-info">
+
+                <span>
+                    ACTOR
+                </span>
+
+                <strong id="modalActor">
+                    —
+                </strong>
+
+            </div>
+
+
+            <div class="modal-info">
+
+                <span>
+                    ENTITY
+                </span>
+
+                <strong id="modalEntity">
+                    —
+                </strong>
+
+            </div>
+
+
+            <div class="modal-info">
+
+                <span>
+                    SOURCE
+                </span>
+
+                <strong id="modalSource">
+                    —
+                </strong>
+
+            </div>
+
+
+            <div class="modal-info">
+
+                <span>
+                    LOG ID
+                </span>
+
+                <strong
+                    id="modalLogId"
+                    class="mono"
+                >
+                    —
+                </strong>
+
+            </div>
+
+
+        </div>
+
+
+
+        <div class="metadata-section">
+
+            <span>
+                METADATA
+            </span>
+
+            <pre id="modalMetadata">{}</pre>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+
+<!-- TOAST -->
+
+<div
+    id="toast"
+    class="toast"
+></div>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script
+    src="../../js/supabase-config.js?v=21"
+></script>
+
+<script
+    src="../../js/admin/logs.js?v=1"
+></script>
+
+</body>
+
+</html>
