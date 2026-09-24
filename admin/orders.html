@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>NOVA — Orders</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <link
+        rel="stylesheet"
+        href="../../css/admin/admin.css?v=30"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../../css/admin/orders.css?v=1"
+    >
+
+    <script src="../../js/supabase-config.js?v=30"></script>
+</head>
+
+<body>
+
+<div class="admin-layout" id="adminLayout">
+
+    <!-- ================= SIDEBAR ================= -->
+
+    <aside class="admin-sidebar" id="adminSidebar">
+
+        <div class="sidebar-top">
+
+            <a href="./index.html" class="admin-brand">
+                <div class="brand-logo">N</div>
+
+                <div class="brand-text">
+                    <strong>NOVA</strong>
+                    <span>ADMIN</span>
+                </div>
+            </a>
+
+            <button
+                type="button"
+                class="sidebar-close"
+                id="sidebarClose"
+            >
+                ×
+            </button>
+
+        </div>
+
+        <nav class="admin-nav">
+
+            <a href="./index.html" class="nav-item">
+                <span class="nav-icon">⌂</span>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="./users.html" class="nav-item">
+                <span class="nav-icon">◉</span>
+                <span>Users</span>
+            </a>
+
+            <a href="./workers.html" class="nav-item">
+                <span class="nav-icon">◆</span>
+                <span>Workers</span>
+            </a>
+
+            <a href="./orders.html" class="nav-item active">
+                <span class="nav-icon">▣</span>
+                <span>Orders</span>
+            </a>
+
+            <a href="./support.html" class="nav-item">
+                <span class="nav-icon">✉</span>
+                <span>Support</span>
+            </a>
+
+            <a href="./payments.html" class="nav-item">
+                <span class="nav-icon">₿</span>
+                <span>Payments</span>
+            </a>
+
+            <a href="./logs.html" class="nav-item">
+                <span class="nav-icon">☷</span>
+                <span>Activity Logs</span>
+            </a>
+
+            <a href="./settings.html" class="nav-item">
+                <span class="nav-icon">⚙</span>
+                <span>Settings</span>
+            </a>
+
+            <a href="./nova-guard.html" class="nav-item">
+                <span class="nav-icon">🛡</span>
+                <span>NOVA Guard</span>
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <div class="guard-mini-card">
+                <div class="guard-mini-icon">🛡</div>
+
+                <div class="guard-mini-info">
+                    <strong>NOVA Guard</strong>
+                    <span>Protection Active</span>
+                </div>
+            </div>
+
+            <button
+                type="button"
+                class="logout-btn"
+                id="logoutBtn"
+            >
+                <span>↪</span>
+                Logout
+            </button>
+
+        </div>
+
+    </aside>
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="admin-main">
+
+        <!-- TOPBAR -->
+
+        <header class="admin-topbar">
+
+            <button
+                type="button"
+                class="sidebar-toggle"
+                id="sidebarToggle"
+            >
+                ☰
+            </button>
+
+            <div class="topbar-page">
+
+                <div>
+                    <h1>Orders</h1>
+
+                    <p>
+                        Manage marketplace orders and delivery status
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="topbar-right">
+
+                <button
+                    type="button"
+                    class="refresh-btn"
+                    id="refreshBtn"
+                    title="Refresh"
+                >
+                    ↻
+                </button>
+
+                <div class="admin-profile">
+
+                    <div class="profile-avatar" id="adminAvatar">
+                        N
+                    </div>
+
+                    <div class="profile-meta">
+                        <strong id="adminName">
+                            Admin
+                        </strong>
+
+                        <span id="adminEmail">
+                            Loading...
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+        <!-- ================= CONTENT ================= -->
+
+        <section class="admin-content">
+
+            <div
+                class="orders-alert"
+                id="ordersAlert"
+                hidden
+            ></div>
+
+            <!-- STATS -->
+
+            <div class="orders-stats">
+
+                <div class="order-stat-card">
+                    <div class="stat-icon purple">▣</div>
+
+                    <div>
+                        <span>Total Orders</span>
+                        <strong id="totalOrders">0</strong>
+                    </div>
+                </div>
+
+                <div class="order-stat-card">
+                    <div class="stat-icon orange">◷</div>
+
+                    <div>
+                        <span>Pending</span>
+                        <strong id="pendingOrders">0</strong>
+                    </div>
+                </div>
+
+                <div class="order-stat-card">
+                    <div class="stat-icon blue">↻</div>
+
+                    <div>
+                        <span>In Progress</span>
+                        <strong id="progressOrders">0</strong>
+                    </div>
+                </div>
+
+                <div class="order-stat-card">
+                    <div class="stat-icon green">✓</div>
+
+                    <div>
+                        <span>Completed</span>
+                        <strong id="completedOrders">0</strong>
+                    </div>
+                </div>
+
+                <div class="order-stat-card">
+                    <div class="stat-icon red">!</div>
+
+                    <div>
+                        <span>Cancelled</span>
+                        <strong id="cancelledOrders">0</strong>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- TOOLBAR -->
+
+            <div class="orders-panel">
+
+                <div class="orders-toolbar">
+
+                    <div class="search-wrap">
+
+                        <span class="search-icon">⌕</span>
+
+                        <input
+                            type="search"
+                            id="searchInput"
+                            placeholder="Search order, service, customer or worker..."
+                            autocomplete="off"
+                        >
+
+                    </div>
+
+                    <select id="statusFilter">
+                        <option value="all">
+                            All Order Status
+                        </option>
+
+                        <option value="pending">
+                            Pending
+                        </option>
+
+                        <option value="accepted">
+                            Accepted
+                        </option>
+
+                        <option value="in_progress">
+                            In Progress
+                        </option>
+
+                        <option value="delivered">
+                            Delivered
+                        </option>
+
+                        <option value="completed">
+                            Completed
+                        </option>
+
+                        <option value="cancelled">
+                            Cancelled
+                        </option>
+
+                        <option value="rejected">
+                            Rejected
+                        </option>
+                    </select>
+
+                    <select id="paymentFilter">
+
+                        <option value="all">
+                            All Payments
+                        </option>
+
+                        <option value="unpaid">
+                            Unpaid
+                        </option>
+
+                        <option value="pending">
+                            Payment Pending
+                        </option>
+
+                        <option value="paid">
+                            Paid
+                        </option>
+
+                        <option value="failed">
+                            Failed
+                        </option>
+
+                        <option value="refunded">
+                            Refunded
+                        </option>
+
+                    </select>
+
+                    <select id="currencyFilter">
+
+                        <option value="all">
+                            All Currencies
+                        </option>
+
+                        <option value="MAD">
+                            MAD
+                        </option>
+
+                        <option value="USD">
+                            USD
+                        </option>
+
+                        <option value="EUR">
+                            EUR
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <!-- TABLE -->
+
+                <div class="orders-table-wrap">
+
+                    <table class="orders-table">
+
+                        <thead>
+
+                            <tr>
+                                <th>Order</th>
+                                <th>Service</th>
+                                <th>Customer</th>
+                                <th>Worker</th>
+                                <th>Amount</th>
+                                <th>Payment</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th></th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="ordersBody">
+
+                        </tbody>
+
+                    </table>
+
+                    <div
+                        class="orders-loading"
+                        id="ordersLoading"
+                    >
+                        <div class="loading-spinner"></div>
+                        <span>Loading orders...</span>
+                    </div>
+
+                    <div
+                        class="orders-empty"
+                        id="ordersEmpty"
+                        hidden
+                    >
+                        <div>▣</div>
+                        <strong>No orders found</strong>
+                        <span>
+                            Try changing your filters or search.
+                        </span>
+                    </div>
+
+                </div>
+
+                <!-- FOOTER -->
+
+                <div class="orders-footer">
+
+                    <span id="ordersCount">
+                        0 orders
+                    </span>
+
+                    <button
+                        type="button"
+                        id="clearFilters"
+                        class="clear-filters"
+                    >
+                        Clear filters
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<div
+    class="sidebar-overlay"
+    id="sidebarOverlay"
+></div>
+
+
+<!-- ================= ORDER DETAILS MODAL ================= -->
+
+<div
+    class="order-modal"
+    id="orderModal"
+    hidden
+>
+
+    <div
+        class="order-modal-backdrop"
+        id="modalBackdrop"
+    ></div>
+
+    <div class="order-modal-card">
+
+        <div class="order-modal-header">
+
+            <div>
+                <span class="modal-kicker">
+                    ORDER DETAILS
+                </span>
+
+                <h2 id="modalOrderTitle">
+                    Order
+                </h2>
+            </div>
+
+            <button
+                type="button"
+                class="modal-close"
+                id="modalClose"
+            >
+                ×
+            </button>
+
+        </div>
+
+        <div
+            class="modal-status-row"
+            id="modalStatusRow"
+        ></div>
+
+        <div class="modal-details-grid">
+
+            <div class="modal-detail">
+                <span>Order ID</span>
+                <strong id="modalOrderId">—</strong>
+            </div>
+
+            <div class="modal-detail">
+                <span>Service</span>
+                <strong id="modalService">—</strong>
+            </div>
+
+            <div class="modal-detail">
+                <span>Customer</span>
+                <strong id="modalCustomer">—</strong>
+            </div>
+
+            <div class="modal-detail">
+                <span>Worker</span>
+                <strong id="modalWorker">—</strong>
+            </div>
+
+            <div class="modal-detail">
+                <span>Price</span>
+                <strong id="modalPrice">—</strong>
+            </div>
+
+            <div class="modal-detail">
+                <span>Platform Fee</span>
+                <strong id="modalFee">—</strong>
+            </div>
+
+            <div class="modal-detail">
+                <span>Worker Amount</span>
+                <strong id="modalWorkerAmount">—</strong>
+            </div>
+
+            <div class="modal-detail">
+                <span>Delivery</span>
+                <strong id="modalDelivery">—</strong>
+            </div>
+
+            <div class="modal-detail">
+                <span>Created</span>
+                <strong id="modalCreated">—</strong>
+            </div>
+
+            <div class="modal-detail">
+                <span>Updated</span>
+                <strong id="modalUpdated">—</strong>
+            </div>
+
+        </div>
+
+        <div class="modal-text-block">
+
+            <span>Customer Notes</span>
+
+            <p id="modalNotes">
+                No notes.
+            </p>
+
+        </div>
+
+        <div class="modal-text-block">
+
+            <span>Requirements</span>
+
+            <p id="modalRequirements">
+                No requirements.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script
+    src="../../js/admin/orders.js?v=1"
+></script>
+
+</body>
+</html>
