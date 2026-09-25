@@ -11,29 +11,39 @@ document.addEventListener(
             window.supabaseClient;
 
 
+        /* =====================================================
+           ELEMENTS
+        ====================================================== */
+
         const loadingState =
             document.getElementById(
                 "loadingState"
             );
-
 
         const errorState =
             document.getElementById(
                 "errorState"
             );
 
-
         const checkoutContent =
             document.getElementById(
                 "checkoutContent"
             );
-
 
         const errorMessage =
             document.getElementById(
                 "errorMessage"
             );
 
+        const confirmOrderBtn =
+            document.getElementById(
+                "confirmOrderBtn"
+            );
+
+
+        /* =====================================================
+           ERROR
+        ====================================================== */
 
         function showError(message) {
 
@@ -44,33 +54,33 @@ document.addEventListener(
 
 
             if (loadingState) {
-
                 loadingState.style.display =
                     "none";
             }
 
 
             if (checkoutContent) {
-
                 checkoutContent.style.display =
                     "none";
             }
 
 
             if (errorState) {
-
                 errorState.style.display =
                     "block";
             }
 
 
             if (errorMessage) {
-
                 errorMessage.textContent =
                     message;
             }
         }
 
+
+        /* =====================================================
+           TOAST
+        ====================================================== */
 
         function showToast(message) {
 
@@ -100,15 +110,22 @@ document.addEventListener(
 
 
             window.novaOrderToast =
-                setTimeout(() => {
+                setTimeout(
+                    () => {
 
-                    toast.classList.remove(
-                        "show"
-                    );
+                        toast.classList.remove(
+                            "show"
+                        );
 
-                }, 3000);
+                    },
+                    3000
+                );
         }
 
+
+        /* =====================================================
+           PRICE
+        ====================================================== */
 
         function formatPrice(value) {
 
@@ -124,10 +141,16 @@ document.addEventListener(
         }
 
 
+        /* =====================================================
+           AVATAR FALLBACK
+        ====================================================== */
+
         function avatarFallback(name) {
 
             const initial =
-                (name || "N")
+                String(
+                    name || "N"
+                )
                     .charAt(0)
                     .toUpperCase();
 
@@ -139,6 +162,7 @@ document.addEventListener(
                         xmlns="http://www.w3.org/2000/svg"
                         width="200"
                         height="200"
+                        viewBox="0 0 200 200"
                     >
 
                         <defs>
@@ -178,6 +202,7 @@ document.addEventListener(
                             x="100"
                             y="110"
                             text-anchor="middle"
+                            dominant-baseline="middle"
                             fill="white"
                             font-family="Arial"
                             font-size="75"
@@ -192,9 +217,27 @@ document.addEventListener(
         }
 
 
-        /* ==========================================
+        /* =====================================================
+           UUID CHECK
+        ====================================================== */
+
+        function isValidUUID(value) {
+
+            if (!value) {
+                return false;
+            }
+
+
+            return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+                .test(
+                    String(value)
+                );
+        }
+
+
+        /* =====================================================
            SUPABASE CHECK
-        ========================================== */
+        ====================================================== */
 
         if (!supabase) {
 
@@ -206,29 +249,50 @@ document.addEventListener(
         }
 
 
-        /* ==========================================
+        /* =====================================================
            USER CHECK
-        ========================================== */
+        ====================================================== */
 
-        const {
-            data: userData,
-            error: userError
-        } =
-            await supabase.auth.getUser();
+        let user = null;
 
 
-        if (userError) {
+        try {
+
+            const {
+                data: userData,
+                error: userError
+            } =
+                await supabase.auth.getUser();
+
+
+            if (userError) {
+
+                showError(
+                    userError.message
+                );
+
+                return;
+            }
+
+
+            user =
+                userData?.user || null;
+
+
+        } catch (error) {
+
+            console.error(
+                "NOVA user check:",
+                error
+            );
+
 
             showError(
-                userError.message
+                "Unable to verify your account."
             );
 
             return;
         }
-
-
-        const user =
-            userData?.user;
 
 
         if (!user) {
@@ -242,9 +306,9 @@ document.addEventListener(
         }
 
 
-        /* ==========================================
-           URL
-        ========================================== */
+        /* =====================================================
+           URL PARAMETERS
+        ====================================================== */
 
         const params =
             new URLSearchParams(
@@ -252,8 +316,23 @@ document.addEventListener(
             );
 
 
+        /*
+         * Accept:
+         *
+         * order.html?service=UUID
+         *
+         * or
+         *
+         * order.html?id=UUID
+         *
+         * or
+         *
+         * order.html?service=UUID&slug=...
+         */
+
         const serviceId =
-            params.get("service");
+            params.get("service") ||
+            params.get("id");
 
 
         const slug =
@@ -270,70 +349,78 @@ document.addEventListener(
         }
 
 
-        /* ==========================================
+        /* =====================================================
            LOAD SERVICE
-        ========================================== */
+        ====================================================== */
 
         let service = null;
 
 
         try {
 
-            let result;
+            let query =
+                supabase
+                    .from("services")
+                    .select(`
+                        id,
+                        worker_id,
+                        title,
+                        slug,
+                        description,
+                        category,
+                        price,
+                        delivery_days,
+                        image_url,
+                        status
+                    `);
 
 
             if (serviceId) {
 
-                result =
-                    await supabase
-                        .from("services")
-                        .select(`
-                            id,
-                            worker_id,
-                            title,
-                            slug,
-                            description,
-                            category,
-                            price,
-                            delivery_days,
-                            image_url,
-                            status
-                        `)
-                        .eq(
-                            "id",
-                            serviceId
-                        )
-                        .maybeSingle();
+                if (!isValidUUID(serviceId)) {
+
+                    showError(
+                        "The selected service ID is invalid."
+                    );
+
+                    return;
+                }
+
+
+                query =
+                    query.eq(
+                        "id",
+                        serviceId
+                    );
 
             } else {
 
-                result =
-                    await supabase
-                        .from("services")
-                        .select(`
-                            id,
-                            worker_id,
-                            title,
-                            slug,
-                            description,
-                            category,
-                            price,
-                            delivery_days,
-                            image_url,
-                            status
-                        `)
-                        .eq(
-                            "slug",
-                            slug
-                        )
-                        .maybeSingle();
+                query =
+                    query.eq(
+                        "slug",
+                        slug
+                    );
             }
 
 
-            if (result.error) {
+            const {
+                data,
+                error
+            } =
+                await query.maybeSingle();
+
+
+            if (error) {
+
+                console.error(
+                    "NOVA service error:",
+                    error
+                );
+
 
                 showError(
-                    result.error.message
+                    error.message ||
+                    "Unable to load the selected service."
                 );
 
                 return;
@@ -341,7 +428,7 @@ document.addEventListener(
 
 
             service =
-                result.data;
+                data;
 
 
             if (!service) {
@@ -355,7 +442,8 @@ document.addEventListener(
 
 
             if (
-                service.status !== "published"
+                service.status !==
+                "published"
             ) {
 
                 showError(
@@ -369,6 +457,7 @@ document.addEventListener(
         } catch (error) {
 
             console.error(
+                "NOVA service loading:",
                 error
             );
 
@@ -381,42 +470,64 @@ document.addEventListener(
         }
 
 
-        /* ==========================================
+        /* =====================================================
            WORKER
-        ========================================== */
+        ====================================================== */
 
         let worker = null;
 
 
         if (service.worker_id) {
 
-            const {
-                data
-            } =
-                await supabase
-                    .from("profiles")
-                    .select(`
-                        id,
-                        first_name,
-                        last_name,
-                        full_name,
-                        avatar_url
-                    `)
-                    .eq(
-                        "id",
-                        service.worker_id
-                    )
-                    .maybeSingle();
+            try {
+
+                const {
+                    data,
+                    error
+                } =
+                    await supabase
+                        .from("profiles")
+                        .select(`
+                            id,
+                            first_name,
+                            last_name,
+                            full_name,
+                            avatar_url,
+                            role
+                        `)
+                        .eq(
+                            "id",
+                            service.worker_id
+                        )
+                        .maybeSingle();
 
 
-            worker =
-                data || null;
+                if (error) {
+
+                    console.warn(
+                        "NOVA worker profile:",
+                        error.message
+                    );
+
+                } else {
+
+                    worker =
+                        data || null;
+                }
+
+            } catch (error) {
+
+                console.warn(
+                    "Worker profile could not be loaded:",
+                    error
+                );
+            }
         }
 
 
-        /* ==========================================
+        /* =====================================================
            VALUES
-        ========================================== */
+        ====================================================== */
 
         const title =
             service.title ||
@@ -447,13 +558,19 @@ document.addEventListener(
 
         const workerFullName =
             worker?.full_name ||
-            `${worker?.first_name || ""} ${worker?.last_name || ""}`.trim() ||
+            [
+                worker?.first_name,
+                worker?.last_name
+            ]
+                .filter(Boolean)
+                .join(" ")
+            ||
             "NOVA Worker";
 
 
-        /* ==========================================
-           ELEMENTS
-        ========================================== */
+        /* =====================================================
+           UI ELEMENTS
+        ====================================================== */
 
         const serviceImage =
             document.getElementById(
@@ -539,15 +656,9 @@ document.addEventListener(
             );
 
 
-        const confirmOrderBtn =
-            document.getElementById(
-                "confirmOrderBtn"
-            );
-
-
-        /* ==========================================
-           FILL SERVICE
-        ========================================== */
+        /* =====================================================
+           FALLBACK SERVICE IMAGE
+        ====================================================== */
 
         const fallbackImage =
             "data:image/svg+xml;charset=UTF-8," +
@@ -556,6 +667,7 @@ document.addEventListener(
                     xmlns="http://www.w3.org/2000/svg"
                     width="1200"
                     height="800"
+                    viewBox="0 0 1200 800"
                 >
 
                     <defs>
@@ -594,6 +706,7 @@ document.addEventListener(
                         x="600"
                         y="410"
                         text-anchor="middle"
+                        dominant-baseline="middle"
                         fill="white"
                         font-family="Arial"
                         font-size="95"
@@ -605,6 +718,10 @@ document.addEventListener(
                 </svg>
             `);
 
+
+        /* =====================================================
+           FILL SERVICE
+        ====================================================== */
 
         if (serviceImage) {
 
@@ -620,8 +737,14 @@ document.addEventListener(
             serviceImage.onerror =
                 () => {
 
-                    serviceImage.src =
-                        fallbackImage;
+                    if (
+                        serviceImage.src !==
+                        fallbackImage
+                    ) {
+
+                        serviceImage.src =
+                            fallbackImage;
+                    }
                 };
         }
 
@@ -668,9 +791,9 @@ document.addEventListener(
         }
 
 
-        /* ==========================================
-           WORKER
-        ========================================== */
+        /* =====================================================
+           FILL WORKER
+        ====================================================== */
 
         if (workerName) {
 
@@ -703,9 +826,9 @@ document.addEventListener(
         }
 
 
-        /* ==========================================
-           SUMMARY
-        ========================================== */
+        /* =====================================================
+           FILL SUMMARY
+        ====================================================== */
 
         if (summaryService) {
 
@@ -732,43 +855,57 @@ document.addEventListener(
             `NOVA MARKET — Checkout — ${title}`;
 
 
-        /* ==========================================
+        /* =====================================================
            CONFIRM ORDER
-        ========================================== */
+        ====================================================== */
 
         if (confirmOrderBtn) {
+
+            confirmOrderBtn.type =
+                "button";
+
 
             confirmOrderBtn.addEventListener(
                 "click",
                 async () => {
 
+                    /* -----------------------------------------
+                       REQUIREMENTS
+                    ----------------------------------------- */
+
                     const requirementsValue =
                         requirements?.value
-                            ?.trim() || "";
+                            ?.trim() ||
+                        "";
 
 
                     const notesValue =
                         notes?.value
-                            ?.trim() || "";
+                            ?.trim() ||
+                        "";
 
 
-                    if (
-                        !requirementsValue
-                    ) {
+                    if (!requirementsValue) {
 
                         showToast(
                             "Please add your project requirements."
                         );
 
-                        requirements?.focus();
+
+                        if (requirements) {
+                            requirements.focus();
+                        }
+
 
                         return;
                     }
 
 
-                    if (
-                        !service.worker_id
-                    ) {
+                    /* -----------------------------------------
+                       WORKER CHECK
+                    ----------------------------------------- */
+
+                    if (!service.worker_id) {
 
                         showToast(
                             "This service has no worker assigned."
@@ -778,8 +915,30 @@ document.addEventListener(
                     }
 
 
+                    /* -----------------------------------------
+                       SERVICE CHECK
+                    ----------------------------------------- */
+
+                    if (!service.id) {
+
+                        showToast(
+                            "Invalid service."
+                        );
+
+                        return;
+                    }
+
+
+                    /* -----------------------------------------
+                       DISABLE
+                    ----------------------------------------- */
+
                     confirmOrderBtn.disabled =
                         true;
+
+
+                    const originalText =
+                        confirmOrderBtn.textContent;
 
 
                     confirmOrderBtn.textContent =
@@ -788,111 +947,102 @@ document.addEventListener(
 
                     try {
 
+                        console.log(
+                            "NOVA: Creating order via RPC..."
+                        );
+
+
                         /*
-                         * NOVA platform fee
-                         * Example: 10%
+                         * IMPORTANT
                          *
-                         * This is only stored now.
-                         * Payment processing comes next.
+                         * DO NOT INSERT DIRECTLY INTO orders.
+                         *
+                         * The secure database function
+                         * create_order() creates the order,
+                         * calculates the platform fee,
+                         * sets the worker amount,
+                         * and controls customer/worker data.
                          */
 
-                        const platformFee =
-                            Number(
-                                (
-                                    price * 0.10
-                                ).toFixed(2)
-                            );
-
-
-                        const workerAmount =
-                            Number(
-                                (
-                                    price -
-                                    platformFee
-                                ).toFixed(2)
-                            );
-
-
                         const {
-                            data:
-                                createdOrder,
+                            data,
                             error
                         } =
-                            await supabase
-                                .from("orders")
-                                .insert({
-
-                                    customer_id:
-                                        user.id,
-
-                                    worker_id:
-                                        service.worker_id,
-
-                                    service_id:
+                            await supabase.rpc(
+                                "create_order",
+                                {
+                                    p_service_id:
                                         service.id,
 
-                                    service_title:
-                                        title,
-
-                                    service_slug:
-                                        service.slug ||
-                                        null,
-
-                                    service_description:
-                                        description,
-
-                                    category:
-                                        category,
-
-                                    price:
-                                        price,
-
-                                    delivery_days:
-                                        days,
-
-                                    currency:
-                                        "MAD",
-
-                                    notes:
-                                        notesValue ||
-                                        null,
-
-                                    requirements:
+                                    p_requirements:
                                         requirementsValue,
 
-                                    status:
-                                        "pending",
-
-                                    payment_status:
-                                        "unpaid",
-
-                                    platform_fee:
-                                        platformFee,
-
-                                    worker_amount:
-                                        workerAmount
-
-                                })
-                                .select()
-                                .single();
+                                    p_notes:
+                                        notesValue ||
+                                        null
+                                }
+                            );
 
 
                         if (error) {
 
                             console.error(
-                                "Create order error:",
+                                "NOVA create_order RPC error:",
                                 error
                             );
+
 
                             throw error;
                         }
 
 
                         console.log(
-                            "NOVA ORDER CREATED:",
-                            createdOrder
+                            "NOVA create_order RPC result:",
+                            data
                         );
 
+
+                        /* -------------------------------------
+                           EXTRACT ORDER ID
+                        ------------------------------------- */
+
+                        const orderId =
+                            extractOrderId(
+                                data
+                            );
+
+
+                        if (!orderId) {
+
+                            console.warn(
+                                "Order was created but no order ID was returned:",
+                                data
+                            );
+
+
+                            showToast(
+                                "Order created successfully."
+                            );
+
+
+                            setTimeout(
+                                () => {
+
+                                    window.location.href =
+                                        "dashboard/orders.html";
+
+                                },
+                                900
+                            );
+
+
+                            return;
+                        }
+
+
+                        /* -------------------------------------
+                           SUCCESS
+                        ------------------------------------- */
 
                         showToast(
                             "Order created successfully!"
@@ -900,18 +1050,22 @@ document.addEventListener(
 
 
                         /*
-                         * Next:
-                         * Customer Orders page
+                         * Redirect to customer Orders.
+                         *
+                         * We pass the newly created order ID.
                          */
 
-                        setTimeout(() => {
+                        setTimeout(
+                            () => {
 
-                            window.location.href =
-                                `dashboard/orders.html?order=${encodeURIComponent(
-                                    createdOrder.id
-                                )}`;
+                                window.location.href =
+                                    `dashboard/orders.html?order=${encodeURIComponent(
+                                        orderId
+                                    )}`;
 
-                        }, 700);
+                            },
+                            700
+                        );
 
 
                     } catch (error) {
@@ -922,9 +1076,58 @@ document.addEventListener(
                         );
 
 
-                        showToast(
+                        let message =
                             error?.message ||
-                            "Unable to create order."
+                            "Unable to create order.";
+
+
+                        /*
+                         * Friendly messages for common
+                         * Supabase errors.
+                         */
+
+                        if (
+                            /function .*create_order/i
+                                .test(
+                                    message
+                                )
+                        ) {
+
+                            message =
+                                "The order system is not configured correctly. Please check the create_order function in Supabase.";
+                        }
+
+
+                        if (
+                            /not authenticated/i
+                                .test(
+                                    message
+                                )
+                        ) {
+
+                            message =
+                                "Your session has expired. Please login again.";
+                        }
+
+
+                        if (
+                            /worker/i
+                                .test(
+                                    message
+                                ) &&
+                            /service/i
+                                .test(
+                                    message
+                                )
+                        ) {
+
+                            message =
+                                "This service is not available for ordering.";
+                        }
+
+
+                        showToast(
+                            message
                         );
 
 
@@ -933,6 +1136,7 @@ document.addEventListener(
 
 
                         confirmOrderBtn.textContent =
+                            originalText ||
                             "Confirm Order";
                     }
                 }
@@ -940,9 +1144,9 @@ document.addEventListener(
         }
 
 
-        /* ==========================================
-           SHOW
-        ========================================== */
+        /* =====================================================
+           SHOW CHECKOUT
+        ====================================================== */
 
         if (loadingState) {
 
@@ -968,5 +1172,103 @@ document.addEventListener(
         console.log(
             "NOVA CHECKOUT READY"
         );
+
     }
 );
+
+
+/* =========================================================
+   EXTRACT ORDER ID
+========================================================= */
+
+function extractOrderId(data) {
+
+    if (!data) {
+        return null;
+    }
+
+
+    /*
+     * UUID directly returned
+     */
+
+    if (
+        typeof data ===
+        "string"
+    ) {
+
+        return isValidUUIDValue(
+            data
+        )
+            ? data
+            : null;
+    }
+
+
+    /*
+     * Object:
+     *
+     * {
+     *   id: "uuid"
+     * }
+     */
+
+    if (
+        typeof data ===
+        "object" &&
+        !Array.isArray(data)
+    ) {
+
+        const possibleId =
+            data.id ||
+            data.order_id ||
+            data.created_order_id;
+
+
+        if (
+            typeof possibleId ===
+            "string" &&
+            isValidUUIDValue(
+                possibleId
+            )
+        ) {
+
+            return possibleId;
+        }
+    }
+
+
+    /*
+     * Array:
+     *
+     * [{ id: "uuid" }]
+     */
+
+    if (
+        Array.isArray(data) &&
+        data.length > 0
+    ) {
+
+        return extractOrderId(
+            data[0]
+        );
+    }
+
+
+    return null;
+}
+
+
+/* =========================================================
+   UUID HELPER
+========================================================= */
+
+function isValidUUIDValue(
+    value
+) {
+
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+        .test(
+            String(value)
+        );
+}
