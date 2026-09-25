@@ -3,145 +3,296 @@
 let allOrders = [];
 let filteredOrders = [];
 
-document.addEventListener("DOMContentLoaded", initOrders);
+document.addEventListener(
+    "DOMContentLoaded",
+    initOrders
+);
+
+
+/* =========================================================
+   INIT
+========================================================= */
 
 async function initOrders() {
+
     setupSidebar();
+
     setupEvents();
 
-    const client = window.supabaseClient;
+    const client =
+        window.supabaseClient;
+
 
     if (!client) {
-        showAlert("Supabase is not configured correctly.", "error");
+
+        showAlert(
+            "Supabase is not configured correctly.",
+            "error"
+        );
+
         return;
     }
 
-    const adminOk = await checkAdmin(client);
+
+    const adminOk =
+        await checkAdmin(client);
+
 
     if (!adminOk) {
         return;
     }
 
+
     await loadOrders(client);
 }
+
 
 /* =========================================================
    ADMIN AUTH
 ========================================================= */
 
 async function checkAdmin(client) {
+
     try {
+
         const {
             data: userData,
             error: userError
-        } = await client.auth.getUser();
+        } =
+            await client.auth.getUser();
 
-        if (userError || !userData?.user) {
-            window.location.href = "../login.html";
+
+        if (
+            userError ||
+            !userData?.user
+        ) {
+
+            window.location.href =
+                "../login.html";
+
             return false;
         }
+
 
         const {
             data: profile,
             error
-        } = await client.rpc("admin_current_profile");
+        } =
+            await client.rpc(
+                "admin_current_profile"
+            );
+
 
         if (error) {
-            showAlert(error.message || "Admin verification failed.", "error");
+
+            showAlert(
+                error.message ||
+                "Admin verification failed.",
+                "error"
+            );
+
             return false;
         }
+
 
         if (
             !profile ||
             profile.role !== "admin" ||
             profile.is_active === false
         ) {
-            window.location.href = "../login.html";
+
+            window.location.href =
+                "../login.html";
+
             return false;
         }
+
 
         applyAdminProfile(profile);
 
         return true;
 
+
     } catch (error) {
-        console.error(error);
-        showAlert("Unable to verify administrator.", "error");
+
+        console.error(
+            "NOVA admin auth error:",
+            error
+        );
+
+
+        showAlert(
+            "Unable to verify administrator.",
+            "error"
+        );
+
         return false;
     }
 }
+
 
 /* =========================================================
    PROFILE
 ========================================================= */
 
 function applyAdminProfile(profile) {
-    const name = document.getElementById("adminName");
-    const email = document.getElementById("adminEmail");
-    const avatar = document.getElementById("adminAvatar");
+
+    const name =
+        document.getElementById(
+            "adminName"
+        );
+
+    const email =
+        document.getElementById(
+            "adminEmail"
+        );
+
+    const avatar =
+        document.getElementById(
+            "adminAvatar"
+        );
+
 
     const fullName =
         profile.full_name ||
-        [profile.first_name, profile.last_name]
+        [
+            profile.first_name,
+            profile.last_name
+        ]
             .filter(Boolean)
             .join(" ") ||
         "Admin";
 
+
     if (name) {
-        name.textContent = fullName;
+
+        name.textContent =
+            fullName;
     }
+
 
     if (email) {
-        email.textContent = profile.email || "";
+
+        email.textContent =
+            profile.email || "";
     }
 
+
     if (avatar) {
+
         if (profile.avatar_url) {
+
             avatar.innerHTML = "";
 
-            const img = document.createElement("img");
-            img.src = profile.avatar_url;
-            img.alt = "Admin";
-            img.style.width = "100%";
-            img.style.height = "100%";
-            img.style.objectFit = "cover";
+            const img =
+                document.createElement(
+                    "img"
+                );
 
-            avatar.appendChild(img);
+            img.src =
+                profile.avatar_url;
+
+            img.alt =
+                "Admin";
+
+            img.style.width =
+                "100%";
+
+            img.style.height =
+                "100%";
+
+            img.style.objectFit =
+                "cover";
+
+            avatar.appendChild(
+                img
+            );
+
         } else {
+
             avatar.textContent =
-                fullName.charAt(0).toUpperCase();
+                fullName
+                    .charAt(0)
+                    .toUpperCase();
         }
     }
 }
+
 
 /* =========================================================
    LOAD ORDERS
 ========================================================= */
 
 async function loadOrders(client) {
+
     setLoading(true);
 
+    showAlert(
+        "",
+        "info",
+        true
+    );
+
+
     try {
+
+        console.log(
+            "NOVA: loading admin orders..."
+        );
+
+
         const {
             data,
             error
-        } = await client.rpc("admin_orders");
+        } =
+            await client.rpc(
+                "admin_orders"
+            );
+
 
         if (error) {
             throw error;
         }
 
-        allOrders = Array.isArray(data)
-            ? data
-            : [];
+
+        allOrders =
+            Array.isArray(data)
+                ? data
+                : [];
+
+
+        console.log(
+            "NOVA: admin orders loaded:",
+            allOrders.length
+        );
+
+
+        /*
+         * Normalize numeric values.
+         */
+        allOrders =
+            allOrders.map(
+                normalizeOrder
+            );
+
 
         updateStats();
+
         applyFilters();
 
+
     } catch (error) {
-        console.error("admin_orders:", error);
+
+        console.error(
+            "NOVA admin_orders error:",
+            error
+        );
+
 
         allOrders = [];
+
+        filteredOrders = [];
+
 
         showAlert(
             error.message ||
@@ -149,77 +300,207 @@ async function loadOrders(client) {
             "error"
         );
 
+
         renderOrders();
 
+
     } finally {
+
+        /*
+         * IMPORTANT:
+         * Force the loading overlay OFF.
+         *
+         * This works even when CSS contains
+         * display:flex / display:block !important.
+         */
         setLoading(false);
+
+
+        /*
+         * Extra safety after rendering.
+         */
+        hideLoadingForce();
     }
 }
+
+
+/* =========================================================
+   NORMALIZE ORDER
+========================================================= */
+
+function normalizeOrder(order) {
+
+    if (!order || typeof order !== "object") {
+
+        return {};
+    }
+
+
+    const normalized = {
+        ...order,
+
+        price:
+            toSafeNumber(
+                order.price
+            ),
+
+        platform_fee:
+            toSafeNumber(
+                order.platform_fee
+            ),
+
+        worker_amount:
+            toSafeNumber(
+                order.worker_amount
+            ),
+
+        delivery_days:
+            toSafeNumber(
+                order.delivery_days
+            )
+    };
+
+
+    return normalized;
+}
+
+
+/* =========================================================
+   SAFE NUMBER
+========================================================= */
+
+function toSafeNumber(value) {
+
+    if (
+        value === null ||
+        value === undefined ||
+        value === ""
+    ) {
+
+        return 0;
+    }
+
+
+    const number =
+        Number(value);
+
+
+    if (
+        !Number.isFinite(number)
+    ) {
+
+        return 0;
+    }
+
+
+    return number;
+}
+
 
 /* =========================================================
    FILTERS
 ========================================================= */
 
 function applyFilters() {
+
     const search =
-        document.getElementById("searchInput")
+        document.getElementById(
+            "searchInput"
+        )
             ?.value
             .trim()
-            .toLowerCase() || "";
+            .toLowerCase() ||
+        "";
+
 
     const status =
-        document.getElementById("statusFilter")
-            ?.value || "all";
+        document.getElementById(
+            "statusFilter"
+        )
+            ?.value ||
+        "all";
+
 
     const payment =
-        document.getElementById("paymentFilter")
-            ?.value || "all";
+        document.getElementById(
+            "paymentFilter"
+        )
+            ?.value ||
+        "all";
+
 
     const currency =
-        document.getElementById("currencyFilter")
-            ?.value || "all";
+        document.getElementById(
+            "currencyFilter"
+        )
+            ?.value ||
+        "all";
 
-    filteredOrders = allOrders.filter(order => {
 
-        const searchText = [
-            order.id,
-            order.service_title,
-            order.service_slug,
-            order.customer_name,
-            order.customer_email,
-            order.worker_name,
-            order.worker_email
-        ]
-            .filter(Boolean)
-            .join(" ")
-            .toLowerCase();
+    filteredOrders =
+        allOrders.filter(
+            order => {
 
-        const matchesSearch =
-            !search ||
-            searchText.includes(search);
+                const searchText = [
 
-        const matchesStatus =
-            status === "all" ||
-            order.order_status === status;
+                    order.id,
 
-        const matchesPayment =
-            payment === "all" ||
-            order.payment_status === payment;
+                    order.service_title,
 
-        const matchesCurrency =
-            currency === "all" ||
-            order.currency === currency;
+                    order.service_slug,
 
-        return (
-            matchesSearch &&
-            matchesStatus &&
-            matchesPayment &&
-            matchesCurrency
+                    order.customer_name,
+
+                    order.customer_email,
+
+                    order.worker_name,
+
+                    order.worker_email
+
+                ]
+                    .filter(Boolean)
+                    .join(" ")
+                    .toLowerCase();
+
+
+                const matchesSearch =
+                    !search ||
+                    searchText.includes(
+                        search
+                    );
+
+
+                const matchesStatus =
+                    status === "all" ||
+                    order.order_status ===
+                    status;
+
+
+                const matchesPayment =
+                    payment === "all" ||
+                    order.payment_status ===
+                    payment;
+
+
+                const matchesCurrency =
+                    currency === "all" ||
+                    order.currency ===
+                    currency;
+
+
+                return (
+                    matchesSearch &&
+                    matchesStatus &&
+                    matchesPayment &&
+                    matchesCurrency
+                );
+            }
         );
-    });
+
 
     renderOrders();
 }
+
 
 /* =========================================================
    STATS
@@ -227,39 +508,81 @@ function applyFilters() {
 
 function updateStats() {
 
-    const total = allOrders.length;
+    const total =
+        allOrders.length;
+
 
     const pending =
         allOrders.filter(
-            o => o.order_status === "pending"
+            order =>
+                order.order_status ===
+                "pending"
         ).length;
+
 
     const progress =
         allOrders.filter(
-            o =>
-                o.order_status === "accepted" ||
-                o.order_status === "in_progress" ||
-                o.order_status === "delivered"
+            order =>
+                order.order_status ===
+                "accepted" ||
+
+                order.order_status ===
+                "in_progress" ||
+
+                order.order_status ===
+                "delivered"
         ).length;
+
 
     const completed =
         allOrders.filter(
-            o => o.order_status === "completed"
+            order =>
+                order.order_status ===
+                "completed"
         ).length;
+
 
     const cancelled =
         allOrders.filter(
-            o =>
-                o.order_status === "cancelled" ||
-                o.order_status === "rejected"
+            order =>
+                order.order_status ===
+                "cancelled" ||
+
+                order.order_status ===
+                "rejected"
         ).length;
 
-    setText("totalOrders", total);
-    setText("pendingOrders", pending);
-    setText("progressOrders", progress);
-    setText("completedOrders", completed);
-    setText("cancelledOrders", cancelled);
+
+    setText(
+        "totalOrders",
+        total
+    );
+
+
+    setText(
+        "pendingOrders",
+        pending
+    );
+
+
+    setText(
+        "progressOrders",
+        progress
+    );
+
+
+    setText(
+        "completedOrders",
+        completed
+    );
+
+
+    setText(
+        "cancelledOrders",
+        cancelled
+    );
 }
+
 
 /* =========================================================
    RENDER
@@ -268,156 +591,266 @@ function updateStats() {
 function renderOrders() {
 
     const body =
-        document.getElementById("ordersBody");
+        document.getElementById(
+            "ordersBody"
+        );
+
 
     const empty =
-        document.getElementById("ordersEmpty");
+        document.getElementById(
+            "ordersEmpty"
+        );
+
 
     if (!body) {
+
+        console.warn(
+            "NOVA: ordersBody not found."
+        );
+
         return;
     }
 
+
     body.innerHTML = "";
 
+
     if (!filteredOrders.length) {
+
         if (empty) {
             empty.hidden = false;
         }
 
-        setText("ordersCount", "0 orders");
+
+        setText(
+            "ordersCount",
+            "0 orders"
+        );
+
+
         return;
     }
 
+
     if (empty) {
+
         empty.hidden = true;
     }
+
 
     const fragment =
         document.createDocumentFragment();
 
-    filteredOrders.forEach(order => {
 
-        const tr =
-            document.createElement("tr");
+    filteredOrders.forEach(
+        order => {
 
-        tr.innerHTML = `
-            <td>
-                <div class="order-main">
-                    <span class="order-number">
-                        #${escapeHtml(shortId(order.id))}
-                    </span>
+            const tr =
+                document.createElement(
+                    "tr"
+                );
 
-                    <span class="order-id">
-                        ${escapeHtml(order.id || "—")}
-                    </span>
-                </div>
-            </td>
 
-            <td>
-                <div class="service-name">
-                    ${escapeHtml(order.service_title || "Untitled Service")}
-                </div>
+            tr.innerHTML = `
 
-                <div class="service-category">
-                    ${escapeHtml(order.category || "Other")}
-                </div>
-            </td>
+                <td>
 
-            <td>
-                ${personHtml(
-                    order.customer_name,
-                    order.customer_email,
-                    order.customer_avatar
-                )}
-            </td>
+                    <div class="order-main">
 
-            <td>
-                ${personHtml(
-                    order.worker_name,
-                    order.worker_email,
-                    order.worker_avatar
-                )}
-            </td>
+                        <span class="order-number">
+                            #${escapeHtml(
+                                shortId(
+                                    order.id
+                                )
+                            )}
+                        </span>
 
-            <td>
-                <span class="amount">
-                    ${formatMoney(order.price, order.currency)}
-                </span>
+                        <span class="order-id">
+                            ${escapeHtml(
+                                order.id ||
+                                "—"
+                            )}
+                        </span>
 
-                <span class="amount-sub">
-                    Fee:
-                    ${formatMoney(
-                        order.platform_fee,
-                        order.currency
+                    </div>
+
+                </td>
+
+
+                <td>
+
+                    <div class="service-name">
+                        ${escapeHtml(
+                            order.service_title ||
+                            "Untitled Service"
+                        )}
+                    </div>
+
+                    <div class="service-category">
+                        ${escapeHtml(
+                            order.category ||
+                            "Other"
+                        )}
+                    </div>
+
+                </td>
+
+
+                <td>
+
+                    ${personHtml(
+                        order.customer_name,
+                        order.customer_email,
+                        order.customer_avatar
                     )}
-                </span>
-            </td>
 
-            <td>
-                ${paymentBadge(order.payment_status)}
-            </td>
+                </td>
 
-            <td>
-                ${statusBadge(order.order_status)}
-            </td>
 
-            <td>
-                <span class="date-cell">
-                    ${formatDate(order.created_at)}
-                </span>
-            </td>
+                <td>
 
-            <td>
-                <button
-                    type="button"
-                    class="view-order-btn"
-                    data-order-id="${escapeHtml(order.id)}"
-                >
-                    View
-                </button>
-            </td>
-        `;
+                    ${personHtml(
+                        order.worker_name,
+                        order.worker_email,
+                        order.worker_avatar
+                    )}
 
-        fragment.appendChild(tr);
-    });
+                </td>
 
-    body.appendChild(fragment);
+
+                <td>
+
+                    <span class="amount">
+
+                        ${formatMoney(
+                            order.price,
+                            order.currency
+                        )}
+
+                    </span>
+
+
+                    <span class="amount-sub">
+
+                        Fee:
+                        ${formatMoney(
+                            order.platform_fee,
+                            order.currency
+                        )}
+
+                    </span>
+
+                </td>
+
+
+                <td>
+
+                    ${paymentBadge(
+                        order.payment_status
+                    )}
+
+                </td>
+
+
+                <td>
+
+                    ${statusBadge(
+                        order.order_status
+                    )}
+
+                </td>
+
+
+                <td>
+
+                    <span class="date-cell">
+
+                        ${formatDate(
+                            order.created_at
+                        )}
+
+                    </span>
+
+                </td>
+
+
+                <td>
+
+                    <button
+                        type="button"
+                        class="view-order-btn"
+                        data-order-id="${escapeHtml(
+                            order.id
+                        )}"
+                    >
+                        View
+                    </button>
+
+                </td>
+
+            `;
+
+
+            fragment.appendChild(
+                tr
+            );
+        }
+    );
+
+
+    body.appendChild(
+        fragment
+    );
+
 
     setText(
         "ordersCount",
-        `${filteredOrders.length} order${filteredOrders.length === 1 ? "" : "s"}`
+        `${filteredOrders.length} order${
+            filteredOrders.length === 1
+                ? ""
+                : "s"
+        }`
     );
 }
 
+
 /* =========================================================
-   DETAILS
+   DETAILS MODAL
 ========================================================= */
 
 function openOrderModal(orderId) {
 
     const order =
         allOrders.find(
-            item => item.id === orderId
+            item =>
+                item.id === orderId
         );
+
 
     if (!order) {
         return;
     }
 
+
     setText(
         "modalOrderTitle",
-        `Order #${shortId(order.id)}`
+        `Order #${shortId(
+            order.id
+        )}`
     );
+
 
     setText(
         "modalOrderId",
         order.id || "—"
     );
 
+
     setText(
         "modalService",
         order.service_title || "—"
     );
+
 
     setText(
         "modalCustomer",
@@ -426,12 +859,14 @@ function openOrderModal(orderId) {
         "—"
     );
 
+
     setText(
         "modalWorker",
         order.worker_name ||
         order.worker_email ||
         "—"
     );
+
 
     setText(
         "modalPrice",
@@ -441,6 +876,7 @@ function openOrderModal(orderId) {
         )
     );
 
+
     setText(
         "modalFee",
         formatMoney(
@@ -448,6 +884,7 @@ function openOrderModal(orderId) {
             order.currency
         )
     );
+
 
     setText(
         "modalWorkerAmount",
@@ -457,64 +894,106 @@ function openOrderModal(orderId) {
         )
     );
 
+
     setText(
         "modalDelivery",
         order.delivery_days
-            ? `${order.delivery_days} day${Number(order.delivery_days) === 1 ? "" : "s"}`
+            ? `${order.delivery_days} day${
+                Number(order.delivery_days) === 1
+                    ? ""
+                    : "s"
+              }`
             : "—"
     );
 
+
     setText(
         "modalCreated",
-        formatDate(order.created_at, true)
+        formatDate(
+            order.created_at,
+            true
+        )
     );
+
 
     setText(
         "modalUpdated",
-        formatDate(order.updated_at, true)
+        formatDate(
+            order.updated_at,
+            true
+        )
     );
+
 
     setText(
         "modalNotes",
-        order.notes || "No notes."
+        order.notes ||
+        "No notes."
     );
+
 
     setText(
         "modalRequirements",
-        order.requirements || "No requirements."
+        order.requirements ||
+        "No requirements."
     );
+
 
     const statusRow =
         document.getElementById(
             "modalStatusRow"
         );
 
+
     if (statusRow) {
+
         statusRow.innerHTML = `
-            ${statusBadge(order.order_status)}
-            ${paymentBadge(order.payment_status)}
+
+            ${statusBadge(
+                order.order_status
+            )}
+
+            ${paymentBadge(
+                order.payment_status
+            )}
+
         `;
     }
 
+
     const modal =
-        document.getElementById("orderModal");
+        document.getElementById(
+            "orderModal"
+        );
+
 
     if (modal) {
+
         modal.hidden = false;
-        document.body.style.overflow = "hidden";
+
+        document.body.style.overflow =
+            "hidden";
     }
 }
+
 
 function closeOrderModal() {
 
     const modal =
-        document.getElementById("orderModal");
+        document.getElementById(
+            "orderModal"
+        );
+
 
     if (modal) {
+
         modal.hidden = true;
-        document.body.style.overflow = "";
+
+        document.body.style.overflow =
+            "";
     }
 }
+
 
 /* =========================================================
    EVENTS
@@ -523,70 +1002,102 @@ function closeOrderModal() {
 function setupEvents() {
 
     document
-        .getElementById("searchInput")
+        .getElementById(
+            "searchInput"
+        )
         ?.addEventListener(
             "input",
             applyFilters
         );
 
+
     document
-        .getElementById("statusFilter")
+        .getElementById(
+            "statusFilter"
+        )
         ?.addEventListener(
             "change",
             applyFilters
         );
 
+
     document
-        .getElementById("paymentFilter")
+        .getElementById(
+            "paymentFilter"
+        )
         ?.addEventListener(
             "change",
             applyFilters
         );
 
+
     document
-        .getElementById("currencyFilter")
+        .getElementById(
+            "currencyFilter"
+        )
         ?.addEventListener(
             "change",
             applyFilters
         );
 
+
     document
-        .getElementById("clearFilters")
+        .getElementById(
+            "clearFilters"
+        )
         ?.addEventListener(
             "click",
             clearFilters
         );
 
-    document
-        .getElementById("refreshBtn")
-        ?.addEventListener(
-            "click",
-            () => window.location.reload()
-        );
 
     document
-        .getElementById("logoutBtn")
+        .getElementById(
+            "refreshBtn"
+        )
+        ?.addEventListener(
+            "click",
+            () =>
+                loadOrders(
+                    window.supabaseClient
+                )
+        );
+
+
+    document
+        .getElementById(
+            "logoutBtn"
+        )
         ?.addEventListener(
             "click",
             logoutAdmin
         );
 
+
     document
-        .getElementById("modalClose")
+        .getElementById(
+            "modalClose"
+        )
         ?.addEventListener(
             "click",
             closeOrderModal
         );
 
+
     document
-        .getElementById("modalBackdrop")
+        .getElementById(
+            "modalBackdrop"
+        )
         ?.addEventListener(
             "click",
             closeOrderModal
         );
 
+
     document
-        .getElementById("ordersBody")
+        .getElementById(
+            "ordersBody"
+        )
         ?.addEventListener(
             "click",
             event => {
@@ -596,9 +1107,11 @@ function setupEvents() {
                         ".view-order-btn"
                     );
 
+
                 if (!button) {
                     return;
                 }
+
 
                 openOrderModal(
                     button.dataset.orderId
@@ -607,27 +1120,60 @@ function setupEvents() {
         );
 }
 
+
+/* =========================================================
+   CLEAR FILTERS
+========================================================= */
+
 function clearFilters() {
 
     const search =
-        document.getElementById("searchInput");
+        document.getElementById(
+            "searchInput"
+        );
+
 
     const status =
-        document.getElementById("statusFilter");
+        document.getElementById(
+            "statusFilter"
+        );
+
 
     const payment =
-        document.getElementById("paymentFilter");
+        document.getElementById(
+            "paymentFilter"
+        );
+
 
     const currency =
-        document.getElementById("currencyFilter");
+        document.getElementById(
+            "currencyFilter"
+        );
 
-    if (search) search.value = "";
-    if (status) status.value = "all";
-    if (payment) payment.value = "all";
-    if (currency) currency.value = "all";
+
+    if (search) {
+        search.value = "";
+    }
+
+
+    if (status) {
+        status.value = "all";
+    }
+
+
+    if (payment) {
+        payment.value = "all";
+    }
+
+
+    if (currency) {
+        currency.value = "all";
+    }
+
 
     applyFilters();
 }
+
 
 /* =========================================================
    SIDEBAR
@@ -636,32 +1182,56 @@ function clearFilters() {
 function setupSidebar() {
 
     const layout =
-        document.getElementById("adminLayout");
+        document.getElementById(
+            "adminLayout"
+        );
+
 
     const toggle =
-        document.getElementById("sidebarToggle");
+        document.getElementById(
+            "sidebarToggle"
+        );
+
 
     const close =
-        document.getElementById("sidebarClose");
+        document.getElementById(
+            "sidebarClose"
+        );
+
 
     const overlay =
-        document.getElementById("sidebarOverlay");
+        document.getElementById(
+            "sidebarOverlay"
+        );
+
 
     toggle?.addEventListener(
         "click",
-        () => layout?.classList.add("sidebar-open")
+        () =>
+            layout?.classList.add(
+                "sidebar-open"
+            )
     );
+
 
     close?.addEventListener(
         "click",
-        () => layout?.classList.remove("sidebar-open")
+        () =>
+            layout?.classList.remove(
+                "sidebar-open"
+            )
     );
+
 
     overlay?.addEventListener(
         "click",
-        () => layout?.classList.remove("sidebar-open")
+        () =>
+            layout?.classList.remove(
+                "sidebar-open"
+            )
     );
 }
+
 
 /* =========================================================
    LOGOUT
@@ -670,56 +1240,115 @@ function setupSidebar() {
 async function logoutAdmin() {
 
     try {
+
         const client =
             window.supabaseClient;
 
+
         if (client) {
+
             await client.auth.signOut();
         }
 
     } finally {
+
         window.location.href =
             "../login.html";
     }
 }
 
+
 /* =========================================================
-   HELPERS
+   STATUS BADGE
 ========================================================= */
 
 function statusBadge(status) {
 
     const value =
-        String(status || "unknown");
+        String(
+            status ||
+            "unknown"
+        );
+
 
     const label =
         value
-            .replaceAll("_", " ")
-            .replace(/\b\w/g, c => c.toUpperCase());
+            .replaceAll(
+                "_",
+                " "
+            )
+            .replace(
+                /\b\w/g,
+                char =>
+                    char.toUpperCase()
+            );
+
 
     return `
-        <span class="status-badge status-${escapeHtml(value)}">
-            ${escapeHtml(label)}
+
+        <span
+            class="status-badge status-${escapeHtml(
+                value
+            )}"
+        >
+
+            ${escapeHtml(
+                label
+            )}
+
         </span>
+
     `;
 }
+
+
+/* =========================================================
+   PAYMENT BADGE
+========================================================= */
 
 function paymentBadge(status) {
 
     const value =
-        String(status || "unknown");
+        String(
+            status ||
+            "unknown"
+        );
+
 
     const label =
         value
-            .replaceAll("_", " ")
-            .replace(/\b\w/g, c => c.toUpperCase());
+            .replaceAll(
+                "_",
+                " "
+            )
+            .replace(
+                /\b\w/g,
+                char =>
+                    char.toUpperCase()
+            );
+
 
     return `
-        <span class="payment-badge payment-${escapeHtml(value)}">
-            ${escapeHtml(label)}
+
+        <span
+            class="payment-badge payment-${escapeHtml(
+                value
+            )}"
+        >
+
+            ${escapeHtml(
+                label
+            )}
+
         </span>
+
     `;
 }
+
+
+/* =========================================================
+   PERSON
+========================================================= */
 
 function personHtml(
     name,
@@ -728,40 +1357,61 @@ function personHtml(
 ) {
 
     const displayName =
-        name || email || "Unknown";
+        name ||
+        email ||
+        "Unknown";
+
 
     const initial =
         displayName
             .charAt(0)
             .toUpperCase();
 
-    const avatarHtml = avatar
-        ? `
-            <img
-                src="${escapeHtml(avatar)}"
-                alt=""
-            >
-        `
-        : initial;
+
+    const avatarHtml =
+        avatar
+            ? `
+                <img
+                    src="${escapeHtml(
+                        avatar
+                    )}"
+                    alt=""
+                >
+            `
+            : initial;
+
 
     return `
+
         <div class="person">
 
             <div class="person-avatar">
+
                 ${avatarHtml}
+
             </div>
+
 
             <div class="person-info">
 
                 <span class="person-name">
-                    ${escapeHtml(displayName)}
+
+                    ${escapeHtml(
+                        displayName
+                    )}
+
                 </span>
+
 
                 ${
                     email
                         ? `
                             <span class="person-email">
-                                ${escapeHtml(email)}
+
+                                ${escapeHtml(
+                                    email
+                                )}
+
                             </span>
                           `
                         : ""
@@ -770,8 +1420,14 @@ function personHtml(
             </div>
 
         </div>
+
     `;
 }
+
+
+/* =========================================================
+   MONEY
+========================================================= */
 
 function formatMoney(
     value,
@@ -779,10 +1435,27 @@ function formatMoney(
 ) {
 
     const amount =
-        Number(value || 0);
+        toSafeNumber(
+            value
+        );
 
-    return `${amount.toFixed(2)} ${currency || "MAD"}`;
+
+    return new Intl.NumberFormat(
+        "en-US",
+        {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }
+    ).format(
+        amount
+    ) +
+    ` ${currency || "MAD"}`;
 }
+
+
+/* =========================================================
+   DATE
+========================================================= */
 
 function formatDate(
     value,
@@ -793,15 +1466,25 @@ function formatDate(
         return "—";
     }
 
+
     const date =
         new Date(value);
 
-    if (Number.isNaN(date.getTime())) {
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
         return "—";
     }
 
+
     return detailed
+
         ? date.toLocaleString()
+
         : date.toLocaleDateString(
             undefined,
             {
@@ -812,44 +1495,174 @@ function formatDate(
         );
 }
 
+
+/* =========================================================
+   SHORT ID
+========================================================= */
+
 function shortId(id) {
 
     if (!id) {
         return "—";
     }
 
-    return id
-        .replaceAll("-", "")
-        .slice(0, 8)
+
+    return String(id)
+        .replaceAll(
+            "-",
+            ""
+        )
+        .slice(
+            0,
+            8
+        )
         .toUpperCase();
 }
 
-function setText(id, value) {
+
+/* =========================================================
+   SET TEXT
+========================================================= */
+
+function setText(
+    id,
+    value
+) {
 
     const element =
-        document.getElementById(id);
+        document.getElementById(
+            id
+        );
+
 
     if (element) {
+
         element.textContent =
             String(value);
     }
 }
 
-function setLoading(value) {
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+function setLoading(
+    value
+) {
 
     const loading =
         document.getElementById(
             "ordersLoading"
         );
 
-    if (loading) {
-        loading.hidden = !value;
+
+    if (!loading) {
+
+        console.warn(
+            "NOVA: #ordersLoading not found."
+        );
+
+        return;
+    }
+
+
+    if (value) {
+
+        loading.hidden =
+            false;
+
+        loading.classList.remove(
+            "hidden"
+        );
+
+        loading.style.setProperty(
+            "display",
+            "flex",
+            "important"
+        );
+
+
+    } else {
+
+        loading.hidden =
+            true;
+
+        loading.classList.add(
+            "hidden"
+        );
+
+        loading.style.setProperty(
+            "display",
+            "none",
+            "important"
+        );
     }
 }
 
+
+/*
+ * Extra hard force-hide.
+ */
+function hideLoadingForce() {
+
+    const loading =
+        document.getElementById(
+            "ordersLoading"
+        );
+
+
+    if (!loading) {
+        return;
+    }
+
+
+    loading.hidden =
+        true;
+
+
+    loading.classList.add(
+        "hidden"
+    );
+
+
+    loading.style.setProperty(
+        "display",
+        "none",
+        "important"
+    );
+
+
+    loading.style.setProperty(
+        "visibility",
+        "hidden",
+        "important"
+    );
+
+
+    loading.style.setProperty(
+        "opacity",
+        "0",
+        "important"
+    );
+
+
+    loading.style.setProperty(
+        "pointer-events",
+        "none",
+        "important"
+    );
+}
+
+
+/* =========================================================
+   ALERT
+========================================================= */
+
 function showAlert(
     message,
-    type = "error"
+    type = "error",
+    silent = false
 ) {
 
     const alert =
@@ -857,33 +1670,95 @@ function showAlert(
             "ordersAlert"
         );
 
+
     if (!alert) {
         return;
     }
 
-    alert.hidden = false;
+
+    if (silent) {
+
+        alert.hidden =
+            true;
+
+        alert.textContent =
+            "";
+
+        return;
+    }
+
+
+    if (!message) {
+
+        alert.hidden =
+            true;
+
+        return;
+    }
+
+
+    alert.hidden =
+        false;
+
+
     alert.className =
         `orders-alert ${type}`;
 
+
     alert.textContent =
         message;
+
 
     clearTimeout(
         window.novaOrdersAlertTimer
     );
 
+
     window.novaOrdersAlertTimer =
-        setTimeout(() => {
-            alert.hidden = true;
-        }, 5000);
+        setTimeout(
+            () => {
+
+                alert.hidden =
+                    true;
+
+            },
+            5000
+        );
 }
+
+
+/* =========================================================
+   ESCAPE
+========================================================= */
 
 function escapeHtml(value) {
 
-    return String(value ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+    return String(
+        value ?? ""
+    )
+
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
+
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
+
+        .replaceAll(
+            "'",
+            "&#039;"
+        );
 }
