@@ -165,14 +165,12 @@ function applyAdminProfile(profile) {
 
 
     if (name) {
-
         name.textContent =
             fullName;
     }
 
 
     if (email) {
-
         email.textContent =
             profile.email || "";
     }
@@ -227,13 +225,6 @@ async function loadOrders(client) {
 
     setLoading(true);
 
-    showAlert(
-        "",
-        "info",
-        true
-    );
-
-
     try {
 
         console.log(
@@ -261,19 +252,16 @@ async function loadOrders(client) {
                 : [];
 
 
-        console.log(
-            "NOVA: admin orders loaded:",
-            allOrders.length
-        );
-
-
-        /*
-         * Normalize numeric values.
-         */
         allOrders =
             allOrders.map(
                 normalizeOrder
             );
+
+
+        console.log(
+            "NOVA: admin orders loaded:",
+            allOrders.length
+        );
 
 
         updateStats();
@@ -306,37 +294,30 @@ async function loadOrders(client) {
 
     } finally {
 
-        /*
-         * IMPORTANT:
-         * Force the loading overlay OFF.
-         *
-         * This works even when CSS contains
-         * display:flex / display:block !important.
-         */
         setLoading(false);
 
-
-        /*
-         * Extra safety after rendering.
-         */
         hideLoadingForce();
     }
 }
 
 
 /* =========================================================
-   NORMALIZE ORDER
+   NORMALIZE
 ========================================================= */
 
 function normalizeOrder(order) {
 
-    if (!order || typeof order !== "object") {
+    if (
+        !order ||
+        typeof order !== "object"
+    ) {
 
         return {};
     }
 
 
-    const normalized = {
+    return {
+
         ...order,
 
         price:
@@ -359,15 +340,8 @@ function normalizeOrder(order) {
                 order.delivery_days
             )
     };
-
-
-    return normalized;
 }
 
-
-/* =========================================================
-   SAFE NUMBER
-========================================================= */
 
 function toSafeNumber(value) {
 
@@ -385,15 +359,9 @@ function toSafeNumber(value) {
         Number(value);
 
 
-    if (
-        !Number.isFinite(number)
-    ) {
-
-        return 0;
-    }
-
-
-    return number;
+    return Number.isFinite(number)
+        ? number
+        : 0;
 }
 
 
@@ -444,17 +412,11 @@ function applyFilters() {
                 const searchText = [
 
                     order.id,
-
                     order.service_title,
-
                     order.service_slug,
-
                     order.customer_name,
-
                     order.customer_email,
-
                     order.worker_name,
-
                     order.worker_email
 
                 ]
@@ -463,36 +425,34 @@ function applyFilters() {
                     .toLowerCase();
 
 
-                const matchesSearch =
-                    !search ||
-                    searchText.includes(
-                        search
-                    );
-
-
-                const matchesStatus =
-                    status === "all" ||
-                    order.order_status ===
-                    status;
-
-
-                const matchesPayment =
-                    payment === "all" ||
-                    order.payment_status ===
-                    payment;
-
-
-                const matchesCurrency =
-                    currency === "all" ||
-                    order.currency ===
-                    currency;
-
-
                 return (
-                    matchesSearch &&
-                    matchesStatus &&
-                    matchesPayment &&
-                    matchesCurrency
+
+                    (
+                        !search ||
+                        searchText.includes(search)
+                    )
+
+                    &&
+
+                    (
+                        status === "all" ||
+                        order.order_status === status
+                    )
+
+                    &&
+
+                    (
+                        payment === "all" ||
+                        order.payment_status === payment
+                    )
+
+                    &&
+
+                    (
+                        currency === "all" ||
+                        order.currency === currency
+                    )
+
                 );
             }
         );
@@ -515,41 +475,31 @@ function updateStats() {
     const pending =
         allOrders.filter(
             order =>
-                order.order_status ===
-                "pending"
+                order.order_status === "pending"
         ).length;
 
 
     const progress =
         allOrders.filter(
             order =>
-                order.order_status ===
-                "accepted" ||
-
-                order.order_status ===
-                "in_progress" ||
-
-                order.order_status ===
-                "delivered"
+                order.order_status === "accepted" ||
+                order.order_status === "in_progress" ||
+                order.order_status === "delivered"
         ).length;
 
 
     const completed =
         allOrders.filter(
             order =>
-                order.order_status ===
-                "completed"
+                order.order_status === "completed"
         ).length;
 
 
     const cancelled =
         allOrders.filter(
             order =>
-                order.order_status ===
-                "cancelled" ||
-
-                order.order_status ===
-                "rejected"
+                order.order_status === "cancelled" ||
+                order.order_status === "rejected"
         ).length;
 
 
@@ -558,24 +508,20 @@ function updateStats() {
         total
     );
 
-
     setText(
         "pendingOrders",
         pending
     );
-
 
     setText(
         "progressOrders",
         progress
     );
 
-
     setText(
         "completedOrders",
         completed
     );
-
 
     setText(
         "cancelledOrders",
@@ -585,7 +531,7 @@ function updateStats() {
 
 
 /* =========================================================
-   RENDER
+   RENDER ORDERS
 ========================================================= */
 
 function renderOrders() {
@@ -627,13 +573,11 @@ function renderOrders() {
             "0 orders"
         );
 
-
         return;
     }
 
 
     if (empty) {
-
         empty.hidden = true;
     }
 
@@ -651,6 +595,68 @@ function renderOrders() {
                 );
 
 
+            const isPending =
+                order.order_status === "pending";
+
+
+            const actionsHtml =
+                isPending
+
+                    ? `
+                        <div class="order-actions">
+
+                            <button
+                                type="button"
+                                class="view-order-btn"
+                                data-order-id="${escapeHtml(
+                                    order.id
+                                )}"
+                            >
+                                View
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="accept-order-btn"
+                                data-order-id="${escapeHtml(
+                                    order.id
+                                )}"
+                            >
+                                ✓ Accept
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="reject-order-btn"
+                                data-order-id="${escapeHtml(
+                                    order.id
+                                )}"
+                            >
+                                × Reject
+                            </button>
+
+                        </div>
+                    `
+
+                    : `
+                        <div class="order-actions">
+
+                            <button
+                                type="button"
+                                class="view-order-btn"
+                                data-order-id="${escapeHtml(
+                                    order.id
+                                )}"
+                            >
+                                View
+                            </button>
+
+                        </div>
+                    `;
+
+
             tr.innerHTML = `
 
                 <td>
@@ -658,18 +664,19 @@ function renderOrders() {
                     <div class="order-main">
 
                         <span class="order-number">
+
                             #${escapeHtml(
-                                shortId(
-                                    order.id
-                                )
+                                shortId(order.id)
                             )}
+
                         </span>
 
                         <span class="order-id">
+
                             ${escapeHtml(
-                                order.id ||
-                                "—"
+                                order.id || "—"
                             )}
+
                         </span>
 
                     </div>
@@ -680,17 +687,21 @@ function renderOrders() {
                 <td>
 
                     <div class="service-name">
+
                         ${escapeHtml(
                             order.service_title ||
                             "Untitled Service"
                         )}
+
                     </div>
 
                     <div class="service-category">
+
                         ${escapeHtml(
                             order.category ||
                             "Other"
                         )}
+
                     </div>
 
                 </td>
@@ -776,15 +787,7 @@ function renderOrders() {
 
                 <td>
 
-                    <button
-                        type="button"
-                        class="view-order-btn"
-                        data-order-id="${escapeHtml(
-                            order.id
-                        )}"
-                    >
-                        View
-                    </button>
+                    ${actionsHtml}
 
                 </td>
 
@@ -815,7 +818,225 @@ function renderOrders() {
 
 
 /* =========================================================
-   DETAILS MODAL
+   ORDER ACTIONS
+========================================================= */
+
+async function acceptOrder(orderId) {
+
+    if (!orderId) {
+        return;
+    }
+
+
+    const confirmed =
+        window.confirm(
+            "Accept this order?"
+        );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    const client =
+        window.supabaseClient;
+
+
+    if (!client) {
+
+        showAlert(
+            "Supabase is not configured.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    const buttons =
+        document.querySelectorAll(
+            `[data-order-id="${CSS.escape(orderId)}"]`
+        );
+
+
+    buttons.forEach(
+        button => {
+            button.disabled = true;
+        }
+    );
+
+
+    try {
+
+        const {
+            data,
+            error
+        } =
+            await client.rpc(
+                "admin_accept_order",
+                {
+                    p_order_id:
+                        orderId
+                }
+            );
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        console.log(
+            "NOVA: order accepted:",
+            data
+        );
+
+
+        showAlert(
+            "Order accepted successfully.",
+            "success"
+        );
+
+
+        await loadOrders(
+            client
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "NOVA accept order error:",
+            error
+        );
+
+
+        showAlert(
+            error.message ||
+            "Could not accept order.",
+            "error"
+        );
+
+
+        buttons.forEach(
+            button => {
+                button.disabled = false;
+            }
+        );
+    }
+}
+
+
+async function rejectOrder(orderId) {
+
+    if (!orderId) {
+        return;
+    }
+
+
+    const confirmed =
+        window.confirm(
+            "Are you sure you want to reject this order?"
+        );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    const client =
+        window.supabaseClient;
+
+
+    if (!client) {
+
+        showAlert(
+            "Supabase is not configured.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    const buttons =
+        document.querySelectorAll(
+            `[data-order-id="${CSS.escape(orderId)}"]`
+        );
+
+
+    buttons.forEach(
+        button => {
+            button.disabled = true;
+        }
+    );
+
+
+    try {
+
+        const {
+            data,
+            error
+        } =
+            await client.rpc(
+                "admin_reject_order",
+                {
+                    p_order_id:
+                        orderId
+                }
+            );
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        console.log(
+            "NOVA: order rejected:",
+            data
+        );
+
+
+        showAlert(
+            "Order rejected successfully.",
+            "success"
+        );
+
+
+        await loadOrders(
+            client
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "NOVA reject order error:",
+            error
+        );
+
+
+        showAlert(
+            error.message ||
+            "Could not reject order.",
+            "error"
+        );
+
+
+        buttons.forEach(
+            button => {
+                button.disabled = false;
+            }
+        );
+    }
+}
+
+
+/* =========================================================
+   ORDER MODAL
 ========================================================= */
 
 function openOrderModal(orderId) {
@@ -969,11 +1190,133 @@ function openOrderModal(orderId) {
 
     if (modal) {
 
-        modal.hidden = false;
+        modal.hidden =
+            false;
 
         document.body.style.overflow =
             "hidden";
     }
+
+
+    /*
+     * Modal actions
+     */
+    setupModalOrderActions(
+        order
+    );
+}
+
+
+/* =========================================================
+   MODAL ACTIONS
+========================================================= */
+
+function setupModalOrderActions(order) {
+
+    const container =
+        document.getElementById(
+            "modalStatusRow"
+        );
+
+
+    if (!container) {
+        return;
+    }
+
+
+    /*
+     * Remove old modal action buttons
+     */
+    const oldActions =
+        document.getElementById(
+            "modalOrderActions"
+        );
+
+
+    if (oldActions) {
+        oldActions.remove();
+    }
+
+
+    if (
+        order.order_status !== "pending"
+    ) {
+        return;
+    }
+
+
+    const actions =
+        document.createElement(
+            "div"
+        );
+
+
+    actions.id =
+        "modalOrderActions";
+
+    actions.className =
+        "order-modal-actions";
+
+
+    actions.innerHTML = `
+
+        <button
+            type="button"
+            id="modalAcceptOrder"
+            class="accept-order-btn"
+        >
+            ✓ Accept Order
+        </button>
+
+
+        <button
+            type="button"
+            id="modalRejectOrder"
+            class="reject-order-btn"
+        >
+            × Reject Order
+        </button>
+
+    `;
+
+
+    container.parentElement?.appendChild(
+        actions
+    );
+
+
+    document
+        .getElementById(
+            "modalAcceptOrder"
+        )
+        ?.addEventListener(
+            "click",
+            async () => {
+
+                await acceptOrder(
+                    order.id
+                );
+
+                closeOrderModal();
+            }
+        );
+
+
+    document
+        .getElementById(
+            "modalRejectOrder"
+        )
+        ?.addEventListener(
+            "click",
+            async () => {
+
+                await rejectOrder(
+                    order.id
+                );
+
+                closeOrderModal();
+            }
+        );
 }
 
 
@@ -987,7 +1330,8 @@ function closeOrderModal() {
 
     if (modal) {
 
-        modal.hidden = true;
+        modal.hidden =
+            true;
 
         document.body.style.overflow =
             "";
@@ -1090,7 +1434,16 @@ function setupEvents() {
         )
         ?.addEventListener(
             "click",
-            closeOrderModal
+            event => {
+
+                if (
+                    event.target ===
+                    event.currentTarget
+                ) {
+
+                    closeOrderModal();
+                }
+            }
         );
 
 
@@ -1100,22 +1453,52 @@ function setupEvents() {
         )
         ?.addEventListener(
             "click",
-            event => {
+            async event => {
 
-                const button =
+                const viewButton =
                     event.target.closest(
                         ".view-order-btn"
                     );
 
 
-                if (!button) {
+                if (viewButton) {
+
+                    openOrderModal(
+                        viewButton.dataset.orderId
+                    );
+
                     return;
                 }
 
 
-                openOrderModal(
-                    button.dataset.orderId
-                );
+                const acceptButton =
+                    event.target.closest(
+                        ".accept-order-btn"
+                    );
+
+
+                if (acceptButton) {
+
+                    await acceptOrder(
+                        acceptButton.dataset.orderId
+                    );
+
+                    return;
+                }
+
+
+                const rejectButton =
+                    event.target.closest(
+                        ".reject-order-btn"
+                    );
+
+
+                if (rejectButton) {
+
+                    await rejectOrder(
+                        rejectButton.dataset.orderId
+                    );
+                }
             }
         );
 }
@@ -1246,7 +1629,6 @@ async function logoutAdmin() {
 
 
         if (client) {
-
             await client.auth.signOut();
         }
 
@@ -1370,6 +1752,7 @@ function personHtml(
 
     const avatarHtml =
         avatar
+
             ? `
                 <img
                     src="${escapeHtml(
@@ -1377,7 +1760,8 @@ function personHtml(
                     )}"
                     alt=""
                 >
-            `
+              `
+
             : initial;
 
 
@@ -1405,6 +1789,7 @@ function personHtml(
 
                 ${
                     email
+
                         ? `
                             <span class="person-email">
 
@@ -1414,6 +1799,7 @@ function personHtml(
 
                             </span>
                           `
+
                         : ""
                 }
 
@@ -1508,14 +1894,8 @@ function shortId(id) {
 
 
     return String(id)
-        .replaceAll(
-            "-",
-            ""
-        )
-        .slice(
-            0,
-            8
-        )
+        .replaceAll("-", "")
+        .slice(0, 8)
         .toUpperCase();
 }
 
@@ -1547,9 +1927,7 @@ function setText(
    LOADING
 ========================================================= */
 
-function setLoading(
-    value
-) {
+function setLoading(value) {
 
     const loading =
         document.getElementById(
@@ -1558,11 +1936,6 @@ function setLoading(
 
 
     if (!loading) {
-
-        console.warn(
-            "NOVA: #ordersLoading not found."
-        );
-
         return;
     }
 
@@ -1582,7 +1955,6 @@ function setLoading(
             "important"
         );
 
-
     } else {
 
         loading.hidden =
@@ -1601,9 +1973,6 @@ function setLoading(
 }
 
 
-/*
- * Extra hard force-hide.
- */
 function hideLoadingForce() {
 
     const loading =
@@ -1676,22 +2045,13 @@ function showAlert(
     }
 
 
-    if (silent) {
+    if (silent || !message) {
 
         alert.hidden =
             true;
 
         alert.textContent =
             "";
-
-        return;
-    }
-
-
-    if (!message) {
-
-        alert.hidden =
-            true;
 
         return;
     }
@@ -1728,7 +2088,7 @@ function showAlert(
 
 
 /* =========================================================
-   ESCAPE
+   ESCAPE HTML
 ========================================================= */
 
 function escapeHtml(value) {
