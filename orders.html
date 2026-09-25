@@ -9,11 +9,11 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>NOVA MARKET — My Orders</title>
+    <title>NOVA MARKET — Worker Orders</title>
 
     <meta
         name="description"
-        content="View and manage your NOVA MARKET orders."
+        content="Manage customer orders as a NOVA MARKET worker."
     >
 
     <link
@@ -35,9 +35,10 @@
     <style>
 
         :root {
+
             --bg: #05060a;
-            --bg-soft: #090c14;
             --card: #0d121d;
+            --card-soft: rgba(255,255,255,.025);
 
             --border: rgba(255,255,255,.08);
 
@@ -47,6 +48,7 @@
 
             --blue: #536dff;
             --purple: #8b5cf6;
+
             --green: #2bd98b;
             --yellow: #f5c451;
             --red: #ff5c7a;
@@ -57,8 +59,10 @@
 
 
         * {
+
             margin: 0;
             padding: 0;
+
             box-sizing: border-box;
         }
 
@@ -72,7 +76,9 @@
 
             min-height: 100vh;
 
-            font-family: "Inter", sans-serif;
+            font-family:
+                "Inter",
+                sans-serif;
 
             color: var(--text);
 
@@ -132,7 +138,6 @@
 
 
         button,
-        input,
         select {
             font-family: inherit;
         }
@@ -166,7 +171,7 @@
 
             justify-content: space-between;
 
-            gap: 20px;
+            gap: 18px;
 
             border-bottom:
                 1px solid
@@ -239,7 +244,7 @@
         }
 
 
-        .nav-link {
+        .nav-btn {
 
             padding:
                 10px 13px;
@@ -247,21 +252,24 @@
             border:
                 1px solid var(--border);
 
-            border-radius: 11px;
+            border-radius:
+                11px;
 
             color:
                 var(--text-soft);
 
-            font-size: 11px;
+            font-size:
+                11px;
 
-            font-weight: 600;
+            font-weight:
+                600;
 
             transition:
                 .2s ease;
         }
 
 
-        .nav-link:hover {
+        .nav-btn:hover {
 
             color: white;
 
@@ -274,10 +282,10 @@
            HEADER
         ========================================= */
 
-        .page-header {
+        .header {
 
             padding:
-                48px 0 30px;
+                48px 0 27px;
         }
 
 
@@ -293,17 +301,19 @@
                 12px;
 
             color:
-                #92a0ff;
+                #93a0ff;
 
-            font-size: 10px;
+            font-size:
+                10px;
 
-            font-weight: 700;
+            font-weight:
+                700;
 
             text-transform:
                 uppercase;
 
             letter-spacing:
-                1.3px;
+                1.25px;
         }
 
 
@@ -311,10 +321,14 @@
 
             content: "";
 
-            width: 7px;
-            height: 7px;
+            width:
+                7px;
 
-            border-radius: 50%;
+            height:
+                7px;
+
+            border-radius:
+                50%;
 
             background:
                 var(--blue);
@@ -325,7 +339,7 @@
         }
 
 
-        .page-header h1 {
+        .header h1 {
 
             font-size:
                 clamp(
@@ -335,20 +349,20 @@
                 );
 
             line-height:
-                1.05;
+                1.04;
 
             letter-spacing:
-                -1.8px;
+                -1.7px;
 
             margin-bottom:
-                12px;
+                11px;
         }
 
 
-        .page-header p {
+        .header p {
 
             max-width:
-                720px;
+                730px;
 
             color:
                 var(--text-muted);
@@ -375,28 +389,34 @@
             justify-content:
                 space-between;
 
-            gap: 15px;
+            gap:
+                12px;
 
             margin-bottom:
-                22px;
+                18px;
         }
 
 
-        .filters {
+        .toolbar-left {
 
-            display: flex;
+            display:
+                flex;
 
             align-items:
                 center;
 
-            gap: 9px;
+            gap:
+                9px;
         }
 
 
         .filter {
 
+            min-width:
+                150px;
+
             padding:
-                10px 13px;
+                10px 12px;
 
             border:
                 1px solid var(--border);
@@ -404,18 +424,25 @@
             border-radius:
                 11px;
 
+            outline:
+                none;
+
             background:
                 rgba(255,255,255,.025);
 
             color:
-                var(--text-soft);
-
-            outline: none;
-
-            cursor: pointer;
+                #d4dbea;
 
             font-size:
                 11px;
+
+            cursor:
+                pointer;
+        }
+
+
+        .filter option {
+            color: #111;
         }
 
 
@@ -434,7 +461,7 @@
                 rgba(255,255,255,.025);
 
             color:
-                #ced5e5;
+                #d4dbea;
 
             cursor:
                 pointer;
@@ -452,10 +479,21 @@
 
         .refresh-btn:hover {
 
-            color: white;
+            color:
+                white;
 
             border-color:
                 rgba(83,109,255,.35);
+        }
+
+
+        .refresh-btn:disabled {
+
+            opacity:
+                .55;
+
+            cursor:
+                not-allowed;
         }
 
 
@@ -465,22 +503,24 @@
 
         .stats {
 
-            display: grid;
+            display:
+                grid;
 
             grid-template-columns:
-                repeat(4,1fr);
+                repeat(5,1fr);
 
-            gap: 12px;
+            gap:
+                11px;
 
             margin-bottom:
-                22px;
+                20px;
         }
 
 
         .stat {
 
             padding:
-                18px;
+                17px;
 
             border:
                 1px solid var(--border);
@@ -499,7 +539,7 @@
                 var(--text-muted);
 
             font-size:
-                9px;
+                8px;
 
             text-transform:
                 uppercase;
@@ -508,14 +548,14 @@
                 1px;
 
             margin-bottom:
-                9px;
+                8px;
         }
 
 
         .stat-value {
 
             font-size:
-                24px;
+                23px;
 
             font-weight:
                 800;
@@ -523,7 +563,7 @@
 
 
         /* =========================================
-           ORDERS LIST
+           ORDERS
         ========================================= */
 
         .orders-list {
@@ -542,14 +582,14 @@
                 grid;
 
             grid-template-columns:
-                minmax(0, 1fr)
-                auto;
+                minmax(0,1fr)
+                185px;
 
             gap:
-                20px;
+                18px;
 
             padding:
-                21px;
+                20px;
 
             border:
                 1px solid var(--border);
@@ -579,14 +619,14 @@
         }
 
 
-        .order-main {
+        .main {
 
             min-width:
                 0;
         }
 
 
-        .order-top {
+        .top {
 
             display:
                 flex;
@@ -605,23 +645,16 @@
         }
 
 
-        .service-info {
-
-            min-width:
-                0;
-        }
-
-
         .service-category {
 
             display:
                 inline-flex;
 
-            margin-bottom:
-                8px;
-
             padding:
                 5px 8px;
+
+            margin-bottom:
+                8px;
 
             border-radius:
                 999px;
@@ -649,7 +682,7 @@
                 1.35;
 
             margin-bottom:
-                6px;
+                5px;
         }
 
 
@@ -679,7 +712,7 @@
                 center;
 
             gap:
-                7px;
+                6px;
 
             flex:
                 0 0 auto;
@@ -695,9 +728,6 @@
 
             font-weight:
                 700;
-
-            text-transform:
-                capitalize;
         }
 
 
@@ -719,62 +749,62 @@
 
         .status-pending {
 
-            background:
-                rgba(245,196,81,.09);
-
             color:
                 var(--yellow);
+
+            background:
+                rgba(245,196,81,.09);
         }
 
 
         .status-accepted {
 
-            background:
-                rgba(81,216,255,.09);
-
             color:
                 var(--cyan);
+
+            background:
+                rgba(81,216,255,.09);
         }
 
 
         .status-in_progress {
 
+            color:
+                #8e9cff;
+
             background:
                 rgba(83,109,255,.09);
-
-            color:
-                #8999ff;
         }
 
 
         .status-delivered {
 
-            background:
-                rgba(139,92,246,.10);
-
             color:
-                #ae8aff;
+                #b291ff;
+
+            background:
+                rgba(139,92,246,.09);
         }
 
 
         .status-completed {
 
-            background:
-                rgba(43,217,139,.09);
-
             color:
                 var(--green);
+
+            background:
+                rgba(43,217,139,.09);
         }
 
 
         .status-cancelled,
         .status-rejected {
 
-            background:
-                rgba(255,92,122,.09);
-
             color:
                 var(--red);
+
+            background:
+                rgba(255,92,122,.09);
         }
 
 
@@ -782,7 +812,7 @@
            DETAILS
         ========================================= */
 
-        .details-grid {
+        .details {
 
             display:
                 grid;
@@ -811,7 +841,7 @@
         }
 
 
-        .detail-label {
+        .label {
 
             color:
                 var(--text-muted);
@@ -824,10 +854,10 @@
         }
 
 
-        .detail-value {
+        .value {
 
             color:
-                #e9edf6;
+                #e8edf7;
 
             font-size:
                 11px;
@@ -847,10 +877,10 @@
 
 
         /* =========================================
-           WORKER
+           CUSTOMER
         ========================================= */
 
-        .worker-mini {
+        .customer {
 
             display:
                 flex;
@@ -866,16 +896,16 @@
         }
 
 
-        .worker-avatar {
+        .customer-avatar {
 
             width:
-                29px;
+                30px;
 
             height:
-                29px;
+                30px;
 
             flex:
-                0 0 29px;
+                0 0 30px;
 
             display:
                 flex;
@@ -910,7 +940,7 @@
         }
 
 
-        .worker-avatar img {
+        .customer-avatar img {
 
             width:
                 100%;
@@ -923,19 +953,7 @@
         }
 
 
-        .worker-name {
-
-            max-width:
-                200px;
-
-            overflow:
-                hidden;
-
-            text-overflow:
-                ellipsis;
-
-            white-space:
-                nowrap;
+        .customer-name {
 
             color:
                 #c2cadb;
@@ -952,10 +970,7 @@
            ACTIONS
         ========================================= */
 
-        .order-actions {
-
-            min-width:
-                150px;
+        .actions {
 
             display:
                 flex;
@@ -967,17 +982,17 @@
                 center;
 
             gap:
-                9px;
+                8px;
         }
 
 
-        .action-btn {
+        .action {
 
             width:
                 100%;
 
             padding:
-                11px 13px;
+                11px 12px;
 
             border:
                 1px solid var(--border);
@@ -992,7 +1007,7 @@
                 rgba(255,255,255,.025);
 
             color:
-                #d3d9e6;
+                #d5dbea;
 
             font-size:
                 10px;
@@ -1005,40 +1020,69 @@
         }
 
 
-        .action-btn:hover {
-
-            border-color:
-                rgba(83,109,255,.3);
+        .action:hover {
 
             color:
                 white;
+
+            border-color:
+                rgba(83,109,255,.32);
         }
 
 
-        .cancel-btn {
+        .accept {
 
             border-color:
-                rgba(255,92,122,.16);
+                rgba(43,217,139,.18);
 
             color:
-                #ff8ba0;
+                #76e9b5;
+
+            background:
+                rgba(43,217,139,.045);
+        }
+
+
+        .reject {
+
+            border-color:
+                rgba(255,92,122,.18);
+
+            color:
+                #ff91a3;
 
             background:
                 rgba(255,92,122,.045);
         }
 
 
-        .cancel-btn:hover {
+        .start {
 
             border-color:
-                rgba(255,92,122,.35);
+                rgba(81,216,255,.18);
+
+            color:
+                #76def8;
 
             background:
-                rgba(255,92,122,.08);
+                rgba(81,216,255,.045);
         }
 
 
-        .cancel-btn:disabled {
+        .deliver {
+
+            border-color:
+                rgba(139,92,246,.18);
+
+            color:
+                #b795ff;
+
+            background:
+                rgba(139,92,246,.045);
+        }
+
+
+        .action:disabled {
 
             opacity:
                 .5;
@@ -1049,7 +1093,7 @@
 
 
         /* =========================================
-           EMPTY / LOADING
+           STATE
         ========================================= */
 
         .state {
@@ -1079,9 +1123,6 @@
             height:
                 58px;
 
-            margin:
-                0 auto 16px;
-
             display:
                 flex;
 
@@ -1091,6 +1132,9 @@
             justify-content:
                 center;
 
+            margin:
+                0 auto 16px;
+
             border-radius:
                 18px;
 
@@ -1098,10 +1142,10 @@
                 rgba(83,109,255,.08);
 
             color:
-                #8d9cff;
+                #8b99ff;
 
             font-size:
-                24px;
+                22px;
 
             font-weight:
                 800;
@@ -1173,6 +1217,191 @@
 
 
         /* =========================================
+           MODAL
+        ========================================= */
+
+        .modal {
+
+            position:
+                fixed;
+
+            inset:
+                0;
+
+            z-index:
+                1000;
+
+            display:
+                none;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
+
+            padding:
+                20px;
+
+            background:
+                rgba(0,0,0,.72);
+
+            backdrop-filter:
+                blur(8px);
+        }
+
+
+        .modal.show {
+
+            display:
+                flex;
+        }
+
+
+        .modal-card {
+
+            width:
+                min(
+                    700px,
+                    100%
+                );
+
+            max-height:
+                90vh;
+
+            overflow:
+                auto;
+
+            padding:
+                25px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius:
+                22px;
+
+            background:
+                #0c111b;
+
+            box-shadow:
+                0 40px 120px
+                rgba(0,0,0,.6);
+        }
+
+
+        .modal-head {
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                space-between;
+
+            gap:
+                15px;
+
+            margin-bottom:
+                22px;
+        }
+
+
+        .modal-head h2 {
+
+            font-size:
+                19px;
+        }
+
+
+        .close-btn {
+
+            width:
+                34px;
+
+            height:
+                34px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius:
+                10px;
+
+            background:
+                rgba(255,255,255,.03);
+
+            color:
+                #d7ddea;
+
+            cursor:
+                pointer;
+
+            font-size:
+                16px;
+        }
+
+
+        .modal-section {
+
+            margin-bottom:
+                18px;
+        }
+
+
+        .modal-label {
+
+            color:
+                var(--text-muted);
+
+            font-size:
+                9px;
+
+            text-transform:
+                uppercase;
+
+            letter-spacing:
+                1px;
+
+            margin-bottom:
+                7px;
+        }
+
+
+        .modal-value {
+
+            color:
+                #e9edf6;
+
+            font-size:
+                12px;
+
+            line-height:
+                1.75;
+
+            white-space:
+                pre-wrap;
+
+            word-break:
+                break-word;
+
+            padding:
+                13px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius:
+                12px;
+
+            background:
+                rgba(255,255,255,.02);
+        }
+
+
+        /* =========================================
            TOAST
         ========================================= */
 
@@ -1188,10 +1417,13 @@
                 22px;
 
             z-index:
-                999;
+                1200;
 
             min-width:
                 280px;
+
+            max-width:
+                calc(100% - 24px);
 
             padding:
                 14px 17px;
@@ -1207,9 +1439,6 @@
 
             backdrop-filter:
                 blur(18px);
-
-            box-shadow:
-                0 25px 60px rgba(0,0,0,.4);
 
             color:
                 white;
@@ -1251,24 +1480,17 @@
            RESPONSIVE
         ========================================= */
 
-        @media (max-width: 1000px) {
+        @media (max-width: 1100px) {
 
             .stats {
 
                 grid-template-columns:
-                    repeat(2,1fr);
-            }
-
-
-            .details-grid {
-
-                grid-template-columns:
-                    repeat(2,1fr);
+                    repeat(3,1fr);
             }
         }
 
 
-        @media (max-width: 800px) {
+        @media (max-width: 900px) {
 
             .order-card {
 
@@ -1277,18 +1499,14 @@
             }
 
 
-            .order-actions {
-
-                min-width:
-                    0;
+            .actions {
 
                 flex-direction:
                     row;
             }
 
 
-            .order-actions
-            .action-btn {
+            .actions .action {
 
                 flex:
                     1;
@@ -1296,7 +1514,7 @@
         }
 
 
-        @media (max-width: 600px) {
+        @media (max-width: 700px) {
 
             .container {
 
@@ -1305,14 +1523,14 @@
             }
 
 
-            .nav-link {
+            .nav-btn {
 
                 display:
                     none;
             }
 
 
-            .page-header {
+            .header {
 
                 padding-top:
                     35px;
@@ -1329,7 +1547,7 @@
             }
 
 
-            .filters {
+            .toolbar-left {
 
                 width:
                     100%;
@@ -1350,24 +1568,34 @@
             }
 
 
-            .order-top {
+            .top {
 
                 flex-direction:
                     column;
             }
 
 
-            .details-grid {
+            .details {
 
                 grid-template-columns:
-                    1fr 1fr;
+                    repeat(2,1fr);
             }
 
 
-            .order-actions {
+            .actions {
 
                 flex-direction:
                     column;
+            }
+        }
+
+
+        @media (max-width: 450px) {
+
+            .details {
+
+                grid-template-columns:
+                    1fr;
             }
         }
 
@@ -1403,16 +1631,16 @@
             <div class="nav-actions">
 
                 <a
-                    href="../services.html"
-                    class="nav-link"
+                    href="../worker-services.html"
+                    class="nav-btn"
                 >
-                    Services
+                    My Services
                 </a>
 
 
                 <a
                     href="../dashboard.html"
-                    class="nav-link"
+                    class="nav-btn"
                 >
                     Dashboard
                 </a>
@@ -1424,19 +1652,21 @@
 
         <!-- HEADER -->
 
-        <section class="page-header">
+        <section class="header">
 
             <div class="eyebrow">
-                Customer Dashboard
+                Worker Dashboard
             </div>
 
+
             <h1>
-                My Orders
+                Customer Orders
             </h1>
 
+
             <p>
-                Track your services, workers, prices,
-                delivery times and order status from one place.
+                Manage incoming orders, accept projects,
+                start work and deliver completed services.
             </p>
 
         </section>
@@ -1446,7 +1676,7 @@
 
         <div class="toolbar">
 
-            <div class="filters">
+            <div class="toolbar-left">
 
                 <select
                     id="statusFilter"
@@ -1477,12 +1707,12 @@
                         Completed
                     </option>
 
-                    <option value="cancelled">
-                        Cancelled
-                    </option>
-
                     <option value="rejected">
                         Rejected
+                    </option>
+
+                    <option value="cancelled">
+                        Cancelled
                     </option>
 
                 </select>
@@ -1491,11 +1721,11 @@
 
 
             <button
-                id="refreshOrdersBtn"
+                id="refreshBtn"
                 type="button"
                 class="refresh-btn"
             >
-                ↻ Refresh Orders
+                ↻ Refresh
             </button>
 
         </div>
@@ -1503,19 +1733,32 @@
 
         <!-- STATS -->
 
-        <section
-            id="stats"
-            class="stats"
-        >
+        <section class="stats">
 
             <div class="stat">
 
                 <div class="stat-label">
-                    Total Orders
+                    Total
                 </div>
 
                 <div
-                    id="totalOrders"
+                    id="totalCount"
+                    class="stat-value"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <div class="stat">
+
+                <div class="stat-label">
+                    Pending
+                </div>
+
+                <div
+                    id="pendingCount"
                     class="stat-value"
                 >
                     0
@@ -1531,7 +1774,7 @@
                 </div>
 
                 <div
-                    id="activeOrders"
+                    id="activeCount"
                     class="stat-value"
                 >
                     0
@@ -1543,11 +1786,11 @@
             <div class="stat">
 
                 <div class="stat-label">
-                    Completed
+                    Delivered
                 </div>
 
                 <div
-                    id="completedOrders"
+                    id="deliveredCount"
                     class="stat-value"
                 >
                     0
@@ -1559,11 +1802,11 @@
             <div class="stat">
 
                 <div class="stat-label">
-                    Total Spent
+                    Revenue
                 </div>
 
                 <div
-                    id="totalSpent"
+                    id="revenueCount"
                     class="stat-value"
                 >
                     0 MAD
@@ -1586,12 +1829,122 @@
                 <div class="spinner"></div>
 
                 <h3>
-                    Loading your orders...
+                    Loading orders...
                 </h3>
 
             </div>
 
         </main>
+
+    </div>
+
+
+    <!-- MODAL -->
+
+    <div
+        id="detailsModal"
+        class="modal"
+    >
+
+        <div class="modal-card">
+
+            <div class="modal-head">
+
+                <h2>
+                    Order Details
+                </h2>
+
+                <button
+                    id="closeModalBtn"
+                    type="button"
+                    class="close-btn"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <div class="modal-section">
+
+                <div class="modal-label">
+                    Service
+                </div>
+
+                <div
+                    id="modalService"
+                    class="modal-value"
+                >
+                    —
+                </div>
+
+            </div>
+
+
+            <div class="modal-section">
+
+                <div class="modal-label">
+                    Customer
+                </div>
+
+                <div
+                    id="modalCustomer"
+                    class="modal-value"
+                >
+                    —
+                </div>
+
+            </div>
+
+
+            <div class="modal-section">
+
+                <div class="modal-label">
+                    Requirements
+                </div>
+
+                <div
+                    id="modalRequirements"
+                    class="modal-value"
+                >
+                    —
+                </div>
+
+            </div>
+
+
+            <div class="modal-section">
+
+                <div class="modal-label">
+                    Additional Note
+                </div>
+
+                <div
+                    id="modalNotes"
+                    class="modal-value"
+                >
+                    —
+                </div>
+
+            </div>
+
+
+            <div class="modal-section">
+
+                <div class="modal-label">
+                    Order Information
+                </div>
+
+                <div
+                    id="modalInfo"
+                    class="modal-value"
+                >
+                    —
+                </div>
+
+            </div>
+
+        </div>
 
     </div>
 
@@ -1612,12 +1965,12 @@
 
 
     <script
-        src="../js/supabase-config.js?v=12"
+        src="../js/supabase-config.js?v=15"
     ></script>
 
 
     <script
-        src="../js/orders.js?v=12"
+        src="../js/worker-orders.js?v=15"
     ></script>
 
 </body>
