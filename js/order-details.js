@@ -7,159 +7,266 @@ document.addEventListener(
     "DOMContentLoaded",
     async () => {
 
+        /* =====================================================
+           SUPABASE
+        ====================================================== */
+
         const supabase =
             window.supabaseClient;
 
 
-        const loading =
-            document.getElementById("loading");
+        /* =====================================================
+           ELEMENTS
+        ====================================================== */
+
+        const loadingState =
+            document.getElementById(
+                "loadingState"
+            );
 
         const errorState =
-            document.getElementById("errorState");
-
-        const content =
-            document.getElementById("content");
+            document.getElementById(
+                "errorState"
+            );
 
         const errorMessage =
-            document.getElementById("errorMessage");
+            document.getElementById(
+                "errorMessage"
+            );
 
-        const actions =
-            document.getElementById("actions");
+        const orderContent =
+            document.getElementById(
+                "orderContent"
+            );
+
+        const toast =
+            document.getElementById(
+                "toast"
+            );
 
 
-        let currentUser = null;
-        let order = null;
-
+        /* =====================================================
+           HELPERS
+        ====================================================== */
 
         function showError(message) {
 
             console.error(
-                "NOVA ORDER DETAILS:",
+                "NOVA ORDER DETAILS ERROR:",
                 message
             );
 
-            if (loading) {
-                loading.style.display = "none";
+
+            if (loadingState) {
+
+                loadingState.style.display =
+                    "none";
             }
 
-            if (content) {
-                content.style.display = "none";
+
+            if (orderContent) {
+
+                orderContent.style.display =
+                    "none";
             }
+
 
             if (errorState) {
-                errorState.style.display = "block";
+
+                errorState.style.display =
+                    "flex";
             }
 
+
             if (errorMessage) {
-                errorMessage.textContent = message;
+
+                errorMessage.textContent =
+                    message;
             }
         }
 
 
         function showToast(message) {
 
-            const toast =
-                document.getElementById("toast");
-
             if (!toast) {
                 return;
             }
 
-            toast.textContent = message;
 
-            toast.classList.add("show");
+            toast.textContent =
+                message;
+
+
+            toast.classList.add(
+                "show"
+            );
+
 
             clearTimeout(
-                window.novaOrderToast
+                window.novaOrderDetailsToast
             );
 
-            window.novaOrderToast =
-                setTimeout(() => {
 
-                    toast.classList.remove(
-                        "show"
+            window.novaOrderDetailsToast =
+                setTimeout(
+                    () => {
+
+                        toast.classList.remove(
+                            "show"
+                        );
+
+                    },
+                    3000
+                );
+        }
+
+
+        function setText(
+            id,
+            value
+        ) {
+
+            const element =
+                document.getElementById(
+                    id
+                );
+
+
+            if (element) {
+
+                element.textContent =
+                    String(
+                        value ??
+                        ""
                     );
-
-                }, 3000);
+            }
         }
 
 
-        function formatPrice(value) {
+        function formatMoney(
+            value,
+            currency = "MAD"
+        ) {
 
-            return new Intl.NumberFormat(
-                "en-US",
-                {
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 2
-                }
-            ).format(
-                Number(value || 0)
+            const amount =
+                Number(
+                    value || 0
+                );
+
+
+            return (
+                new Intl.NumberFormat(
+                    "en-US",
+                    {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 2
+                    }
+                ).format(
+                    amount
+                ) +
+                ` ${currency}`
             );
         }
 
 
-        function formatDate(value) {
+        function formatDate(
+            value,
+            detailed = false
+        ) {
 
             if (!value) {
                 return "—";
             }
 
+
             const date =
-                new Date(value);
+                new Date(
+                    value
+                );
+
 
             if (
                 Number.isNaN(
                     date.getTime()
                 )
             ) {
+
                 return "—";
             }
 
-            return new Intl.DateTimeFormat(
+
+            if (detailed) {
+
+                return date.toLocaleString(
+                    "en-US",
+                    {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit"
+                    }
+                );
+            }
+
+
+            return date.toLocaleDateString(
                 "en-US",
                 {
-                    year: "numeric",
+                    day: "2-digit",
                     month: "short",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit"
+                    year: "numeric"
                 }
-            ).format(date);
-        }
-
-
-        function formatStatus(status) {
-
-            const labels = {
-
-                pending: "Pending",
-
-                accepted: "Accepted",
-
-                in_progress: "In Progress",
-
-                delivered: "Delivered",
-
-                completed: "Completed",
-
-                cancelled: "Cancelled",
-
-                rejected: "Rejected"
-            };
-
-            return (
-                labels[status] ||
-                "Unknown"
             );
         }
 
 
-        function avatarFallback(name) {
+        function shortOrderId(
+            id
+        ) {
+
+            if (!id) {
+                return "--------";
+            }
+
+
+            return String(id)
+                .replaceAll(
+                    "-",
+                    ""
+                )
+                .slice(
+                    0,
+                    8
+                )
+                .toUpperCase();
+        }
+
+
+        function isValidUUID(
+            value
+        ) {
+
+            return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+                .test(
+                    String(
+                        value || ""
+                    )
+                );
+        }
+
+
+        function avatarFallback(
+            name
+        ) {
 
             const initial =
-                (name || "N")
+                String(
+                    name || "N"
+                )
                     .charAt(0)
                     .toUpperCase();
+
 
             return (
                 "data:image/svg+xml;charset=UTF-8," +
@@ -168,6 +275,7 @@ document.addEventListener(
                         xmlns="http://www.w3.org/2000/svg"
                         width="200"
                         height="200"
+                        viewBox="0 0 200 200"
                     >
 
                         <defs>
@@ -198,18 +306,19 @@ document.addEventListener(
                         <rect
                             width="200"
                             height="200"
-                            rx="40"
+                            rx="50"
                             fill="url(#g)"
                         />
 
 
                         <text
                             x="100"
-                            y="110"
+                            y="108"
                             text-anchor="middle"
+                            dominant-baseline="middle"
                             fill="white"
                             font-family="Arial"
-                            font-size="75"
+                            font-size="78"
                             font-weight="700"
                         >
                             ${initial}
@@ -221,19 +330,98 @@ document.addEventListener(
         }
 
 
+        function statusLabel(
+            status
+        ) {
+
+            const labels = {
+
+                pending:
+                    "Pending",
+
+                accepted:
+                    "Accepted",
+
+                in_progress:
+                    "In Progress",
+
+                delivered:
+                    "Delivered",
+
+                completed:
+                    "Completed",
+
+                cancelled:
+                    "Cancelled",
+
+                rejected:
+                    "Rejected"
+
+            };
+
+
+            return (
+                labels[
+                    String(status || "")
+                ] ||
+                "Unknown"
+            );
+        }
+
+
+        function paymentLabel(
+            status
+        ) {
+
+            const labels = {
+
+                unpaid:
+                    "Unpaid",
+
+                pending:
+                    "Payment Pending",
+
+                paid:
+                    "Paid",
+
+                failed:
+                    "Failed",
+
+                refunded:
+                    "Refunded"
+
+            };
+
+
+            return (
+                labels[
+                    String(status || "")
+                ] ||
+                "Unknown"
+            );
+        }
+
+
+        /* =====================================================
+           SUPABASE CHECK
+        ====================================================== */
+
         if (!supabase) {
 
             showError(
-                "Supabase client is missing."
+                "Supabase is not configured. Check js/supabase-config.js."
             );
 
             return;
         }
 
 
-        /* ======================================
-           AUTH
-        ====================================== */
+        /* =====================================================
+           AUTH CHECK
+        ====================================================== */
+
+        let currentUser = null;
+
 
         try {
 
@@ -241,23 +429,30 @@ document.addEventListener(
                 data,
                 error
             } =
-                await supabase.auth
-                    .getUser();
+                await supabase.auth.getUser();
 
 
             if (error) {
+
                 throw error;
             }
 
 
             currentUser =
-                data?.user || null;
+                data?.user ||
+                null;
 
 
         } catch (error) {
 
+            console.error(
+                "NOVA auth error:",
+                error
+            );
+
+
             showError(
-                "Your login session could not be verified."
+                "Unable to verify your account."
             );
 
             return;
@@ -268,17 +463,16 @@ document.addEventListener(
 
             window.location.href =
                 `../login.html?redirect=${encodeURIComponent(
-                    window.location.pathname +
-                    window.location.search
+                    window.location.href
                 )}`;
 
             return;
         }
 
 
-        /* ======================================
-           GET ORDER ID
-        ====================================== */
+        /* =====================================================
+           URL ORDER ID
+        ====================================================== */
 
         const params =
             new URLSearchParams(
@@ -287,7 +481,12 @@ document.addEventListener(
 
 
         const orderId =
-            params.get("order");
+            params.get(
+                "id"
+            ) ||
+            params.get(
+                "order"
+            );
 
 
         if (!orderId) {
@@ -300,9 +499,22 @@ document.addEventListener(
         }
 
 
-        /* ======================================
+        if (!isValidUUID(orderId)) {
+
+            showError(
+                "The order ID is invalid."
+            );
+
+            return;
+        }
+
+
+        /* =====================================================
            LOAD ORDER
-        ====================================== */
+        ====================================================== */
+
+        let order = null;
+
 
         try {
 
@@ -322,12 +534,14 @@ document.addEventListener(
                         service_description,
                         category,
                         price,
-                        delivery_days,
                         currency,
+                        delivery_days,
                         notes,
                         requirements,
                         status,
                         payment_status,
+                        platform_fee,
+                        worker_amount,
                         created_at,
                         updated_at
                     `)
@@ -335,166 +549,425 @@ document.addEventListener(
                         "id",
                         orderId
                     )
-                    .eq(
-                        "customer_id",
-                        currentUser.id
-                    )
                     .maybeSingle();
 
 
             if (error) {
+
                 throw error;
             }
 
 
-            if (!data) {
-
-                showError(
-                    "This order does not exist or does not belong to your account."
-                );
-
-                return;
-            }
-
-
-            order = data;
+            order =
+                data;
 
 
         } catch (error) {
 
             console.error(
-                "NOVA load order error:",
+                "NOVA load order:",
                 error
             );
 
 
+            if (
+                /permission denied/i
+                    .test(
+                        error?.message || ""
+                    )
+            ) {
+
+                showError(
+                    "You do not have permission to view this order."
+                );
+
+            } else {
+
+                showError(
+                    error?.message ||
+                    "Unable to load this order."
+                );
+            }
+
+
+            return;
+        }
+
+
+        if (!order) {
+
             showError(
-                error.message ||
-                "Unable to load this order."
+                "Order not found."
             );
 
             return;
         }
 
 
-        /* ======================================
-           LOAD WORKER
-        ====================================== */
+        /* =====================================================
+           SECURITY CHECK
+        ====================================================== */
 
-        let worker = null;
-
-
-        if (order.worker_id) {
-
-            const {
-                data
-            } =
-                await supabase
-                    .from("profiles")
-                    .select(`
-                        id,
-                        first_name,
-                        last_name,
-                        full_name,
-                        avatar_url
-                    `)
-                    .eq(
-                        "id",
-                        order.worker_id
-                    )
-                    .maybeSingle();
+        const isCustomer =
+            order.customer_id ===
+            currentUser.id;
 
 
-            worker =
-                data || null;
+        const isWorker =
+            order.worker_id ===
+            currentUser.id;
+
+
+        if (
+            !isCustomer &&
+            !isWorker
+        ) {
+
+            showError(
+                "You are not authorized to view this order."
+            );
+
+            return;
         }
 
 
-        /* ======================================
-           VALUES
-        ====================================== */
+        /* =====================================================
+           LOAD PROFILE
+        ====================================================== */
 
-        const title =
-            order.service_title ||
-            "Untitled Service";
+        let customer = null;
+        let worker = null;
+
+
+        try {
+
+            if (order.customer_id) {
+
+                const {
+                    data
+                } =
+                    await supabase
+                        .from("profiles")
+                        .select(`
+                            id,
+                            first_name,
+                            last_name,
+                            full_name,
+                            email,
+                            avatar_url
+                        `)
+                        .eq(
+                            "id",
+                            order.customer_id
+                        )
+                        .maybeSingle();
+
+
+                customer =
+                    data ||
+                    null;
+            }
+
+
+            if (order.worker_id) {
+
+                const {
+                    data
+                } =
+                    await supabase
+                        .from("profiles")
+                        .select(`
+                            id,
+                            first_name,
+                            last_name,
+                            full_name,
+                            email,
+                            avatar_url
+                        `)
+                        .eq(
+                            "id",
+                            order.worker_id
+                        )
+                        .maybeSingle();
+
+
+                worker =
+                    data ||
+                    null;
+            }
+
+        } catch (error) {
+
+            console.warn(
+                "NOVA profile loading warning:",
+                error
+            );
+        }
+
+
+        /* =====================================================
+           NAMES
+        ====================================================== */
+
+        const customerName =
+            customer?.full_name ||
+            [
+                customer?.first_name,
+                customer?.last_name
+            ]
+                .filter(Boolean)
+                .join(" ") ||
+            customer?.email ||
+            "Customer";
 
 
         const workerName =
             worker?.full_name ||
-            `${worker?.first_name || ""} ${worker?.last_name || ""}`.trim() ||
+            [
+                worker?.first_name,
+                worker?.last_name
+            ]
+                .filter(Boolean)
+                .join(" ") ||
+            worker?.email ||
             "NOVA Worker";
 
 
-        const price =
-            Number(order.price || 0);
+        const currency =
+            order.currency ||
+            "MAD";
 
 
-        const days =
-            Number(order.delivery_days || 1);
+        const status =
+            order.status ||
+            "pending";
 
 
-        /* ======================================
-           FILL PAGE
-        ====================================== */
-
-        document.title =
-            `NOVA MARKET — ${title}`;
-
-
-        document.getElementById(
-            "category"
-        ).textContent =
-            order.category ||
-            "Digital Service";
-
-
-        document.getElementById(
-            "serviceTitle"
-        ).textContent =
-            title;
-
-
-        document.getElementById(
-            "description"
-        ).textContent =
-            order.service_description ||
-            "Professional digital service.";
-
-
-        document.getElementById(
-            "price"
-        ).textContent =
-            `${formatPrice(price)} ${
-                order.currency || "MAD"
-            }`;
-
-
-        document.getElementById(
-            "delivery"
-        ).textContent =
-            `${days} day${days === 1 ? "" : "s"}`;
-
-
-        document.getElementById(
-            "payment"
-        ).textContent =
+        const paymentStatus =
             order.payment_status ||
             "unpaid";
 
 
-        document.getElementById(
-            "orderDate"
-        ).textContent =
-            formatDate(
-                order.created_at
+        /* =====================================================
+           PROFILE TOPBAR
+        ====================================================== */
+
+        const profileAvatar =
+            document.getElementById(
+                "profileAvatar"
             );
 
 
-        document.getElementById(
-            "workerName"
-        ).textContent =
-            workerName;
+        const profileName =
+            document.getElementById(
+                "profileName"
+            );
 
+
+        const profileEmail =
+            document.getElementById(
+                "profileEmail"
+            );
+
+
+        const currentProfileName =
+            customerName;
+
+
+        if (profileName) {
+
+            profileName.textContent =
+                currentProfileName;
+        }
+
+
+        if (profileEmail) {
+
+            profileEmail.textContent =
+                customer?.email ||
+                currentUser.email ||
+                "";
+        }
+
+
+        if (profileAvatar) {
+
+            profileAvatar.src =
+                customer?.avatar_url ||
+                avatarFallback(
+                    currentProfileName
+                );
+
+
+            profileAvatar.alt =
+                currentProfileName;
+
+
+            profileAvatar.onerror =
+                () => {
+
+                    profileAvatar.src =
+                        avatarFallback(
+                            currentProfileName
+                        );
+                };
+        }
+
+
+        /* =====================================================
+           PAGE TITLE
+        ====================================================== */
+
+        document.title =
+            `NOVA MARKET — Order #${shortOrderId(
+                order.id
+            )}`;
+
+
+        setText(
+            "orderNumber",
+            `#${shortOrderId(
+                order.id
+            )}`
+        );
+
+
+        /* =====================================================
+           MAIN STATUS
+        ====================================================== */
+
+        setText(
+            "statusMainText",
+            statusLabel(
+                status
+            )
+        );
+
+
+        setText(
+            "orderStatusBadge",
+            statusLabel(
+                status
+            )
+        );
+
+
+        setText(
+            "paymentStatusBadge",
+            `Payment: ${paymentLabel(
+                paymentStatus
+            )}`
+        );
+
+
+        setText(
+            "detailOrderStatus",
+            statusLabel(
+                status
+            )
+        );
+
+
+        setText(
+            "detailPaymentStatus",
+            paymentLabel(
+                paymentStatus
+            )
+        );
+
+
+        /* =====================================================
+           MAIN STATUS COLOR
+        ====================================================== */
+
+        const statusDot =
+            document.getElementById(
+                "statusMainDot"
+            );
+
+
+        if (statusDot) {
+
+            statusDot.style.background =
+                getStatusColor(
+                    status
+                );
+
+            statusDot.style.boxShadow =
+                `0 0 0 4px ${getStatusGlow(
+                    status
+                )}`;
+        }
+
+
+        const orderStatusBadge =
+            document.getElementById(
+                "orderStatusBadge"
+            );
+
+
+        if (orderStatusBadge) {
+
+            orderStatusBadge.style.color =
+                getStatusColor(
+                    status
+                );
+
+            orderStatusBadge.style.background =
+                getStatusBackground(
+                    status
+                );
+        }
+
+
+        const paymentStatusBadge =
+            document.getElementById(
+                "paymentStatusBadge"
+            );
+
+
+        if (paymentStatusBadge) {
+
+            paymentStatusBadge.style.color =
+                getPaymentColor(
+                    paymentStatus
+                );
+
+            paymentStatusBadge.style.background =
+                getPaymentBackground(
+                    paymentStatus
+                );
+        }
+
+
+        /* =====================================================
+           SERVICE
+        ====================================================== */
+
+        setText(
+            "serviceCategory",
+            order.category ||
+            "Other"
+        );
+
+
+        setText(
+            "serviceTitle",
+            order.service_title ||
+            "NOVA Service"
+        );
+
+
+        setText(
+            "serviceDescription",
+            order.service_description ||
+            "Professional digital service."
+        );
+
+
+        /* =====================================================
+           WORKER
+        ====================================================== */
 
         const workerAvatar =
             document.getElementById(
@@ -504,18 +977,46 @@ document.addEventListener(
 
         if (workerAvatar) {
 
-            if (worker?.avatar_url) {
+            workerAvatar.innerHTML = "";
 
-                workerAvatar.innerHTML = `
-                    <img
-                        src="${worker.avatar_url}"
-                        alt="${workerName}"
-                    >
-                `;
+
+            if (
+                worker?.avatar_url
+            ) {
+
+                const img =
+                    document.createElement(
+                        "img"
+                    );
+
+
+                img.src =
+                    worker.avatar_url;
+
+
+                img.alt =
+                    workerName;
+
+
+                img.style.width =
+                    "100%";
+
+
+                img.style.height =
+                    "100%";
+
+
+                img.style.objectFit =
+                    "cover";
+
+
+                workerAvatar.appendChild(
+                    img
+                );
 
             } else {
 
-                workerAvatar.innerHTML =
+                workerAvatar.textContent =
                     workerName
                         .charAt(0)
                         .toUpperCase();
@@ -523,453 +1024,721 @@ document.addEventListener(
         }
 
 
-        document.getElementById(
-            "requirements"
-        ).textContent =
+        setText(
+            "workerName",
+            workerName
+        );
+
+
+        /* =====================================================
+           ORDER INFO
+        ====================================================== */
+
+        setText(
+            "detailOrderId",
+            order.id
+        );
+
+
+        setText(
+            "detailDelivery",
+            order.delivery_days
+                ? `${order.delivery_days} day${
+                    Number(
+                        order.delivery_days
+                    ) === 1
+                        ? ""
+                        : "s"
+                }`
+                : "—"
+        );
+
+
+        setText(
+            "detailCreated",
+            formatDate(
+                order.created_at,
+                true
+            )
+        );
+
+
+        setText(
+            "detailUpdated",
+            formatDate(
+                order.updated_at,
+                true
+            )
+        );
+
+
+        /* =====================================================
+           MONEY
+        ====================================================== */
+
+        setText(
+            "orderPrice",
+            formatMoney(
+                order.price,
+                ""
+            ).trim()
+        );
+
+
+        setText(
+            "orderCurrency",
+            currency
+        );
+
+
+        setText(
+            "servicePrice",
+            formatMoney(
+                order.price,
+                currency
+            )
+        );
+
+
+        setText(
+            "platformFee",
+            formatMoney(
+                order.platform_fee,
+                currency
+            )
+        );
+
+
+        setText(
+            "workerAmount",
+            formatMoney(
+                order.worker_amount,
+                currency
+            )
+        );
+
+
+        /* =====================================================
+           REQUIREMENTS
+        ====================================================== */
+
+        setText(
+            "orderRequirements",
             order.requirements ||
-            "No requirements provided.";
+            "No requirements were provided."
+        );
 
 
-        document.getElementById(
-            "notes"
-        ).textContent =
+        setText(
+            "orderNotes",
             order.notes ||
-            "No additional notes.";
+            "No notes were added."
+        );
 
 
-        document.getElementById(
-            "summaryService"
-        ).textContent =
-            title;
+        /* =====================================================
+           TIMELINE
+        ====================================================== */
+
+        renderTimeline(
+            order
+        );
 
 
-        document.getElementById(
-            "summaryDelivery"
-        ).textContent =
-            `${days} day${days === 1 ? "" : "s"}`;
+        /* =====================================================
+           SUPPORT BUTTON
+        ====================================================== */
 
-
-        document.getElementById(
-            "summaryPayment"
-        ).textContent =
-            order.payment_status ||
-            "unpaid";
-
-
-        document.getElementById(
-            "totalPrice"
-        ).textContent =
-            formatPrice(price);
-
-
-        /* ======================================
-           STATUS
-        ====================================== */
-
-        const statusElement =
+        const supportBtn =
             document.getElementById(
-                "status"
+                "supportBtn"
             );
 
 
-        statusElement.className =
-            `status status-${order.status}`;
+        if (supportBtn) {
 
+            supportBtn.addEventListener(
+                "click",
+                () => {
 
-        statusElement.innerHTML = `
-            <span class="dot"></span>
-            ${formatStatus(order.status)}
-        `;
-
-
-        /* ======================================
-           ACTIONS
-        ====================================== */
-
-        renderActions();
-
-
-        /* ======================================
-           SHOW
-        ====================================== */
-
-        loading.style.display =
-            "none";
-
-
-        errorState.style.display =
-            "none";
-
-
-        content.style.display =
-            "block";
-
-
-        /* ======================================
-           ACTION RENDERER
-        ====================================== */
-
-        function renderActions() {
-
-            actions.innerHTML =
-                "";
-
-
-            /*
-             * Pending:
-             * Customer can cancel.
-             */
-
-            if (
-                order.status ===
-                "pending"
-            ) {
-
-                actions.innerHTML = `
-                    <button
-                        type="button"
-                        id="cancelBtn"
-                        class="action cancel"
-                    >
-                        Cancel Order
-                    </button>
-                `;
-
-
-                document
-                    .getElementById(
-                        "cancelBtn"
-                    )
-                    .addEventListener(
-                        "click",
-                        cancelOrder
-                    );
-            }
-
-
-            /*
-             * Delivered:
-             * Customer can complete.
-             */
-
-            else if (
-                order.status ===
-                "delivered"
-            ) {
-
-                actions.innerHTML = `
-                    <button
-                        type="button"
-                        id="completeBtn"
-                        class="action complete"
-                    >
-                        ✓ Complete Order
-                    </button>
-                `;
-
-
-                document
-                    .getElementById(
-                        "completeBtn"
-                    )
-                    .addEventListener(
-                        "click",
-                        completeOrder
-                    );
-            }
-
-
-            /*
-             * Completed.
-             */
-
-            else if (
-                order.status ===
-                "completed"
-            ) {
-
-                actions.innerHTML = `
-                    <div
-                        style="
-                            padding:14px;
-                            border:1px solid rgba(43,217,139,.16);
-                            border-radius:12px;
-                            background:rgba(43,217,139,.05);
-                            color:#7beab8;
-                            text-align:center;
-                            font-size:11px;
-                            font-weight:700;
-                        "
-                    >
-                        ✓ Order Completed
-                    </div>
-                `;
-            }
-        }
-
-
-        /* ======================================
-           CANCEL
-        ====================================== */
-
-        async function cancelOrder() {
-
-            if (
-                order.status !==
-                "pending"
-            ) {
-
-                showToast(
-                    "This order cannot be cancelled anymore."
-                );
-
-                return;
-            }
-
-
-            const confirmed =
-                window.confirm(
-                    "Are you sure you want to cancel this order?"
-                );
-
-
-            if (!confirmed) {
-                return;
-            }
-
-
-            const button =
-                document.getElementById(
-                    "cancelBtn"
-                );
-
-
-            button.disabled =
-                true;
-
-
-            button.textContent =
-                "Cancelling...";
-
-
-            try {
-
-                const {
-                    data,
-                    error
-                } =
-                    await supabase
-                        .from("orders")
-                        .update({
-                            status:
-                                "cancelled"
-                        })
-                        .eq(
-                            "id",
+                    window.location.href =
+                        `support.html?order=${encodeURIComponent(
                             order.id
-                        )
-                        .eq(
-                            "customer_id",
-                            currentUser.id
-                        )
-                        .eq(
-                            "status",
-                            "pending"
-                        )
-                        .select()
-                        .maybeSingle();
-
-
-                if (error) {
-                    throw error;
+                        )}`;
                 }
-
-
-                if (!data) {
-
-                    throw new Error(
-                        "The order status may have changed already."
-                    );
-                }
-
-
-                order =
-                    data;
-
-
-                showToast(
-                    "Order cancelled successfully."
-                );
-
-
-                renderActions();
-
-
-                updateStatusUI();
-
-
-            } catch (error) {
-
-                console.error(
-                    error
-                );
-
-
-                showToast(
-                    error.message ||
-                    "Unable to cancel order."
-                );
-
-
-                button.disabled =
-                    false;
-
-
-                button.textContent =
-                    "Cancel Order";
-            }
+            );
         }
 
 
-        /* ======================================
-           COMPLETE
-        ====================================== */
+        /* =====================================================
+           BACK TO ORDERS
+        ====================================================== */
 
-        async function completeOrder() {
-
-            if (
-                order.status !==
-                "delivered"
-            ) {
-
-                showToast(
-                    "Only delivered orders can be completed."
-                );
-
-                return;
-            }
+        const ordersBtn =
+            document.getElementById(
+                "ordersBtn"
+            );
 
 
-            const confirmed =
-                window.confirm(
-                    "Confirm that you received and accepted the delivered work?"
-                );
+        if (ordersBtn) {
 
+            ordersBtn.addEventListener(
+                "click",
+                () => {
 
-            if (!confirmed) {
-                return;
-            }
-
-
-            const button =
-                document.getElementById(
-                    "completeBtn"
-                );
-
-
-            button.disabled =
-                true;
-
-
-            button.textContent =
-                "Completing...";
-
-
-            try {
-
-                const {
-                    data,
-                    error
-                } =
-                    await supabase
-                        .from("orders")
-                        .update({
-                            status:
-                                "completed"
-                        })
-                        .eq(
-                            "id",
-                            order.id
-                        )
-                        .eq(
-                            "customer_id",
-                            currentUser.id
-                        )
-                        .eq(
-                            "status",
-                            "delivered"
-                        )
-                        .select()
-                        .maybeSingle();
-
-
-                if (error) {
-                    throw error;
+                    window.location.href =
+                        "orders.html";
                 }
-
-
-                if (!data) {
-
-                    throw new Error(
-                        "The order could not be completed."
-                    );
-                }
-
-
-                order =
-                    data;
-
-
-                showToast(
-                    "Order completed successfully!"
-                );
-
-
-                renderActions();
-
-
-                updateStatusUI();
-
-
-            } catch (error) {
-
-                console.error(
-                    "NOVA complete order error:",
-                    error
-                );
-
-
-                showToast(
-                    error.message ||
-                    "Unable to complete order."
-                );
-
-
-                button.disabled =
-                    false;
-
-
-                button.textContent =
-                    "✓ Complete Order";
-            }
+            );
         }
 
 
-        /* ======================================
-           UPDATE STATUS
-        ====================================== */
+        /* =====================================================
+           SHOW CONTENT
+        ====================================================== */
 
-        function updateStatusUI() {
+        if (loadingState) {
 
-            statusElement.className =
-                `status status-${order.status}`;
-
-
-            statusElement.innerHTML = `
-                <span class="dot"></span>
-                ${formatStatus(order.status)}
-            `;
+            loadingState.style.display =
+                "none";
         }
 
+
+        if (errorState) {
+
+            errorState.style.display =
+                "none";
+        }
+
+
+        if (orderContent) {
+
+            orderContent.style.display =
+                "block";
+        }
+
+
+        console.log(
+            "NOVA ORDER DETAILS READY:",
+            order.id
+        );
     }
 );
+
+
+/* =========================================================
+   TIMELINE
+========================================================= */
+
+function renderTimeline(
+    order
+) {
+
+    const container =
+        document.getElementById(
+            "orderTimeline"
+        );
+
+
+    if (!container) {
+        return;
+    }
+
+
+    const status =
+        order.status ||
+        "pending";
+
+
+    const createdDate =
+        formatTimelineDate(
+            order.created_at
+        );
+
+
+    const updatedDate =
+        formatTimelineDate(
+            order.updated_at
+        );
+
+
+    const steps = [
+        {
+            key: "pending",
+            title: "Order Created",
+            text: createdDate
+        },
+        {
+            key: "accepted",
+            title: "Order Accepted",
+            text: "Worker accepted the order"
+        },
+        {
+            key: "in_progress",
+            title: "Work In Progress",
+            text: "Worker started working"
+        },
+        {
+            key: "delivered",
+            title: "Order Delivered",
+            text: "Work has been delivered"
+        },
+        {
+            key: "completed",
+            title: "Order Completed",
+            text: updatedDate
+        }
+    ];
+
+
+    const orderSequence = [
+        "pending",
+        "accepted",
+        "in_progress",
+        "delivered",
+        "completed"
+    ];
+
+
+    const cancelled =
+        status === "cancelled";
+
+
+    const rejected =
+        status === "rejected";
+
+
+    let currentIndex =
+        orderSequence.indexOf(
+            status
+        );
+
+
+    if (
+        currentIndex < 0 &&
+        !cancelled &&
+        !rejected
+    ) {
+
+        currentIndex = 0;
+    }
+
+
+    let html = "";
+
+
+    steps.forEach(
+        (step, index) => {
+
+            let active =
+                index <= currentIndex;
+
+
+            let title =
+                step.title;
+
+
+            let text =
+                step.text;
+
+
+            if (
+                cancelled &&
+                step.key === "pending"
+            ) {
+
+                active = true;
+
+                title =
+                    "Order Created";
+
+                text =
+                    `${createdDate}`;
+            }
+
+
+            html += `
+                <div
+                    class="timeline-item ${
+                        active
+                            ? "active"
+                            : ""
+                    }"
+                >
+
+                    <span
+                        class="timeline-dot"
+                    ></span>
+
+                    <div class="timeline-info">
+
+                        <strong>
+                            ${escapeHtml(
+                                title
+                            )}
+                        </strong>
+
+                        <span>
+                            ${escapeHtml(
+                                text
+                            )}
+                        </span>
+
+                    </div>
+
+                </div>
+            `;
+        }
+    );
+
+
+    if (
+        cancelled
+    ) {
+
+        html += `
+            <div
+                class="timeline-item active"
+            >
+
+                <span
+                    class="timeline-dot"
+                    style="
+                        background:#ff6d72;
+                    "
+                ></span>
+
+                <div class="timeline-info">
+
+                    <strong>
+                        Order Cancelled
+                    </strong>
+
+                    <span>
+                        ${escapeHtml(
+                            updatedDate
+                        )}
+                    </span>
+
+                </div>
+
+            </div>
+        `;
+    }
+
+
+    if (
+        rejected
+    ) {
+
+        html += `
+            <div
+                class="timeline-item active"
+            >
+
+                <span
+                    class="timeline-dot"
+                    style="
+                        background:#ff6d72;
+                    "
+                ></span>
+
+                <div class="timeline-info">
+
+                    <strong>
+                        Order Rejected
+                    </strong>
+
+                    <span>
+                        ${escapeHtml(
+                            updatedDate
+                        )}
+                    </span>
+
+                </div>
+
+            </div>
+        `;
+    }
+
+
+    container.innerHTML =
+        html;
+}
+
+
+/* =========================================================
+   TIMELINE DATE
+========================================================= */
+
+function formatTimelineDate(
+    value
+) {
+
+    if (!value) {
+        return "Date unavailable";
+    }
+
+
+    const date =
+        new Date(
+            value
+        );
+
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return "Date unavailable";
+    }
+
+
+    return date.toLocaleString(
+        "en-US",
+        {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+        }
+    );
+}
+
+
+/* =========================================================
+   STATUS COLORS
+========================================================= */
+
+function getStatusColor(
+    status
+) {
+
+    const colors = {
+
+        pending:
+            "#ffc365",
+
+        accepted:
+            "#83aaff",
+
+        in_progress:
+            "#a998ff",
+
+        delivered:
+            "#65ddbf",
+
+        completed:
+            "#53e69a",
+
+        cancelled:
+            "#ff7378",
+
+        rejected:
+            "#ff7378"
+
+    };
+
+
+    return (
+        colors[
+            String(
+                status || ""
+            )
+        ] ||
+        "#ffffff"
+    );
+}
+
+
+function getStatusGlow(
+    status
+) {
+
+    const glows = {
+
+        pending:
+            "rgba(255,195,101,.10)",
+
+        accepted:
+            "rgba(131,170,255,.10)",
+
+        in_progress:
+            "rgba(169,152,255,.10)",
+
+        delivered:
+            "rgba(101,221,191,.10)",
+
+        completed:
+            "rgba(83,230,154,.10)",
+
+        cancelled:
+            "rgba(255,115,120,.10)",
+
+        rejected:
+            "rgba(255,115,120,.10)"
+
+    };
+
+
+    return (
+        glows[
+            String(
+                status || ""
+            )
+        ] ||
+        "rgba(255,255,255,.08)"
+    );
+}
+
+
+function getStatusBackground(
+    status
+) {
+
+    const backgrounds = {
+
+        pending:
+            "rgba(255,195,101,.08)",
+
+        accepted:
+            "rgba(131,170,255,.08)",
+
+        in_progress:
+            "rgba(169,152,255,.08)",
+
+        delivered:
+            "rgba(101,221,191,.08)",
+
+        completed:
+            "rgba(83,230,154,.08)",
+
+        cancelled:
+            "rgba(255,115,120,.08)",
+
+        rejected:
+            "rgba(255,115,120,.08)"
+
+    };
+
+
+    return (
+        backgrounds[
+            String(
+                status || ""
+            )
+        ] ||
+        "rgba(255,255,255,.04)"
+    );
+}
+
+
+/* =========================================================
+   PAYMENT COLORS
+========================================================= */
+
+function getPaymentColor(
+    status
+) {
+
+    const colors = {
+
+        unpaid:
+            "#bfc4d1",
+
+        pending:
+            "#ffc365",
+
+        paid:
+            "#53e69a",
+
+        failed:
+            "#ff7378",
+
+        refunded:
+            "#91a5ff"
+
+    };
+
+
+    return (
+        colors[
+            String(
+                status || ""
+            )
+        ] ||
+        "#ffffff"
+    );
+}
+
+
+function getPaymentBackground(
+    status
+) {
+
+    const backgrounds = {
+
+        unpaid:
+            "rgba(255,255,255,.05)",
+
+        pending:
+            "rgba(255,195,101,.07)",
+
+        paid:
+            "rgba(83,230,154,.07)",
+
+        failed:
+            "rgba(255,115,120,.07)",
+
+        refunded:
+            "rgba(145,165,255,.07)"
+
+    };
+
+
+    return (
+        backgrounds[
+            String(
+                status || ""
+            )
+        ] ||
+        "rgba(255,255,255,.04)"
+    );
+}
+
+
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
+
+function escapeHtml(
+    value
+) {
+
+    return String(
+        value ?? ""
+    )
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
+        .replaceAll(
+            "'",
+            "&#039;"
+        );
+}
