@@ -1,16 +1,38 @@
+/* =========================================================
+   NOVA MARKET — ADMIN REPORTS
+========================================================= */
+
 "use strict";
 
+
+/* =========================================================
+   STATE
+========================================================= */
+
 let reportData = null;
+
+let currentStartDate = "";
+let currentEndDate = "";
+
+let currentPeriodLabel = "Last 30 days";
+
+
+/* =========================================================
+   DEFAULT INIT
+========================================================= */
 
 document.addEventListener(
     "DOMContentLoaded",
     initReports
 );
 
+
 async function initReports() {
 
     setupSidebar();
     setupEvents();
+
+    setDefaultPeriod(30);
 
     const client =
         window.supabaseClient;
@@ -25,22 +47,24 @@ async function initReports() {
         return;
     }
 
+
     const adminOk =
-        await checkAdmin(client);
+        await verifyAdmin(client);
 
     if (!adminOk) {
         return;
     }
 
-    await loadReports(client);
+
+    await loadReport(client);
 }
 
 
 /* =========================================================
-   ADMIN AUTH
+   ADMIN VERIFICATION
 ========================================================= */
 
-async function checkAdmin(client) {
+async function verifyAdmin(client) {
 
     try {
 
@@ -48,6 +72,7 @@ async function checkAdmin(client) {
             data: userData,
             error: userError
         } = await client.auth.getUser();
+
 
         if (
             userError ||
@@ -68,7 +93,13 @@ async function checkAdmin(client) {
             "admin_current_profile"
         );
 
+
         if (error) {
+
+            console.error(
+                "admin_current_profile:",
+                error
+            );
 
             showAlert(
                 error.message ||
@@ -99,7 +130,10 @@ async function checkAdmin(client) {
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "Admin verification error:",
+            error
+        );
 
         showAlert(
             "Unable to verify administrator.",
@@ -112,22 +146,22 @@ async function checkAdmin(client) {
 
 
 /* =========================================================
-   PROFILE
+   ADMIN PROFILE
 ========================================================= */
 
 function applyAdminProfile(profile) {
 
-    const name =
+    const nameElement =
         document.getElementById(
             "adminName"
         );
 
-    const email =
+    const emailElement =
         document.getElementById(
             "adminEmail"
         );
 
-    const avatar =
+    const avatarElement =
         document.getElementById(
             "adminAvatar"
         );
@@ -144,26 +178,31 @@ function applyAdminProfile(profile) {
         "Admin";
 
 
-    if (name) {
-        name.textContent =
+    if (nameElement) {
+
+        nameElement.textContent =
             fullName;
     }
 
 
-    if (email) {
-        email.textContent =
-            profile.email || "";
+    if (emailElement) {
+
+        emailElement.textContent =
+            profile.email ||
+            "";
     }
 
 
-    if (avatar) {
+    if (avatarElement) {
+
+        avatarElement.innerHTML = "";
 
         if (profile.avatar_url) {
 
-            avatar.innerHTML = "";
-
             const img =
-                document.createElement("img");
+                document.createElement(
+                    "img"
+                );
 
             img.src =
                 profile.avatar_url;
@@ -180,11 +219,16 @@ function applyAdminProfile(profile) {
             img.style.objectFit =
                 "cover";
 
-            avatar.appendChild(img);
+            img.style.borderRadius =
+                "50%";
+
+            avatarElement.appendChild(
+                img
+            );
 
         } else {
 
-            avatar.textContent =
+            avatarElement.textContent =
                 fullName
                     .charAt(0)
                     .toUpperCase();
@@ -194,19 +238,203 @@ function applyAdminProfile(profile) {
 
 
 /* =========================================================
-   LOAD REPORTS
+   PERIOD
 ========================================================= */
 
-async function loadReports(client) {
+function setDefaultPeriod(days) {
 
-    setReportLoading(true);
+    const end =
+        new Date();
+
+    const start =
+        new Date();
+
+
+    start.setDate(
+        end.getDate() -
+        (days - 1)
+    );
+
+
+    currentStartDate =
+        formatInputDate(
+            start
+        );
+
+    currentEndDate =
+        formatInputDate(
+            end
+        );
+
+
+    currentPeriodLabel =
+        `Last ${days} days`;
+
+
+    document
+        .querySelectorAll(
+            ".period-btn"
+        )
+        .forEach(
+            button => {
+
+                button.classList.toggle(
+                    "active",
+                    button.dataset.days ===
+                    String(days)
+                );
+            }
+        );
+
+
+    const customPanel =
+        document.getElementById(
+            "customPeriod"
+        );
+
+    if (customPanel) {
+        customPanel.hidden = true;
+    }
+
+
+    updatePeriodLabel();
+}
+
+
+/* =========================================================
+   CUSTOM PERIOD
+========================================================= */
+
+function openCustomPeriod() {
+
+    const panel =
+        document.getElementById(
+            "customPeriod"
+        );
+
+    if (panel) {
+        panel.hidden = false;
+    }
+
+
+    const start =
+        document.getElementById(
+            "startDate"
+        );
+
+    const end =
+        document.getElementById(
+            "endDate"
+        );
+
+
+    if (start) {
+
+        start.value =
+            currentStartDate;
+    }
+
+
+    if (end) {
+
+        end.value =
+            currentEndDate;
+    }
+}
+
+
+async function applyCustomPeriod() {
+
+    const start =
+        document.getElementById(
+            "startDate"
+        )?.value;
+
+
+    const end =
+        document.getElementById(
+            "endDate"
+        )?.value;
+
+
+    if (!start || !end) {
+
+        showAlert(
+            "Please select both dates.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    if (start > end) {
+
+        showAlert(
+            "Start date cannot be after end date.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    currentStartDate =
+        start;
+
+    currentEndDate =
+        end;
+
+
+    currentPeriodLabel =
+        `${formatReadableDate(start)} → ${formatReadableDate(end)}`;
+
+
+    updatePeriodLabel();
+
+
+    await loadReport(
+        window.supabaseClient
+    );
+}
+
+
+function updatePeriodLabel() {
+
+    const element =
+        document.getElementById(
+            "periodLabel"
+        );
+
+
+    if (element) {
+
+        element.textContent =
+            currentPeriodLabel;
+    }
+}
+
+
+/* =========================================================
+   LOAD REPORT
+========================================================= */
+
+async function loadReport(client) {
+
+    if (!client) {
+
+        showAlert(
+            "Supabase is not available.",
+            "error"
+        );
+
+        return;
+    }
+
 
     try {
 
-        const period =
-            document.getElementById(
-                "periodFilter"
-            )?.value || "30";
+        setReportLoading(true);
 
 
         const {
@@ -215,10 +443,11 @@ async function loadReports(client) {
         } = await client.rpc(
             "admin_reports",
             {
-                p_days:
-                    period === "all"
-                        ? null
-                        : Number(period)
+                p_start_date:
+                    currentStartDate,
+
+                p_end_date:
+                    currentEndDate
             }
         );
 
@@ -229,11 +458,19 @@ async function loadReports(client) {
 
 
         reportData =
-            data || {};
+            normalizeReportData(
+                data
+            );
 
 
-        renderReports(
+        renderReport(
             reportData
+        );
+
+
+        showAlert(
+            "Report updated successfully.",
+            "success"
         );
 
     } catch (error) {
@@ -243,9 +480,10 @@ async function loadReports(client) {
             error
         );
 
+
         showAlert(
             error.message ||
-            "Failed to load reports.",
+            "Failed to load report.",
             "error"
         );
 
@@ -257,212 +495,1166 @@ async function loadReports(client) {
 
 
 /* =========================================================
-   RENDER
+   NORMALIZE DATA
 ========================================================= */
 
-function renderReports(data) {
+function normalizeReportData(data) {
 
-    const overview =
-        data.overview || {};
+    const source =
+        data || {};
+
+
+    return {
+
+        summary:
+            source.summary || {},
+
+        users:
+            source.users || {},
+
+        workers:
+            source.workers || {},
+
+        orders:
+            source.orders || {},
+
+        payments:
+            source.payments || {},
+
+        timeline:
+            Array.isArray(
+                source.timeline
+            )
+                ? source.timeline
+                : [],
+
+        top_services:
+            Array.isArray(
+                source.top_services
+            )
+                ? source.top_services
+                : [],
+
+        top_workers:
+            Array.isArray(
+                source.top_workers
+            )
+                ? source.top_workers
+                : []
+    };
+}
+
+
+/* =========================================================
+   RENDER REPORT
+========================================================= */
+
+function renderReport(data) {
+
+    const summary =
+        data.summary;
+
+    const users =
+        data.users;
+
+    const workers =
+        data.workers;
 
     const orders =
-        data.orders || {};
+        data.orders;
 
-    const financial =
-        data.financial || {};
+    const payments =
+        data.payments;
 
 
-    /* KPI */
-
-    setText(
-        "usersMetric",
-        number(
-            overview.total_users
-        )
-    );
+    /* -----------------------------------------
+       KPI
+    ----------------------------------------- */
 
     setText(
-        "usersSub",
-        `${number(overview.new_users)} new`
+        "grossSales",
+        `${money(summary.gross_sales_mad)} MAD`
     );
 
 
     setText(
-        "workersMetric",
-        number(
-            overview.total_workers
-        )
-    );
-
-    setText(
-        "workersSub",
-        `${number(overview.active_workers)} active`
+        "platformFees",
+        `${money(summary.platform_fees_mad)} MAD`
     );
 
 
     setText(
-        "servicesMetric",
-        number(
-            overview.total_services
-        )
-    );
-
-    setText(
-        "servicesSub",
-        `${number(overview.published_services)} published`
+        "totalOrders",
+        summary.total_orders || 0
     );
 
 
     setText(
-        "ordersMetric",
-        number(
-            overview.total_orders
-        )
-    );
-
-    setText(
-        "ordersSub",
-        `${number(overview.completed_orders)} completed`
+        "completedOrders",
+        summary.completed_orders || 0
     );
 
 
     setText(
-        "salesMetric",
-        money(
-            financial.paid_amount_mad
-        )
+        "newUsers",
+        users.new_users || 0
     );
 
 
     setText(
-        "feesMetric",
-        money(
-            financial.platform_fees_mad
-        )
+        "newWorkers",
+        workers.new_workers || 0
     );
 
 
-    /* ORDER STATUS */
+    /* -----------------------------------------
+       CHART TOTALS
+    ----------------------------------------- */
 
-    const statusMap = [
-        [
-            "pending",
-            orders.pending,
-            "barPending",
-            "statusPending"
-        ],
-        [
-            "accepted",
-            orders.accepted,
-            "barAccepted",
-            "statusAccepted"
-        ],
-        [
-            "in_progress",
-            orders.in_progress,
-            "barProgress",
-            "statusProgress"
-        ],
-        [
-            "delivered",
-            orders.delivered,
-            "barDelivered",
-            "statusDelivered"
-        ],
-        [
-            "completed",
-            orders.completed,
-            "barCompleted",
-            "statusCompleted"
-        ],
-        [
-            "cancelled",
-            orders.cancelled,
-            "barCancelled",
-            "statusCancelled"
-        ]
-    ];
+    setText(
+        "chartOrderTotal",
+        summary.total_orders || 0
+    );
 
 
-    const maxStatus =
-        Math.max(
-            1,
-            ...statusMap.map(
-                item => Number(item[1] || 0)
-            )
+    setText(
+        "chartSalesTotal",
+        `${money(summary.gross_sales_mad)} MAD`
+    );
+
+
+    /* -----------------------------------------
+       CHARTS
+    ----------------------------------------- */
+
+    drawOrdersChart(
+        data.timeline
+    );
+
+
+    drawSalesChart(
+        data.timeline
+    );
+
+
+    /* -----------------------------------------
+       BREAKDOWNS
+    ----------------------------------------- */
+
+    renderStatusBreakdown(
+        orders.by_status || {}
+    );
+
+
+    renderPaymentBreakdown(
+        payments.by_status || {}
+    );
+
+
+    /* -----------------------------------------
+       TOP LISTS
+    ----------------------------------------- */
+
+    renderTopServices(
+        data.top_services
+    );
+
+
+    renderTopWorkers(
+        data.top_workers
+    );
+
+
+    /* -----------------------------------------
+       SUMMARY
+    ----------------------------------------- */
+
+    renderSummary(
+        summary,
+        users,
+        workers
+    );
+}
+
+
+/* =========================================================
+   ORDER CHART
+========================================================= */
+
+function drawOrdersChart(timeline) {
+
+    const canvas =
+        document.getElementById(
+            "ordersChart"
         );
 
 
-    statusMap.forEach(
-        item => {
+    if (!canvas) {
+        return;
+    }
 
-            const value =
-                Number(item[1] || 0);
 
-            setText(
-                item[3],
-                value
+    const ctx =
+        setupCanvas(
+            canvas
+        );
+
+
+    const width =
+        canvas.clientWidth;
+
+    const height =
+        canvas.clientHeight;
+
+
+    ctx.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    if (!timeline.length) {
+
+        drawEmptyChart(
+            ctx,
+            width,
+            height,
+            "No order data"
+        );
+
+        return;
+    }
+
+
+    const values =
+        timeline.map(
+            item =>
+                Number(
+                    item.orders || 0
+                )
+        );
+
+
+    const dates =
+        timeline.map(
+            item =>
+                item.date
+        );
+
+
+    drawLineChart(
+        ctx,
+        width,
+        height,
+        values,
+        dates,
+        false
+    );
+}
+
+
+/* =========================================================
+   SALES CHART
+========================================================= */
+
+function drawSalesChart(timeline) {
+
+    const canvas =
+        document.getElementById(
+            "salesChart"
+        );
+
+
+    if (!canvas) {
+        return;
+    }
+
+
+    const ctx =
+        setupCanvas(
+            canvas
+        );
+
+
+    const width =
+        canvas.clientWidth;
+
+    const height =
+        canvas.clientHeight;
+
+
+    ctx.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    if (!timeline.length) {
+
+        drawEmptyChart(
+            ctx,
+            width,
+            height,
+            "No sales data"
+        );
+
+        return;
+    }
+
+
+    const values =
+        timeline.map(
+            item =>
+                Number(
+                    item.sales_mad || 0
+                )
+        );
+
+
+    const dates =
+        timeline.map(
+            item =>
+                item.date
+        );
+
+
+    drawLineChart(
+        ctx,
+        width,
+        height,
+        values,
+        dates,
+        true
+    );
+}
+
+
+/* =========================================================
+   CANVAS SETUP
+========================================================= */
+
+function setupCanvas(canvas) {
+
+    const rect =
+        canvas.getBoundingClientRect();
+
+
+    const ratio =
+        window.devicePixelRatio ||
+        1;
+
+
+    const width =
+        Math.max(
+            rect.width,
+            1
+        );
+
+
+    const height =
+        Math.max(
+            rect.height,
+            1
+        );
+
+
+    canvas.width =
+        Math.round(
+            width * ratio
+        );
+
+
+    canvas.height =
+        Math.round(
+            height * ratio
+        );
+
+
+    const ctx =
+        canvas.getContext(
+            "2d"
+        );
+
+
+    ctx.setTransform(
+        ratio,
+        0,
+        0,
+        ratio,
+        0,
+        0
+    );
+
+
+    return ctx;
+}
+
+
+/* =========================================================
+   LINE CHART
+========================================================= */
+
+function drawLineChart(
+    ctx,
+    width,
+    height,
+    values,
+    dates,
+    moneyMode = false
+) {
+
+    const padding = {
+        top: 22,
+        right: 18,
+        bottom: 38,
+        left: 45
+    };
+
+
+    const chartWidth =
+        Math.max(
+            width -
+            padding.left -
+            padding.right,
+            1
+        );
+
+
+    const chartHeight =
+        Math.max(
+            height -
+            padding.top -
+            padding.bottom,
+            1
+        );
+
+
+    let maxValue =
+        Math.max(
+            ...values,
+            1
+        );
+
+
+    /* -----------------------------------------
+       NICE MAX
+    ----------------------------------------- */
+
+    if (moneyMode) {
+
+        const magnitude =
+            Math.pow(
+                10,
+                Math.max(
+                    0,
+                    Math.floor(
+                        Math.log10(
+                            maxValue
+                        )
+                    )
+                )
             );
 
-            const bar =
-                document.getElementById(
-                    item[2]
-                );
+        const normalized =
+            maxValue /
+            magnitude;
 
-            if (bar) {
+        let nice =
+            1;
 
-                const percentage =
-                    Math.round(
-                        (value / maxStatus) *
-                        100
+        if (normalized <= 1) {
+            nice = 1;
+        } else if (normalized <= 2) {
+            nice = 2;
+        } else if (normalized <= 5) {
+            nice = 5;
+        } else {
+            nice = 10;
+        }
+
+        maxValue =
+            nice * magnitude;
+    }
+
+
+    /* -----------------------------------------
+       GRID
+    ----------------------------------------- */
+
+    ctx.lineWidth = 1;
+
+    ctx.font =
+        "9px Arial";
+
+
+    for (
+        let i = 0;
+        i <= 4;
+        i++
+    ) {
+
+        const y =
+            padding.top +
+            chartHeight -
+            (
+                chartHeight *
+                i /
+                4
+            );
+
+
+        ctx.strokeStyle =
+            "rgba(255,255,255,.055)";
+
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            padding.left,
+            y
+        );
+
+        ctx.lineTo(
+            width -
+            padding.right,
+            y
+        );
+
+        ctx.stroke();
+
+
+        const labelValue =
+            (
+                maxValue *
+                i /
+                4
+            );
+
+
+        const label =
+            moneyMode
+                ? formatCompactMoney(
+                    labelValue
+                )
+                : Math.round(
+                    labelValue
+                ).toString();
+
+
+        ctx.fillStyle =
+            "rgba(255,255,255,.25)";
+
+
+        ctx.textAlign =
+            "right";
+
+
+        ctx.fillText(
+            label,
+            padding.left - 7,
+            y + 3
+        );
+    }
+
+
+    /* -----------------------------------------
+       POINTS
+    ----------------------------------------- */
+
+    const count =
+        values.length;
+
+
+    const step =
+        count > 1
+            ? chartWidth /
+              (count - 1)
+            : 0;
+
+
+    const points =
+        values.map(
+            (value, index) => {
+
+                const x =
+                    count === 1
+                        ? (
+                            padding.left +
+                            chartWidth / 2
+                        )
+                        : (
+                            padding.left +
+                            index * step
+                        );
+
+
+                const y =
+                    padding.top +
+                    chartHeight -
+                    (
+                        (
+                            Number(value) /
+                            maxValue
+                        ) *
+                        chartHeight
                     );
 
-                bar.style.width =
-                    `${percentage}%`;
+
+                return {
+                    x,
+                    y
+                };
             }
+        );
+
+
+    /* -----------------------------------------
+       AREA
+    ----------------------------------------- */
+
+    if (points.length) {
+
+        const gradient =
+            ctx.createLinearGradient(
+                0,
+                padding.top,
+                0,
+                height -
+                padding.bottom
+            );
+
+
+        gradient.addColorStop(
+            0,
+            "rgba(110,98,255,.18)"
+        );
+
+
+        gradient.addColorStop(
+            1,
+            "rgba(110,98,255,0)"
+        );
+
+
+        ctx.fillStyle =
+            gradient;
+
+
+        ctx.beginPath();
+
+
+        ctx.moveTo(
+            points[0].x,
+            height -
+            padding.bottom
+        );
+
+
+        points.forEach(
+            point => {
+
+                ctx.lineTo(
+                    point.x,
+                    point.y
+                );
+            }
+        );
+
+
+        ctx.lineTo(
+            points[
+                points.length - 1
+            ].x,
+            height -
+            padding.bottom
+        );
+
+
+        ctx.closePath();
+
+        ctx.fill();
+    }
+
+
+    /* -----------------------------------------
+       LINE
+    ----------------------------------------- */
+
+    if (points.length) {
+
+        ctx.beginPath();
+
+
+        points.forEach(
+            (point, index) => {
+
+                if (index === 0) {
+
+                    ctx.moveTo(
+                        point.x,
+                        point.y
+                    );
+
+                } else {
+
+                    ctx.lineTo(
+                        point.x,
+                        point.y
+                    );
+                }
+            }
+        );
+
+
+        ctx.strokeStyle =
+            "#776cff";
+
+        ctx.lineWidth =
+            2;
+
+
+        ctx.stroke();
+    }
+
+
+    /* -----------------------------------------
+       POINT DOTS
+    ----------------------------------------- */
+
+    points.forEach(
+        point => {
+
+            ctx.beginPath();
+
+            ctx.arc(
+                point.x,
+                point.y,
+                3,
+                0,
+                Math.PI * 2
+            );
+
+
+            ctx.fillStyle =
+                "#8d83ff";
+
+
+            ctx.fill();
         }
     );
 
 
-    /* FINANCIAL */
+    /* -----------------------------------------
+       DATE LABELS
+    ----------------------------------------- */
 
-    setText(
-        "paidVolume",
-        money(
-            financial.paid_amount_mad
-        )
+    if (dates.length) {
+
+        const desiredLabels =
+            width < 500
+                ? 4
+                : 6;
+
+
+        const labelStep =
+            Math.max(
+                1,
+                Math.ceil(
+                    dates.length /
+                    desiredLabels
+                )
+            );
+
+
+        dates.forEach(
+            (date, index) => {
+
+                const isFirst =
+                    index === 0;
+
+                const isLast =
+                    index ===
+                    dates.length - 1;
+
+                const isStep =
+                    index %
+                    labelStep ===
+                    0;
+
+
+                if (
+                    !isFirst &&
+                    !isLast &&
+                    !isStep
+                ) {
+                    return;
+                }
+
+
+                const point =
+                    points[index];
+
+
+                if (!point) {
+                    return;
+                }
+
+
+                ctx.fillStyle =
+                    "rgba(255,255,255,.27)";
+
+
+                ctx.font =
+                    "8px Arial";
+
+
+                ctx.textAlign =
+                    "center";
+
+
+                ctx.fillText(
+                    formatShortDate(
+                        date
+                    ),
+                    point.x,
+                    height - 13
+                );
+            }
+        );
+    }
+
+
+    ctx.textAlign =
+        "left";
+}
+
+
+/* =========================================================
+   EMPTY CHART
+========================================================= */
+
+function drawEmptyChart(
+    ctx,
+    width,
+    height,
+    message
+) {
+
+    ctx.fillStyle =
+        "rgba(255,255,255,.25)";
+
+    ctx.font =
+        "11px Arial";
+
+    ctx.textAlign =
+        "center";
+
+
+    ctx.fillText(
+        message,
+        width / 2,
+        height / 2
     );
 
-    setText(
-        "platformFees",
-        money(
-            financial.platform_fees_mad
-        )
-    );
 
-    setText(
-        "workerEarnings",
-        money(
-            financial.worker_amount_mad
-        )
-    );
-
-    setText(
-        "paidTransactions",
-        number(
-            financial.paid_transactions
-        )
-    );
+    ctx.textAlign =
+        "left";
+}
 
 
-    renderTopServices(
-        data.top_services || []
-    );
+/* =========================================================
+   ORDER STATUS BREAKDOWN
+========================================================= */
+
+function renderStatusBreakdown(data) {
+
+    const container =
+        document.getElementById(
+            "statusBreakdown"
+        );
 
 
-    renderActivity(
-        data.activity || []
-    );
+    if (!container) {
+        return;
+    }
+
+
+    const items = [
+
+        {
+            key: "pending",
+            label: "Pending"
+        },
+
+        {
+            key: "accepted",
+            label: "Accepted"
+        },
+
+        {
+            key: "in_progress",
+            label: "In Progress"
+        },
+
+        {
+            key: "delivered",
+            label: "Delivered"
+        },
+
+        {
+            key: "completed",
+            label: "Completed"
+        },
+
+        {
+            key: "cancelled",
+            label: "Cancelled"
+        },
+
+        {
+            key: "rejected",
+            label: "Rejected"
+        }
+
+    ];
+
+
+    const values =
+        items.map(
+            item => ({
+                ...item,
+
+                value:
+                    Number(
+                        data[
+                            item.key
+                        ] || 0
+                    )
+            })
+        );
+
+
+    const total =
+        values.reduce(
+            (
+                sum,
+                item
+            ) =>
+                sum +
+                item.value,
+            0
+        );
+
+
+    if (total === 0) {
+
+        container.innerHTML =
+            emptyBreakdown(
+                "No orders in this period."
+            );
+
+        return;
+    }
+
+
+    container.innerHTML =
+        values
+            .map(
+                item => {
+
+                    const percentage =
+                        total > 0
+                            ? (
+                                item.value /
+                                total
+                            ) * 100
+                            : 0;
+
+
+                    return `
+                        <div class="breakdown-row">
+
+                            <div class="breakdown-top">
+
+                                <span class="breakdown-name">
+
+                                    <span
+                                        class="breakdown-dot"
+                                    ></span>
+
+                                    ${escapeHtml(
+                                        item.label
+                                    )}
+
+                                </span>
+
+                                <span class="breakdown-number">
+
+                                    ${item.value}
+
+                                </span>
+
+                            </div>
+
+
+                            <div class="breakdown-track">
+
+                                <div
+                                    class="breakdown-fill"
+                                    style="width:${percentage.toFixed(2)}%"
+                                ></div>
+
+                            </div>
+
+                        </div>
+                    `;
+                }
+            )
+            .join("");
+}
+
+
+/* =========================================================
+   PAYMENT BREAKDOWN
+========================================================= */
+
+function renderPaymentBreakdown(data) {
+
+    const container =
+        document.getElementById(
+            "paymentBreakdown"
+        );
+
+
+    if (!container) {
+        return;
+    }
+
+
+    const items = [
+
+        {
+            key: "unpaid",
+            label: "Unpaid"
+        },
+
+        {
+            key: "pending",
+            label: "Pending"
+        },
+
+        {
+            key: "paid",
+            label: "Paid"
+        },
+
+        {
+            key: "failed",
+            label: "Failed"
+        },
+
+        {
+            key: "refunded",
+            label: "Refunded"
+        }
+
+    ];
+
+
+    const values =
+        items.map(
+            item => ({
+
+                ...item,
+
+                value:
+                    Number(
+                        data[
+                            item.key
+                        ] || 0
+                    )
+
+            })
+        );
+
+
+    const total =
+        values.reduce(
+            (
+                sum,
+                item
+            ) =>
+                sum +
+                item.value,
+            0
+        );
+
+
+    if (total === 0) {
+
+        container.innerHTML =
+            emptyBreakdown(
+                "No payment data in this period."
+            );
+
+        return;
+    }
+
+
+    container.innerHTML =
+        values
+            .map(
+                item => {
+
+                    const percentage =
+                        (
+                            item.value /
+                            total
+                        ) * 100;
+
+
+                    return `
+                        <div class="breakdown-row">
+
+                            <div class="breakdown-top">
+
+                                <span class="breakdown-name">
+
+                                    <span
+                                        class="breakdown-dot"
+                                    ></span>
+
+                                    ${escapeHtml(
+                                        item.label
+                                    )}
+
+                                </span>
+
+                                <span class="breakdown-number">
+                                    ${item.value}
+                                </span>
+
+                            </div>
+
+
+                            <div class="breakdown-track">
+
+                                <div
+                                    class="breakdown-fill"
+                                    style="width:${percentage.toFixed(2)}%"
+                                ></div>
+
+                            </div>
+
+                        </div>
+                    `;
+                }
+            )
+            .join("");
 }
 
 
@@ -470,161 +1662,267 @@ function renderReports(data) {
    TOP SERVICES
 ========================================================= */
 
-function renderTopServices(
-    services
-) {
+function renderTopServices(items) {
 
     const container =
         document.getElementById(
             "topServices"
         );
 
+
     if (!container) {
         return;
     }
 
 
-    if (!services.length) {
+    if (!items.length) {
 
-        container.innerHTML = `
-            <div class="report-loading">
-                No service data available.
-            </div>
-        `;
+        container.innerHTML =
+            emptyRanking(
+                "No service data available."
+            );
 
         return;
     }
 
 
     container.innerHTML =
-        services
+        items
             .slice(0, 8)
             .map(
-                (service, index) => `
-                    <div class="service-report-row">
+                (
+                    item,
+                    index
+                ) => {
 
-                        <div class="service-rank">
-                            ${index + 1}
-                        </div>
+                    return `
+                        <div class="ranking-item">
 
-                        <div class="service-report-info">
+                            <div class="ranking-number">
+                                ${index + 1}
+                            </div>
 
-                            <span class="service-report-name">
-                                ${escapeHtml(
-                                    service.service_title ||
-                                    "Untitled service"
-                                )}
-                            </span>
 
-                            <span class="service-report-category">
-                                ${escapeHtml(
-                                    service.category ||
-                                    "Other"
-                                )}
-                            </span>
+                            <div class="ranking-info">
 
-                        </div>
+                                <span class="ranking-title">
+                                    ${escapeHtml(
+                                        item.title ||
+                                        "Untitled Service"
+                                    )}
+                                </span>
 
-                        <div class="service-report-stat">
+                                <span class="ranking-subtitle">
+                                    ${escapeHtml(
+                                        item.category ||
+                                        "Other"
+                                    )}
+                                </span>
 
-                            <span>
-                                Orders
-                            </span>
+                            </div>
 
-                            <strong>
-                                ${number(
-                                    service.order_count
-                                )}
-                            </strong>
 
-                        </div>
+                            <div class="ranking-value">
 
-                        <div class="service-report-stat">
+                                <strong>
+                                    ${Number(
+                                        item.orders ||
+                                        0
+                                    )}
+                                </strong>
 
-                            <span>
-                                Sales
-                            </span>
+                                <span>
+                                    orders
+                                </span>
 
-                            <strong>
-                                ${formatCompactMoney(
-                                    service.sales_mad
-                                )}
-                            </strong>
+                            </div>
 
                         </div>
-
-                    </div>
-                `
+                    `;
+                }
             )
             .join("");
 }
 
 
 /* =========================================================
-   ACTIVITY
+   TOP WORKERS
 ========================================================= */
 
-function renderActivity(
-    activity
-) {
+function renderTopWorkers(items) {
 
     const container =
         document.getElementById(
-            "activityList"
+            "topWorkers"
         );
+
 
     if (!container) {
         return;
     }
 
 
-    if (!activity.length) {
+    if (!items.length) {
 
-        container.innerHTML = `
-            <div class="report-loading">
-                No recent activity.
-            </div>
-        `;
+        container.innerHTML =
+            emptyRanking(
+                "No worker data available."
+            );
 
         return;
     }
 
 
     container.innerHTML =
-        activity
+        items
             .slice(0, 8)
             .map(
-                item => `
-                    <div class="activity-item">
+                (
+                    item,
+                    index
+                ) => {
 
-                        <div class="activity-icon">
-                            ${activityIcon(
-                                item.entity_type
-                            )}
-                        </div>
+                    return `
+                        <div class="ranking-item">
 
-                        <div class="activity-info">
-
-                            <div class="activity-description">
-                                ${escapeHtml(
-                                    item.description ||
-                                    item.action ||
-                                    "Activity"
-                                )}
+                            <div class="ranking-number">
+                                ${index + 1}
                             </div>
 
-                            <div class="activity-date">
-                                ${formatDate(
-                                    item.created_at
-                                )}
+
+                            <div class="ranking-info">
+
+                                <span class="ranking-title">
+                                    ${escapeHtml(
+                                        item.name ||
+                                        "Unknown Worker"
+                                    )}
+                                </span>
+
+                                <span class="ranking-subtitle">
+                                    ${escapeHtml(
+                                        item.email ||
+                                        "Worker"
+                                    )}
+                                </span>
+
+                            </div>
+
+
+                            <div class="ranking-value">
+
+                                <strong>
+                                    ${Number(
+                                        item.orders ||
+                                        0
+                                    )}
+                                </strong>
+
+                                <span>
+                                    orders
+                                </span>
+
                             </div>
 
                         </div>
-
-                    </div>
-                `
+                    `;
+                }
             )
             .join("");
+}
+
+
+/* =========================================================
+   REPORT SUMMARY
+========================================================= */
+
+function renderSummary(
+    summary,
+    users,
+    workers
+) {
+
+    const titleElement =
+        document.getElementById(
+            "summaryTitle"
+        );
+
+    const textElement =
+        document.getElementById(
+            "summaryText"
+        );
+
+
+    if (titleElement) {
+
+        titleElement.textContent =
+            currentPeriodLabel;
+    }
+
+
+    if (!textElement) {
+        return;
+    }
+
+
+    const totalOrders =
+        Number(
+            summary.total_orders || 0
+        );
+
+
+    const completedOrders =
+        Number(
+            summary.completed_orders || 0
+        );
+
+
+    const grossSales =
+        Number(
+            summary.gross_sales_mad || 0
+        );
+
+
+    const platformFees =
+        Number(
+            summary.platform_fees_mad || 0
+        );
+
+
+    const newUsers =
+        Number(
+            users.new_users || 0
+        );
+
+
+    const newWorkers =
+        Number(
+            workers.new_workers || 0
+        );
+
+
+    const completionRate =
+        totalOrders > 0
+            ? Math.round(
+                (
+                    completedOrders /
+                    totalOrders
+                ) * 100
+            )
+            : 0;
+
+
+    if (totalOrders === 0) {
+
+        textElement.textContent =
+            `There is no order activity for ${currentPeriodLabel.toLowerCase()}. The platform recorded ${newUsers} new users and ${newWorkers} new workers during this period.`;
+
+        return;
+    }
+
+
+    textElement.textContent =
+        `During ${currentPeriodLabel.toLowerCase()}, NOVA MARKET recorded ${totalOrders} orders and ${money(grossSales)} MAD in paid gross sales. Platform fees were ${money(platformFees)} MAD. ${completedOrders} orders were completed, representing a ${completionRate}% completion ratio. The platform added ${newUsers} new users and ${newWorkers} new workers during the selected period.`;
 }
 
 
@@ -634,23 +1932,96 @@ function renderActivity(
 
 function setupEvents() {
 
+
+    /* -----------------------------------------
+       PERIOD BUTTONS
+    ----------------------------------------- */
+
     document
-        .getElementById(
-            "periodFilter"
+        .querySelectorAll(
+            ".period-btn"
         )
-        ?.addEventListener(
-            "change",
-            async () => {
+        .forEach(
+            button => {
 
-                const client =
-                    window.supabaseClient;
+                button.addEventListener(
+                    "click",
+                    async () => {
 
-                if (client) {
-                    await loadReports(client);
-                }
+                        if (
+                            button.dataset.custom ===
+                            "true"
+                        ) {
+
+                            document
+                                .querySelectorAll(
+                                    ".period-btn"
+                                )
+                                .forEach(
+                                    item =>
+                                        item.classList.remove(
+                                            "active"
+                                        )
+                                );
+
+
+                            button.classList.add(
+                                "active"
+                            );
+
+
+                            openCustomPeriod();
+
+                            return;
+                        }
+
+
+                        const days =
+                            Number(
+                                button.dataset.days
+                            );
+
+
+                        if (
+                            !Number.isFinite(
+                                days
+                            )
+                        ) {
+                            return;
+                        }
+
+
+                        setDefaultPeriod(
+                            days
+                        );
+
+
+                        await loadReport(
+                            window.supabaseClient
+                        );
+                    }
+                );
             }
         );
 
+
+    /* -----------------------------------------
+       CUSTOM DATE
+    ----------------------------------------- */
+
+    document
+        .getElementById(
+            "applyDateBtn"
+        )
+        ?.addEventListener(
+            "click",
+            applyCustomPeriod
+        );
+
+
+    /* -----------------------------------------
+       REFRESH TOPBAR
+    ----------------------------------------- */
 
     document
         .getElementById(
@@ -658,17 +2029,17 @@ function setupEvents() {
         )
         ?.addEventListener(
             "click",
-            async () => {
+            () => {
 
-                const client =
-                    window.supabaseClient;
+                window.location.reload();
 
-                if (client) {
-                    await loadReports(client);
-                }
             }
         );
 
+
+    /* -----------------------------------------
+       REFRESH REPORT
+    ----------------------------------------- */
 
     document
         .getElementById(
@@ -678,15 +2049,31 @@ function setupEvents() {
             "click",
             async () => {
 
-                const client =
-                    window.supabaseClient;
+                await loadReport(
+                    window.supabaseClient
+                );
 
-                if (client) {
-                    await loadReports(client);
-                }
             }
         );
 
+
+    /* -----------------------------------------
+       EXPORT
+    ----------------------------------------- */
+
+    document
+        .getElementById(
+            "exportBtn"
+        )
+        ?.addEventListener(
+            "click",
+            exportReportCSV
+        );
+
+
+    /* -----------------------------------------
+       LOGOUT
+    ----------------------------------------- */
 
     document
         .getElementById(
@@ -696,6 +2083,149 @@ function setupEvents() {
             "click",
             logoutAdmin
         );
+
+
+    /* -----------------------------------------
+       RESIZE
+    ----------------------------------------- */
+
+    window.addEventListener(
+        "resize",
+        debounce(
+            () => {
+
+                if (!reportData) {
+                    return;
+                }
+
+
+                drawOrdersChart(
+                    reportData.timeline
+                );
+
+
+                drawSalesChart(
+                    reportData.timeline
+                );
+
+            },
+            150
+        )
+    );
+}
+
+
+/* =========================================================
+   EXPORT CSV
+========================================================= */
+
+function exportReportCSV() {
+
+    if (
+        !reportData ||
+        !reportData.timeline.length
+    ) {
+
+        showAlert(
+            "There is no timeline data to export.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    const rows = [
+
+        [
+            "Date",
+            "Orders",
+            "Sales MAD"
+        ]
+
+    ];
+
+
+    reportData.timeline.forEach(
+        item => {
+
+            rows.push([
+                item.date || "",
+                Number(
+                    item.orders || 0
+                ),
+                Number(
+                    item.sales_mad || 0
+                )
+            ]);
+
+        }
+    );
+
+
+    const csv =
+        rows
+            .map(
+                row =>
+                    row
+                        .map(
+                            csvCell
+                        )
+                        .join(",")
+            )
+            .join("\n");
+
+
+    const blob =
+        new Blob(
+            [csv],
+            {
+                type:
+                    "text/csv;charset=utf-8;"
+            }
+        );
+
+
+    const url =
+        URL.createObjectURL(
+            blob
+        );
+
+
+    const link =
+        document.createElement(
+            "a"
+        );
+
+
+    link.href =
+        url;
+
+
+    link.download =
+        `nova-report-${currentStartDate}-to-${currentEndDate}.csv`;
+
+
+    document.body.appendChild(
+        link
+    );
+
+
+    link.click();
+
+
+    link.remove();
+
+
+    URL.revokeObjectURL(
+        url
+    );
+
+
+    showAlert(
+        "Report exported successfully.",
+        "success"
+    );
 }
 
 
@@ -710,15 +2240,18 @@ function setupSidebar() {
             "adminLayout"
         );
 
+
     const toggle =
         document.getElementById(
             "sidebarToggle"
         );
 
+
     const close =
         document.getElementById(
             "sidebarClose"
         );
+
 
     const overlay =
         document.getElementById(
@@ -728,31 +2261,28 @@ function setupSidebar() {
 
     toggle?.addEventListener(
         "click",
-        () => {
+        () =>
             layout?.classList.add(
                 "sidebar-open"
-            );
-        }
+            )
     );
 
 
     close?.addEventListener(
         "click",
-        () => {
+        () =>
             layout?.classList.remove(
                 "sidebar-open"
-            );
-        }
+            )
     );
 
 
     overlay?.addEventListener(
         "click",
-        () => {
+        () =>
             layout?.classList.remove(
                 "sidebar-open"
-            );
-        }
+            )
     );
 }
 
@@ -768,9 +2298,19 @@ async function logoutAdmin() {
         const client =
             window.supabaseClient;
 
+
         if (client) {
+
             await client.auth.signOut();
+
         }
+
+    } catch (error) {
+
+        console.error(
+            "Logout error:",
+            error
+        );
 
     } finally {
 
@@ -781,59 +2321,230 @@ async function logoutAdmin() {
 
 
 /* =========================================================
-   HELPERS
+   LOADING
 ========================================================= */
 
 function setReportLoading(
     loading
 ) {
 
-    const loadingElements =
+    const buttons =
         document.querySelectorAll(
-            ".report-loading"
+            ".period-btn, .report-btn"
         );
 
-    if (!loading) {
-        return;
+
+    buttons.forEach(
+        button => {
+
+            button.disabled =
+                loading;
+        }
+    );
+
+
+    if (loading) {
+
+        setText(
+            "grossSales",
+            "Loading..."
+        );
+
+        setText(
+            "platformFees",
+            "Loading..."
+        );
+
+        setText(
+            "totalOrders",
+            "..."
+        );
+
+    }
+}
+
+
+/* =========================================================
+   EMPTY BREAKDOWN
+========================================================= */
+
+function emptyBreakdown(
+    message
+) {
+
+    return `
+        <div
+            style="
+                min-height:150px;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                text-align:center;
+                color:rgba(255,255,255,.30);
+                font-size:10px;
+            "
+        >
+            ${escapeHtml(message)}
+        </div>
+    `;
+}
+
+
+/* =========================================================
+   EMPTY RANKING
+========================================================= */
+
+function emptyRanking(
+    message
+) {
+
+    return `
+        <div
+            style="
+                min-height:160px;
+                display:flex;
+                flex-direction:column;
+                align-items:center;
+                justify-content:center;
+                gap:7px;
+                text-align:center;
+                color:rgba(255,255,255,.28);
+                font-size:10px;
+            "
+        >
+
+            <div
+                style="
+                    font-size:26px;
+                    opacity:.25;
+                "
+            >
+                ◌
+            </div>
+
+            <strong
+                style="
+                    color:rgba(255,255,255,.45);
+                    font-size:10px;
+                "
+            >
+                ${escapeHtml(message)}
+            </strong>
+
+        </div>
+    `;
+}
+
+
+/* =========================================================
+   DATE HELPERS
+========================================================= */
+
+function formatInputDate(
+    date
+) {
+
+    const year =
+        date.getFullYear();
+
+
+    const month =
+        String(
+            date.getMonth() + 1
+        ).padStart(
+            2,
+            "0"
+        );
+
+
+    const day =
+        String(
+            date.getDate()
+        ).padStart(
+            2,
+            "0"
+        );
+
+
+    return `${year}-${month}-${day}`;
+}
+
+
+function formatReadableDate(
+    value
+) {
+
+    const date =
+        new Date(
+            `${value}T00:00:00`
+        );
+
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return value;
     }
 
-    loadingElements.forEach(
-        element => {
-            element.style.display =
-                "block";
+
+    return date.toLocaleDateString(
+        undefined,
+        {
+            day: "2-digit",
+            month: "short",
+            year: "numeric"
         }
     );
 }
 
 
-function setText(
-    id,
+function formatShortDate(
     value
 ) {
 
-    const element =
-        document.getElementById(id);
-
-    if (element) {
-        element.textContent =
-            String(value);
+    if (!value) {
+        return "";
     }
-}
 
 
-function number(value) {
+    const date =
+        new Date(
+            `${value}T00:00:00`
+        );
 
-    return Number(
-        value || 0
-    ).toLocaleString(
-        "en-US"
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return "";
+    }
+
+
+    return date.toLocaleDateString(
+        undefined,
+        {
+            day: "2-digit",
+            month: "short"
+        }
     );
 }
 
 
-function money(value) {
+/* =========================================================
+   NUMBER HELPERS
+========================================================= */
 
-    return `${Number(
+function money(
+    value
+) {
+
+    return Number(
         value || 0
     ).toLocaleString(
         "en-US",
@@ -841,106 +2552,95 @@ function money(value) {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
         }
-    )} MAD`;
-}
-
-
-function formatCompactMoney(value) {
-
-    const amount =
-        Number(value || 0);
-
-    if (amount >= 1000000) {
-        return (
-            (amount / 1000000)
-                .toFixed(1)
-                .replace(".0", "")
-            + "M MAD"
-        );
-    }
-
-    if (amount >= 1000) {
-        return (
-            (amount / 1000)
-                .toFixed(1)
-                .replace(".0", "")
-            + "K MAD"
-        );
-    }
-
-    return (
-        amount
-            .toFixed(0)
-        + " MAD"
     );
 }
 
 
-function formatDate(
+function formatCompactMoney(
     value
 ) {
 
-    if (!value) {
-        return "—";
+    const amount =
+        Number(
+            value || 0
+        );
+
+
+    if (amount >= 1000000) {
+
+        return (
+            amount /
+            1000000
+        ).toFixed(1) + "M";
     }
 
-    const date =
-        new Date(value);
 
-    if (
-        Number.isNaN(
-            date.getTime()
-        )
-    ) {
-        return "—";
+    if (amount >= 1000) {
+
+        return (
+            amount /
+            1000
+        ).toFixed(1) + "K";
     }
 
-    return date.toLocaleString(
-        "en-US",
-        {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit"
-        }
-    );
+
+    return Math.round(
+        amount
+    ).toString();
 }
 
 
-function activityIcon(
-    type
+/* =========================================================
+   DOM HELPERS
+========================================================= */
+
+function setText(
+    id,
+    value
 ) {
 
-    switch (
-        String(type || "").toLowerCase()
-    ) {
+    const element =
+        document.getElementById(
+            id
+        );
 
-        case "orders":
-            return "▣";
 
-        case "services":
-            return "◇";
+    if (element) {
 
-        case "profiles":
-            return "♙";
-
-        case "support":
-        case "support_tickets":
-            return "◌";
-
-        case "payments":
-            return "$";
-
-        default:
-            return "•";
+        element.textContent =
+            String(value);
     }
 }
 
+
+/* =========================================================
+   CSV
+========================================================= */
+
+function csvCell(
+    value
+) {
+
+    const text =
+        String(
+            value ?? ""
+        );
+
+
+    return `"${text.replaceAll(
+        '"',
+        '""'
+    )}"`;
+}
+
+
+/* =========================================================
+   ALERT
+========================================================= */
 
 function showAlert(
     message,
-    type = "error"
+    type = "success"
 ) {
 
     const alert =
@@ -948,33 +2648,48 @@ function showAlert(
             "reportsAlert"
         );
 
+
     if (!alert) {
         return;
     }
 
-    alert.hidden = false;
+
+    alert.hidden =
+        false;
+
 
     alert.className =
         `reports-alert ${type}`;
 
+
     alert.textContent =
         message;
+
 
     clearTimeout(
         window.novaReportsAlertTimer
     );
 
+
     window.novaReportsAlertTimer =
         setTimeout(
             () => {
+
                 alert.hidden = true;
+
             },
-            5000
+            4500
         );
 }
 
 
-function escapeHtml(value) {
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
+
+function escapeHtml(
+    value
+) {
 
     return String(
         value ?? ""
@@ -999,4 +2714,38 @@ function escapeHtml(value) {
             "'",
             "&#039;"
         );
+}
+
+
+/* =========================================================
+   DEBOUNCE
+========================================================= */
+
+function debounce(
+    callback,
+    wait
+) {
+
+    let timeout = null;
+
+
+    return function (...args) {
+
+        clearTimeout(
+            timeout
+        );
+
+
+        timeout =
+            setTimeout(
+                () => {
+
+                    callback(
+                        ...args
+                    );
+
+                },
+                wait
+            );
+    };
 }
