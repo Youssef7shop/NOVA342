@@ -145,6 +145,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     let selectedTicket = null;
 
+    /*
+     * Order linked from:
+     * dashboard/support.html?order=UUID
+     */
+    let linkedOrderId = null;
+
 
     /* =====================================================
        HELPERS
@@ -161,10 +167,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
 
-    function getInitial(
-        name,
-        email
-    ) {
+    function getInitial(name, email) {
 
         const text =
             String(
@@ -242,6 +245,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
 
+    function isValidUUID(value) {
+
+        return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+            .test(String(value || ""));
+    }
+
+
     function showToast(message) {
 
         const toast =
@@ -306,6 +316,80 @@ document.addEventListener("DOMContentLoaded", async () => {
         errorMessage.textContent =
             message ||
             "Something went wrong.";
+    }
+
+
+    /*
+     * Read order UUID from URL
+     */
+    function readLinkedOrder() {
+
+        const params =
+            new URLSearchParams(
+                window.location.search
+            );
+
+        const order =
+            params.get("order");
+
+        if (!order) {
+            linkedOrderId = null;
+            return;
+        }
+
+        if (!isValidUUID(order)) {
+
+            console.warn(
+                "NOVA: Invalid order UUID:",
+                order
+            );
+
+            linkedOrderId = null;
+
+            return;
+        }
+
+        linkedOrderId =
+            order;
+    }
+
+
+    /*
+     * Remove ?order=... after ticket creation
+     * so a second new ticket isn't linked
+     * to the same order accidentally.
+     */
+    function clearLinkedOrderFromUrl() {
+
+        try {
+
+            const url =
+                new URL(
+                    window.location.href
+                );
+
+            url.searchParams.delete(
+                "order"
+            );
+
+            window.history.replaceState(
+                {},
+                document.title,
+                url.pathname +
+                (
+                    url.search
+                        ? url.search
+                        : ""
+                )
+            );
+
+        } catch (error) {
+
+            console.warn(
+                "NOVA: Could not clean support URL:",
+                error
+            );
+        }
     }
 
 
@@ -555,6 +639,22 @@ document.addEventListener("DOMContentLoaded", async () => {
                             ).toLowerCase();
 
 
+                        const orderHtml =
+                            ticket.order_id
+                                ? `
+                                    <span
+                                        class="ticket-category"
+                                    >
+                                        Order #${escapeHtml(
+                                            shortId(
+                                                ticket.order_id
+                                            )
+                                        )}
+                                    </span>
+                                `
+                                : "";
+
+
                         return `
                             <article
                                 class="ticket-row"
@@ -590,6 +690,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                                             "General"
                                         )}
                                     </span>
+
+                                    ${orderHtml}
 
                                 </div>
 
@@ -697,17 +799,42 @@ document.addEventListener("DOMContentLoaded", async () => {
         ticketForm.reset();
 
         ticketCategory.value =
-            "General";
+            linkedOrderId
+                ? "Order"
+                : "General";
 
         ticketPriority.value =
             "normal";
+
+
+        /*
+         * When opening support from an Order
+         * automatically prepare the subject.
+         */
+        if (linkedOrderId) {
+
+            ticketSubject.value =
+                `Support request for Order #${shortId(
+                    linkedOrderId
+                )}`;
+
+            showToast(
+                `This ticket will be linked to Order #${shortId(
+                    linkedOrderId
+                )}.`
+            );
+        }
+
 
         ticketModal.classList.remove(
             "hidden"
         );
 
+
         setTimeout(() => {
+
             ticketSubject?.focus();
+
         }, 50);
     }
 
@@ -720,9 +847,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
 
-    async function createTicket(
-        event
-    ) {
+    async function createTicket(event) {
 
         event.preventDefault();
 
@@ -765,25 +890,38 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         try {
 
+            const rpcPayload = {
+
+                p_subject:
+                    subject,
+
+                p_category:
+                    category,
+
+                p_priority:
+                    priority,
+
+                p_message:
+                    message,
+
+                p_order_id:
+                    linkedOrderId || null
+            };
+
+
+            console.log(
+                "NOVA: creating support ticket:",
+                rpcPayload
+            );
+
+
             const {
                 data,
                 error
             } =
                 await supabaseClient.rpc(
                     "create_support_ticket",
-                    {
-                        p_subject:
-                            subject,
-
-                        p_category:
-                            category,
-
-                        p_priority:
-                            priority,
-
-                        p_message:
-                            message
-                    }
+                    rpcPayload
                 );
 
 
@@ -796,15 +934,33 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
             showToast(
-                "Support ticket created."
+                linkedOrderId
+                    ? "Support ticket created and linked to the order."
+                    : "Support ticket created."
             );
 
 
-            await loadTickets();
-
-
+            /*
+             * Save ticket ID before clearing
+             * the linked order from URL.
+             */
             const ticketId =
                 data?.ticket_id;
+
+
+            /*
+             * Prevent another newly-created
+             * ticket from using the same order.
+             */
+            if (linkedOrderId) {
+
+                linkedOrderId = null;
+
+                clearLinkedOrderFromUrl();
+            }
+
+
+            await loadTickets();
 
 
             if (ticketId) {
@@ -843,9 +999,7 @@ document.addEventListener("DOMContentLoaded", async () => {
        OPEN TICKET
     ===================================================== */
 
-    async function openTicket(
-        ticketId
-    ) {
+    async function openTicket(ticketId) {
 
         if (!ticketId) {
             return;
@@ -910,10 +1064,18 @@ document.addEventListener("DOMContentLoaded", async () => {
                 selectedTicket.subject;
 
 
+            const orderPart =
+                selectedTicket.order_id
+                    ? ` • Order #${shortId(
+                        selectedTicket.order_id
+                    )}`
+                    : "";
+
+
             detailsMeta.textContent =
                 `#${shortId(
                     selectedTicket.id
-                )} • ${selectedTicket.category || "General"} • Created ${formatDate(
+                )} • ${selectedTicket.category || "General"}${orderPart} • Created ${formatDate(
                     selectedTicket.created_at
                 )}`;
 
@@ -949,9 +1111,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
 
-    function renderDetailsStatus(
-        status
-    ) {
+    function renderDetailsStatus(status) {
 
         const safe =
             String(
@@ -1008,9 +1168,7 @@ document.addEventListener("DOMContentLoaded", async () => {
        LOAD MESSAGES
     ===================================================== */
 
-    async function loadMessages(
-        ticketId
-    ) {
+    async function loadMessages(ticketId) {
 
         const {
             data,
@@ -1125,9 +1283,7 @@ document.addEventListener("DOMContentLoaded", async () => {
        REPLY
     ===================================================== */
 
-    async function sendReply(
-        event
-    ) {
+    async function sendReply(event) {
 
         event.preventDefault();
 
@@ -1190,6 +1346,33 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
             await loadTickets();
+
+
+            /*
+             * Reload selected ticket so
+             * status changes are reflected.
+             */
+            const {
+                data: refreshedTicket
+            } =
+                await supabaseClient.rpc(
+                    "get_my_support_ticket",
+                    {
+                        p_ticket_id:
+                            selectedTicket.id
+                    }
+                );
+
+
+            if (refreshedTicket) {
+
+                selectedTicket =
+                    Array.isArray(
+                        refreshedTicket
+                    )
+                        ? refreshedTicket[0]
+                        : refreshedTicket;
+            }
 
 
             showToast(
@@ -1317,6 +1500,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
 
 
+            readLinkedOrder();
+
+
             currentUser =
                 await getCurrentUser();
 
@@ -1336,6 +1522,24 @@ document.addEventListener("DOMContentLoaded", async () => {
             await loadTickets();
 
             showContent();
+
+
+            /*
+             * When Contact Support is opened
+             * from Order Details:
+             *
+             * support.html?order=UUID
+             *
+             * automatically open the ticket modal.
+             */
+            if (linkedOrderId) {
+
+                setTimeout(() => {
+
+                    openTicketModal();
+
+                }, 250);
+            }
 
 
         } catch (error) {

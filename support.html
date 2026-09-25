@@ -12,7 +12,7 @@
 
     <link
         rel="stylesheet"
-        href="../css/support.css?v=1"
+        href="../css/support.css?v=2"
     >
 </head>
 
@@ -20,7 +20,9 @@
 
 <div class="dashboard-app">
 
-    <!-- SIDEBAR -->
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
     <aside
         class="sidebar"
         id="sidebar"
@@ -121,6 +123,7 @@
                 <div class="guard-dot"></div>
 
                 <div>
+
                     <strong>
                         NOVA Guard
                     </strong>
@@ -128,6 +131,7 @@
                     <span>
                         System Protected
                     </span>
+
                 </div>
 
             </div>
@@ -139,9 +143,11 @@
                 class="logout-btn"
             >
                 ⇥
+
                 <span>
                     Logout
                 </span>
+
             </button>
 
         </div>
@@ -149,7 +155,9 @@
     </aside>
 
 
-    <!-- MAIN -->
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
     <main class="main-content">
 
         <!-- TOPBAR -->
@@ -206,7 +214,9 @@
         </header>
 
 
-        <!-- PAGE -->
+        <!-- =================================================
+             PAGE CONTENT
+        ================================================== -->
         <section class="page-content">
 
             <!-- LOADING -->
@@ -263,7 +273,48 @@
                 class="hidden"
             >
 
-                <!-- HERO -->
+                <!-- =================================================
+                     ORDER LINKED BANNER
+                ================================================== -->
+                <section
+                    id="linkedOrderBanner"
+                    class="linked-order-banner hidden"
+                >
+
+                    <div class="linked-order-icon">
+                        📦
+                    </div>
+
+                    <div class="linked-order-content">
+
+                        <span>
+                            ORDER SUPPORT
+                        </span>
+
+                        <strong>
+                            Support request for your order
+                        </strong>
+
+                        <p>
+                            This support ticket will be linked
+                            directly to your order.
+                        </p>
+
+                    </div>
+
+                    <div
+                        id="linkedOrderNumber"
+                        class="linked-order-number"
+                    >
+                        Order #—
+                    </div>
+
+                </section>
+
+
+                <!-- =================================================
+                     HERO
+                ================================================== -->
                 <section class="support-hero">
 
                     <div class="hero-main">
@@ -290,14 +341,21 @@
                         id="newTicketBtn"
                         class="new-ticket-btn"
                     >
-                        <span>＋</span>
+
+                        <span>
+                            ＋
+                        </span>
+
                         New Ticket
+
                     </button>
 
                 </section>
 
 
-                <!-- STATS -->
+                <!-- =================================================
+                     STATS
+                ================================================== -->
                 <section class="support-stats">
 
                     <article class="support-stat">
@@ -307,6 +365,7 @@
                         </div>
 
                         <div>
+
                             <span>
                                 TOTAL TICKETS
                             </span>
@@ -314,6 +373,7 @@
                             <strong id="totalTickets">
                                 0
                             </strong>
+
                         </div>
 
                     </article>
@@ -326,6 +386,7 @@
                         </div>
 
                         <div>
+
                             <span>
                                 OPEN
                             </span>
@@ -333,6 +394,7 @@
                             <strong id="openTickets">
                                 0
                             </strong>
+
                         </div>
 
                     </article>
@@ -345,6 +407,7 @@
                         </div>
 
                         <div>
+
                             <span>
                                 IN PROGRESS
                             </span>
@@ -352,6 +415,7 @@
                             <strong id="progressTickets">
                                 0
                             </strong>
+
                         </div>
 
                     </article>
@@ -364,6 +428,7 @@
                         </div>
 
                         <div>
+
                             <span>
                                 RESOLVED
                             </span>
@@ -371,6 +436,7 @@
                             <strong id="resolvedTickets">
                                 0
                             </strong>
+
                         </div>
 
                     </article>
@@ -378,7 +444,9 @@
                 </section>
 
 
-                <!-- TICKETS -->
+                <!-- =================================================
+                     TICKETS
+                ================================================== -->
                 <section class="tickets-panel">
 
                     <div class="panel-header">
@@ -451,7 +519,9 @@
 </div>
 
 
-<!-- NEW TICKET MODAL -->
+<!-- =========================================================
+     NEW TICKET MODAL
+========================================================= -->
 <div
     id="ticketModal"
     class="modal-backdrop hidden"
@@ -463,6 +533,7 @@
             type="button"
             id="closeTicketModal"
             class="modal-close"
+            aria-label="Close"
         >
             ×
         </button>
@@ -481,6 +552,31 @@
             <p>
                 Tell us what you need help with.
             </p>
+
+        </div>
+
+
+        <!-- LINKED ORDER INSIDE MODAL -->
+        <div
+            id="modalLinkedOrder"
+            class="modal-linked-order hidden"
+        >
+
+            <div class="modal-linked-order-icon">
+                📦
+            </div>
+
+            <div>
+
+                <span>
+                    LINKED ORDER
+                </span>
+
+                <strong id="modalLinkedOrderNumber">
+                    Order #—
+                </strong>
+
+            </div>
 
         </div>
 
@@ -603,6 +699,7 @@
                     Cancel
                 </button>
 
+
                 <button
                     type="submit"
                     id="submitTicketBtn"
@@ -620,7 +717,9 @@
 </div>
 
 
-<!-- TICKET DETAILS MODAL -->
+<!-- =========================================================
+     TICKET DETAILS MODAL
+========================================================= -->
 <div
     id="detailsModal"
     class="modal-backdrop hidden"
@@ -632,6 +731,7 @@
             type="button"
             id="closeDetailsModal"
             class="modal-close"
+            aria-label="Close"
         >
             ×
         </button>
@@ -658,12 +758,37 @@
 
             </div>
 
+
             <span
                 id="detailsStatus"
                 class="ticket-status"
             >
                 OPEN
             </span>
+
+        </div>
+
+
+        <!-- ORDER INFO IN DETAILS -->
+        <div
+            id="detailsOrder"
+            class="details-order hidden"
+        >
+
+            <span>
+                ORDER
+            </span>
+
+            <strong id="detailsOrderNumber">
+                #—
+            </strong>
+
+            <a
+                id="detailsOrderLink"
+                href="#"
+            >
+                View Order
+            </a>
 
         </div>
 
@@ -695,6 +820,7 @@
                     Support conversation
                 </span>
 
+
                 <button
                     type="submit"
                     id="sendReplyBtn"
@@ -725,18 +851,30 @@
 </div>
 
 
-<!-- TOAST -->
+<!-- =========================================================
+     TOAST
+========================================================= -->
 <div
     id="toast"
     class="toast"
 ></div>
 
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- =========================================================
+     SCRIPTS
+========================================================= -->
 
-<script src="../js/supabase-config.js?v=21"></script>
+<script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+></script>
 
-<script src="../js/support.js?v=1"></script>
+<script
+    src="../js/supabase-config.js?v=22"
+></script>
+
+<script
+    src="../js/support.js?v=2"
+></script>
 
 </body>
 </html>
